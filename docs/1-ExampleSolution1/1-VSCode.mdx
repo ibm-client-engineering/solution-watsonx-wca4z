@@ -1,0 +1,40 @@
+---
+id: vscode
+sidebar_position: 1
+title: VSCode
+custom_edit_url: null
+---
+
+# VSCode Configuration
+
+- Instructions followed: https://ibm.ent.box.com/s/3e4jshd4pdqcmkp231ug1dkedaiuc1ki
+- This has to be done before initiating the demo
+- Environment: Ubuntu 22.04 on WSL2
+- Install IBM Semeru 21.0.1.0
+	- https://developer.ibm.com/languages/java/semeru-runtimes/downloads/
+- Install JDK from tar.gz (https://gist.github.com/filipelenfers/ef3f593deb0751944bb54b744bcac074)
+	- Had to remove all the other java from Ubuntu first
+- Configure JVM in VSCode
+    - Open VS Code
+    - Ctrl+Shift+p
+	- Preferences: Open Settings (UI)
+    - Enter/search for: java.configuration
+	- Installed JDKs
+	- Click "Java > Configuration: Runtimes"
+    - "Edit in settings.json"
+    -  "java.jdt.ls.java.home": "/opt/jdk-21.0.1+12",
+- Install IBM Z Open Editor extension
+- Set JAVA_HOME on extension settings
+- Restart VSCode
+- Install language support for Java extension (already done)
+- While enabling WCAz, the `enter API key` didn't prompt as shown in the instructions, use `Ctrl+Shift+p` menu and search for API key and continue
+
+## Troubleshooting
+
+- Problem: After IBM Z Open Editor extension installed, error shown on startup
+```
+Error: Failed to load Keytar module: libsecret-1.so.0: cannot open shared object file: No such file or directory ProfInfoErr: Failed to initialize secure credential manager   Source: Zowe Explorer (Extension)
+```
+- Resolution: Install libsecret libraries on Ubuntu and restart VSCode
+	- `sudo apt install libsecret-1-dev`
+	- restart VSCode
