@@ -89,6 +89,62 @@ This command decodes and decrypts your password, which is automatically generate
     
 You can also use the API to get the encrypted password, which returns the decoded and decrypted password. For more information, see [Retrieve configuration that is used to initialize the instance API](https://cloud.ibm.com/apidocs/vpc/latest#retrieve-configuration-used-to-initialize-the-inst).
 
+The output of the above command should return something like this:
+```tsx
+Getting instance initialization values for wca4z-addi under account Fred Whipple's Account as user kramerro@us.ibm.com...
 
+Keys                 ID                                          Name            Fingerprint
+                     r014-48416b92-2235-48ff-aea7-034e5a38e8a5   win-key-wca4z   SHA256:rUix46/y3Qol46dnznusfaq4dRV/RlMrGsjEvLNWoDw
+
+Encrypted password   I/AbavM1cYL1g0omTPzNlpIIIR3zwQKYmEmAe2DFb72Bs+HmqUy+h0C8c3bD/fV1LyUGoCWqJqnngz7+SlVddzFLunVtvM1X30qUgBCzuJfvJo6IpyNFc5YFoWZxMojWKp1e71ezzILTD10Z6MPNtdCwL2syYag+vNPexgHwc4eJwlqnhUTdFD3i0FPYOzSiReKxw1m4QpwXTd/EyecvDbrSAXnIjYyyMlJsv/dmZrLhynEjUBwn39RTqD2Da9Mjyi7hyrzKZqkKP3barnwPRFd8xQI21gA0Lm3mgC7PJzmA5Z8KqGQV3IPlFE909HRQeHpB5DN8nS4KsNGKPRVl/pF3XAA9BRoMKoOMV1d4mOXGU2b5QU1+IKpZU7ObCKhqLw+U3Dm1sPYW5IgujZd725uhqwwIBZukMQE2RSYRij0ef5mhv9gt/f/zrNWTaZVjgQqA3ufL4dIdu/W8mZf2puxKCYvhIwolA13Y09BeTLRBCK9/8LOx0e8WjmDg9lx49Fv5AwgaUi2tpLWjBf4Xgt8b6ddIo0Lgy8sc4KdsdQ/8Jtugblp/zfEzxJl6WqpD6+3UOSLQi9dKtproL9tI3CDkk2WLhV02m+vG6imrVMZpCGsgdlLEWqwCXKNIvaGmCKG0TTm7QT8BqiqxTwUPvQCLcIEGf4yWVsEbYGvR+zQ=
+Encryption key CRN   SHA256:rUix46/y3Qol46dnznusfaq4dRV/RlMrGsjEvLNWoDw
+Password             <UNENCRYPTED PASSWORD>
+```
+
+Once you have obtained the password from the above command, make sure you have associated a floating public IP for the ADDI host so it is accessible:
+
+```tsx
+ibmcloud is floating-ip-reserve <FLOATING_IP_NAME> --nic <NIC>
+```
+
+You now have what you need to connect to your Windows instance: a decrypted password and a floating IP address. Use your preferred Remote Desktop client to connect to your instance. To connect to your instance, provide the floating IP address and the decrypted password. The username is `Administrator` by default. If you're connecting from a client that is running the Windows Administrator account, use `.\administrator` as the user ID to log on to RDP.
+
+### Configure the data disk
+
+Open the server manager on the ADDI host and select the 300 gig disk:
+
+![server_manager](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/9341ebae-dfac-40d2-ac5c-c79a317b9339)
+
+Start up the New Volume Wizard
+
+![volume_wizard1](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/86305a77-8975-46f9-9b69-8c1d25bc7185)
+
+![volume_wizard2](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/5df74072-7ae5-4248-a5f5-a79371e51093)
+
+![volume_wizard3](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/0de541f6-b795-475d-93ce-7a94ccedb6fc)
+
+Make it Drive D. This will be our storage for the ADDI Data.
+
+![volume_wizard4](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/b32f31ca-b7c8-4a4b-a65b-550835abdc32)
+
+We'll call our volume label `AD Data`
+
+![volume_wizard5](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/ed2f78aa-38cf-4acc-9f10-2156954dbad6)
+
+Confirm and Create
+
+### Installing Microsoft SQL Server
+
+As of this writing, the following versions of MS SQL Server are compatible with ADDI:
+
+- Microsoft SQL Server 2014/2016/2017/2019/2022 (Express/Standard/Developer)
+
+For our examples, we will be using the Express edition of 2019.
+
+On your ADDI host, open the Edge browser and download the [installer](https://download.microsoft.com/download/7/f/8/7f8a9c43-8c8a-4f7c-9f92-83c18d96b681/SQL2019-SSEI-Expr.exe)
+
+Locate the SQL Server installer we downloaded
+
+![sql_install1](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/750b7cf7-bf7b-4c15-b47f-6303517a0e4b)
 
 
