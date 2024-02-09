@@ -1,0 +1,94 @@
+---
+id: Pre-Requisites
+sidebar_position: 1
+title: Pre-Requisites
+custom_edit_url: null
+---
+
+:::note
+This guide assumes you have an IBM Cloud account that is accessible. It also assumes you have the `ibmcloud` cli installed and configured. The installation of `ibmcloud` cli can be found [here](https://cloud.ibm.com/docs/cli?topic=cli-install-ibmcloud-cli). 
+
+Mileage may vary on different cloud providers.
+:::
+
+## Pre-Requisites
+
+- Watsonx Code Assistant instance deployed in IBM Cloud
+- IBM® Application Discovery and Delivery Intelligence (ADDI)
+- IBM Application Discovery Connect for Mainframe (IBM AD Connect for Mainframe)
+
+## Hardware
+
+For this build, we will be deploying Virtual Server Instances into IBM Cloud. They require the following:
+
+ADDI Host
+- OS: Windows 10 or 11 
+- RAM: 32 Gigs
+- Storage: 100G for local, 300G for AD components
+- Cores: 8
+
+Refactor Host
+- OS: Red Hat Enterprise Linux 8x/9x
+- RAM: 16G
+- Storage: 100G for local, 400G for data
+- Cores: 4
+
+## Software to be installed
+
+ADDI Host
+- ADDI
+- Microsoft SQL Server (standard, express, or developer editions)
+- VSCode
+
+Refactoring Assistant
+- Podman
+- Refactor Containers
+
+## ADDI Host
+
+### Creating the instance in IBM Cloud
+
+Install the ibmcloud plugin for infrastructure service
+
+_note to RK: Add the cli commands to create the instance here_
+
+### Accessing the instance in IBM Cloud
+
+```tsx
+ibmcloud plugin install infrastructure-service
+```
+:::info
+Useful links for topics covered here.
+https://cloud.ibm.com/docs/vpc?topic=vpc-vsi_is_connecting_windows#vsi_connecting_windows_instance
+:::
+Our instance name for windows is called "wca4z-addi"
+
+Query the status of your instance by running the following command. `INSTANCE` is the ID or Name for the instance that you want to connect:
+
+```tsx
+ibmcloud is instance wca4z-addi
+```
+
+When the instance shows that it's `running`, you are ready to retrieve the initialization values to get your password.
+
+Run the following command to initialize your instance and obtain your instance password. Specify your instance ID or Name for the `INSTANCE` variable and your private key for the `KEY` or `KEY_FILE` variable:
+
+```tsx
+ibmcloud is instance-initialization-values wca4z-addi [--private-key (KEY | @KEY_FILE)]
+```
+
+The key we created is called `win-key-wca4z_rsa.prv`
+
+So our command should be 
+
+```tsx
+ibmcloud is instance-initialization-values wca4z-addi --private-key @~/.ssh/win-key-wca4z_rsa.prv
+```
+
+This command decodes and decrypts your password, which is automatically generated when you create an instance by using a Windows image. The password is decoded and decrypted based on the public SSH Key that you used at instance create time and the associated private SSH key that you specify in the `instance-initialization-values` command. For more information, see the [CLI command reference](https://cloud.ibm.com/docs/vpc?topic=vpc-vpc-reference#instance-initialization-values).
+    
+You can also use the API to get the encrypted password, which returns the decoded and decrypted password. For more information, see [Retrieve configuration that is used to initialize the instance API](https://cloud.ibm.com/apidocs/vpc/latest#retrieve-configuration-used-to-initialize-the-inst).
+
+
+
+
