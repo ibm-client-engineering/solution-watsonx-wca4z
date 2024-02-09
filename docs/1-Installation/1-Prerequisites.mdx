@@ -38,7 +38,8 @@ Refactor Host
 ADDI Host
 - ADDI
 - Microsoft SQL Server (standard, express, or developer editions)
-- VSCode
+- Adoptium Java SDK 11
+- SQL Server Management Studio
 
 Refactoring Assistant
 - Podman
@@ -139,12 +140,201 @@ As of this writing, the following versions of MS SQL Server are compatible with 
 
 - Microsoft SQL Server 2014/2016/2017/2019/2022 (Express/Standard/Developer)
 
-For our examples, we will be using the Express edition of 2019.
+For our examples, we will be using the Developer edition of 2022.
 
-On your ADDI host, open the Edge browser and download the [installer](https://download.microsoft.com/download/7/f/8/7f8a9c43-8c8a-4f7c-9f92-83c18d96b681/SQL2019-SSEI-Expr.exe)
+On your ADDI host, open the Edge browser and download the [installer](https://go.microsoft.com/fwlink/p/?linkid=2215158&clcid=0x409&culture=en-us&country=us)
 
 Locate the SQL Server installer we downloaded
 
 ![sql_install1](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/750b7cf7-bf7b-4c15-b47f-6303517a0e4b)
 
+Run the installer and select Download Media
 
+![sql_install2](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/abe4d1e8-09f0-4472-8f4f-9713d0b85c86)
+
+Select ISO image
+
+![sql_install3](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/8f9cafe7-11e1-43ed-aa3c-bfa26b5d0e1f)
+
+Download the ISO image and then right click and mount it.
+
+In our case it was mounted as DVD Drive (E)
+
+![sql_install4](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/89a35d3d-d33f-4fe8-a7d2-4e5997fd9303)
+
+Open PowerShell and change to that directory
+
+
+```powershell
+PS C:\> e:
+PS E:\> dir
+
+
+    Directory: E:\
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----         10/8/2022  10:20 AM                1033_ENU_LP
+d-----         10/8/2022  10:20 AM                Tools
+d-----         10/8/2022  10:19 AM                redist
+d-----         10/8/2022  10:19 AM                resources
+d-----         10/8/2022  10:20 AM                x64
+--r---         10/8/2022  10:20 AM            314 MediaInfo.xml
+--r---         10/8/2022   8:39 AM         231328 SqlSetupBootstrapper.dll
+--r---         10/8/2022   8:39 AM             45 autorun.inf
+--r---         10/8/2022   8:39 AM         133032 setup.exe
+--r---         10/8/2022   8:39 AM            532 setup.exe.config
+
+
+PS E:\>
+
+```
+Let's build our install command here:
+
+Options like `SQLSYSADMINACCOUNTS` are the admin user. Typically this is the hostname capitlized followed by Administrator.
+
+Ex: `WCA4Z-ADDI-Administrator`
+
+Also the `SAPWD` password should be set to your Windows Administrator password.
+
+```powershell
+
+.\setup.exe /Q /IACCEPTSQLSERVERLICENSETERMS /ACTION=install /TCPENABLED=1 /UpdateEnabled=0 /SQLSYSADMINACCOUNTS="WCA4Z-ADDI\Administrator" /FEATURES=SQLENGINE /SECURITYMODE=SQL /INSTANCENAME=MSSQLSERVER /AGTSVCSTARTUPTYPE=Automatic /BROWSERSVCSTARTUPTYPE=Automatic /PRODUCTCOVEREDBYSA="False" /NPENABLED=1 /SAPWD="<ADMIN PASSWORD>"
+
+```
+
+Run the setup command.
+
+
+### MS SQL Management Studio
+
+MSSMS can be downloaded [here](https://aka.ms/ssmsfullsetup). Download it and install it with default options. It will require a restart of the ADDI host.
+
+#### Setting up an SQL User Account
+
+Locate the `SQL Server Management Studio 19` in Program Files and start it up.
+
+![SQL SMS](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/a06f4ce8-d08e-4701-af43-90b470ca2e43)
+
+Click `Connect`
+
+
+
+Start SQL Server Management Studio.
+		- Expand Security > Logins then right-click Logins and choose New Login. Add a login name, select SQL Server Authentication, add a password, and make sure that the default database is set to master. This user is referred to as **IBM AD SQL Identity**. 
+		- Make sure the `addi_user` is NOT required to change his password on first login.
+        - Our user is `addi_user` and his password is `p@ssw0rd`
+
+![SQL SMS](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/1db25218-70dc-491c-a0c5-6889f4528827)
+
+		- Under User Mapping, add this user to the master database.
+2. Expand Databases > System Databases > master then right-click master and choose Properties. Go to Permissions tab and for the **IBM AD SQL Identity** and make sure that permissions are granted for: Create database, Create function, Create procedure, Create table, and Create view.
+
+![SQL SMS](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/05743182-f4ab-48fb-823d-3f4e5a9e6a68)
+
+3. The following permission must be granted only if the **Rename project** feature is used in IBM AD Build, otherwise it is not needed. Right-click on the SQL server instance and then select Properties. In the Server Properties window select Permissions: From the roles list, select the **IBM AD SQL Identity** and then select Grant for _Alter any database_ permission.
+
+### Install Java JDK
+
+Our JAVA SDK will be the open version from Adoptium. It can be downloaded from the following link. Be sure it's vers 11.
+
+https://adoptium.net/temurin/archive/?version=11
+
+Make sure to set both JAVA_HOME and JavaSoft to full install of feature set to local drive
+
+![java_install1](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/905b2903-fb90-4778-a476-6d848d60691b)
+
+### Firewall Ports
+
+Open the Powershell and run the following command to open all required ports:
+
+```powershell
+New-NetFirewallRule -DisplayName "ADDIandSQLPorts" -Direction inbound -Profile Any -Action Allow -LocalPort 1433,3000,9080,9443,2181,2281,2424,2430,2434,2440,7600,7700,7800,7900,7650,7850,9999 -Protocol TCP
+
+```
+### Installing ADDI
+
+https://w3south-limited-use.cpc.ibm.com/software/xl/download/ticket.wss
+
+Retrieve the ADDI installer from IBM's software repository
+
+https://www.ibm.com/docs/en/watsonx-code-assistant-4z/1.0?topic=installing-components-addi-installer
+
+Once we have downloaded the installation file, it should show up as a zip file in our `Downloads` folder called `ADDI_FOR_IBM_Z_612_WIN.zip`.
+
+Right click the zip file and extract it.
+
+In the File Explorer window, go to `C:\Users\Administrator.WCA4Z-ADDI\Downloads\ADDI_FOR_IBM_Z_612_WIN\IBM ADDI`
+
+Double click the installer.
+
+`IBM_Application_Discovery_and_Delivery_Intelligence_Installer-6.1.2-ifix1.exe`
+
+
+#### Configuration of ADDI
+
+https://www.ibm.com/docs/en/watsonx-code-assistant-4z/1.0?topic=configuring-by-using-ad-configuration-wizard
+
+Most of these settings are defaults.
+
+![ADDI Install1](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/6f00c1eb-9925-4d32-a432-b02e31d04ca6)
+
+![ADDI Install2](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/d65a3836-ab7a-4723-ae1a-0f743521dacc)
+
+![ADDI Install3](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/eeaebe77-1d1d-4133-b88f-3a8ed59c2048)
+
+Enable the DEX server
+
+![ADDI Install4](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/2a93a1c1-2628-450c-9961-8f2d44ed7e37)
+
+![ADDI Install5](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/e24deb17-565c-467c-b192-52b6e2204641)
+
+Keep our external IP as the Config service IP. In this case, our VM is `10.241.64.4`.
+
+![ADDI Install6](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/7cae894a-9b5c-425a-b197-77befe8054bd)
+
+![ADDI Install7](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/1f5e2187-cd26-4198-833b-0bb990090ab7)
+
+At some point, the installer will spin up the ADDI web dashboard to continue the installation
+![CleanShot 2024-02-09 at 15 40 39](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/68df8096-4c29-4dc1-b008-8e81481fbd0d)
+
+Set our Relational Database Server info to point to our local SQL Server. Use the `addi_user` we configured with his password `p@ssw0rd`.
+
+![CleanShot 2024-02-09 at 15 19 11](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/50e58f92-936d-4f84-a12f-c288cb7d8933)
+
+In our instance we're setting "D:" to be our data drive, so let's set it up that way.
+
+![ADDI Install8](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/3c79da98-db57-4b33-abd9-70704e1c1e56)
+
+
+On the Relational Database Server page, enter the following information:
+
+![ADDI Install9](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/f636ac82-4f44-4a06-b882-22b4afcf5cd6)
+
+Database names can stay default
+
+We set the Graph Database user password to `P@ssw0rd`
+
+![ADDI Install10](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/88064467-ba41-409c-9010-ba8ed5180372)
+
+Batch server settings can stay default
+
+Allow the Health Check to create the `GenApp` project.
+
+![ADDI Install11](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/22b86cad-35d3-4760-9523-bd9b72515e45)
+
+Cross your fingers and commit.
+
+![ADDI Install12](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/7916f02d-5729-4dce-bd71-368565a627e5)
+
+So this is expected behavior:
+
+![ADDI Install13](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/177d1fa7-1a4f-4940-abdb-e2f1cce15b3a)
+
+Click `Done` and the ADDI Dashboard should open.
+
+The following services should be offline or disabled in the Dashboard
+- Authentication server (DEX)
+- Catalog service
+- Validation service
