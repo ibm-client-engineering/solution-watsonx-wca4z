@@ -1,0 +1,340 @@
+---
+id: ADDI
+sidebar_position: 1
+title: ADDI
+custom_edit_url: null
+---
+
+:::note
+This guide assumes you have an IBM Cloud account that is accessible. It also assumes you have the `ibmcloud` cli installed and configured. The installation of `ibmcloud` cli can be found [here](https://cloud.ibm.com/docs/cli?topic=cli-install-ibmcloud-cli). 
+
+Mileage may vary on different cloud providers.
+:::
+
+## Pre-Requisites
+
+- Watsonx Code Assistant instance deployed in IBM Cloud
+- IBM® Application Discovery and Delivery Intelligence (ADDI)
+- IBM Application Discovery Connect for Mainframe (IBM AD Connect for Mainframe)
+
+## Hardware
+
+For this build, we will be deploying Virtual Server Instances into IBM Cloud. They require the following:
+
+ADDI Host
+- OS: Windows 10 or 11 
+- RAM: 32 Gigs
+- Storage: 100G for local, 300G for AD components
+- Cores: 8
+
+Refactor Host
+- OS: Red Hat Enterprise Linux 8x/9x
+- RAM: 16G
+- Storage: 100G for local, 400G for data
+- Cores: 4
+
+## Software to be installed
+
+ADDI Host
+- ADDI
+- Microsoft SQL Server (standard, express, or developer editions)
+- Adoptium Java SDK 11
+- SQL Server Management Studio
+
+Refactoring Assistant
+- Podman
+- Refactor Containers
+
+## ADDI Host
+
+### Creating the instance in IBM Cloud
+
+Install the ibmcloud plugin for infrastructure service
+
+_note to RK: Add the cli commands to create the instance here_
+
+### Accessing the instance in IBM Cloud
+
+```tsx
+ibmcloud plugin install infrastructure-service
+```
+:::info
+Useful links for topics covered here.
+https://cloud.ibm.com/docs/vpc?topic=vpc-vsi_is_connecting_windows#vsi_connecting_windows_instance
+:::
+Our instance name for windows is called "wca4z-addi"
+
+Query the status of your instance by running the following command. `INSTANCE` is the ID or Name for the instance that you want to connect:
+
+```tsx
+ibmcloud is instance wca4z-addi
+```
+
+When the instance shows that it's `running`, you are ready to retrieve the initialization values to get your password.
+
+Run the following command to initialize your instance and obtain your instance password. Specify your instance ID or Name for the `INSTANCE` variable and your private key for the `KEY` or `KEY_FILE` variable:
+
+```tsx
+ibmcloud is instance-initialization-values wca4z-addi [--private-key (KEY | @KEY_FILE)]
+```
+
+The key we created is called `win-key-wca4z_rsa.prv`
+
+So our command should be 
+
+```tsx
+ibmcloud is instance-initialization-values wca4z-addi --private-key @~/.ssh/win-key-wca4z_rsa.prv
+```
+
+This command decodes and decrypts your password, which is automatically generated when you create an instance by using a Windows image. The password is decoded and decrypted based on the public SSH Key that you used at instance create time and the associated private SSH key that you specify in the `instance-initialization-values` command. For more information, see the [CLI command reference](https://cloud.ibm.com/docs/vpc?topic=vpc-vpc-reference#instance-initialization-values).
+    
+You can also use the API to get the encrypted password, which returns the decoded and decrypted password. For more information, see [Retrieve configuration that is used to initialize the instance API](https://cloud.ibm.com/apidocs/vpc/latest#retrieve-configuration-used-to-initialize-the-inst).
+
+The output of the above command should return something like this:
+```tsx
+Getting instance initialization values for wca4z-addi under account Fred Whipple's Account as user kramerro@us.ibm.com...
+
+Keys                 ID                                          Name            Fingerprint
+                     r014-48416b92-2235-48ff-aea7-034e5a38e8a5   win-key-wca4z   SHA256:rUix46/y3Qol46dnznusfaq4dRV/RlMrGsjEvLNWoDw
+
+Encrypted password   I/AbavM1cYL1g0omTPzNlpIIIR3zwQKYmEmAe2DFb72Bs+HmqUy+h0C8c3bD/fV1LyUGoCWqJqnngz7+SlVddzFLunVtvM1X30qUgBCzuJfvJo6IpyNFc5YFoWZxMojWKp1e71ezzILTD10Z6MPNtdCwL2syYag+vNPexgHwc4eJwlqnhUTdFD3i0FPYOzSiReKxw1m4QpwXTd/EyecvDbrSAXnIjYyyMlJsv/dmZrLhynEjUBwn39RTqD2Da9Mjyi7hyrzKZqkKP3barnwPRFd8xQI21gA0Lm3mgC7PJzmA5Z8KqGQV3IPlFE909HRQeHpB5DN8nS4KsNGKPRVl/pF3XAA9BRoMKoOMV1d4mOXGU2b5QU1+IKpZU7ObCKhqLw+U3Dm1sPYW5IgujZd725uhqwwIBZukMQE2RSYRij0ef5mhv9gt/f/zrNWTaZVjgQqA3ufL4dIdu/W8mZf2puxKCYvhIwolA13Y09BeTLRBCK9/8LOx0e8WjmDg9lx49Fv5AwgaUi2tpLWjBf4Xgt8b6ddIo0Lgy8sc4KdsdQ/8Jtugblp/zfEzxJl6WqpD6+3UOSLQi9dKtproL9tI3CDkk2WLhV02m+vG6imrVMZpCGsgdlLEWqwCXKNIvaGmCKG0TTm7QT8BqiqxTwUPvQCLcIEGf4yWVsEbYGvR+zQ=
+Encryption key CRN   SHA256:rUix46/y3Qol46dnznusfaq4dRV/RlMrGsjEvLNWoDw
+Password             <UNENCRYPTED PASSWORD>
+```
+
+Once you have obtained the password from the above command, make sure you have associated a floating public IP for the ADDI host so it is accessible:
+
+```tsx
+ibmcloud is floating-ip-reserve <FLOATING_IP_NAME> --nic <NIC>
+```
+
+You now have what you need to connect to your Windows instance: a decrypted password and a floating IP address. Use your preferred Remote Desktop client to connect to your instance. To connect to your instance, provide the floating IP address and the decrypted password. The username is `Administrator` by default. If you're connecting from a client that is running the Windows Administrator account, use `.\administrator` as the user ID to log on to RDP.
+
+### Configure the data disk
+
+Open the server manager on the ADDI host and select the 300 gig disk:
+
+![server_manager](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/9341ebae-dfac-40d2-ac5c-c79a317b9339)
+
+Start up the New Volume Wizard
+
+![volume_wizard1](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/86305a77-8975-46f9-9b69-8c1d25bc7185)
+
+![volume_wizard2](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/5df74072-7ae5-4248-a5f5-a79371e51093)
+
+![volume_wizard3](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/0de541f6-b795-475d-93ce-7a94ccedb6fc)
+
+Make it Drive D. This will be our storage for the ADDI Data.
+
+![volume_wizard4](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/b32f31ca-b7c8-4a4b-a65b-550835abdc32)
+
+We'll call our volume label `AD Data`
+
+![volume_wizard5](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/ed2f78aa-38cf-4acc-9f10-2156954dbad6)
+
+Confirm and Create
+
+### Installing Microsoft SQL Server
+
+As of this writing, the following versions of MS SQL Server are compatible with ADDI:
+
+- Microsoft SQL Server 2014/2016/2017/2019/2022 (Express/Standard/Developer)
+
+For our examples, we will be using the Developer edition of 2022.
+
+On your ADDI host, open the Edge browser and download the [installer](https://go.microsoft.com/fwlink/p/?linkid=2215158&clcid=0x409&culture=en-us&country=us)
+
+Locate the SQL Server installer we downloaded
+
+![sql_install1](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/750b7cf7-bf7b-4c15-b47f-6303517a0e4b)
+
+Run the installer and select Download Media
+
+![sql_install2](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/abe4d1e8-09f0-4472-8f4f-9713d0b85c86)
+
+Select ISO image
+
+![sql_install3](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/8f9cafe7-11e1-43ed-aa3c-bfa26b5d0e1f)
+
+Download the ISO image and then right click and mount it.
+
+In our case it was mounted as DVD Drive (E)
+
+![sql_install4](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/89a35d3d-d33f-4fe8-a7d2-4e5997fd9303)
+
+Open PowerShell and change to that directory
+
+
+```powershell
+PS C:\> e:
+PS E:\> dir
+
+
+    Directory: E:\
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----         10/8/2022  10:20 AM                1033_ENU_LP
+d-----         10/8/2022  10:20 AM                Tools
+d-----         10/8/2022  10:19 AM                redist
+d-----         10/8/2022  10:19 AM                resources
+d-----         10/8/2022  10:20 AM                x64
+--r---         10/8/2022  10:20 AM            314 MediaInfo.xml
+--r---         10/8/2022   8:39 AM         231328 SqlSetupBootstrapper.dll
+--r---         10/8/2022   8:39 AM             45 autorun.inf
+--r---         10/8/2022   8:39 AM         133032 setup.exe
+--r---         10/8/2022   8:39 AM            532 setup.exe.config
+
+
+PS E:\>
+
+```
+Let's build our install command here:
+
+Options like `SQLSYSADMINACCOUNTS` are the admin user. Typically this is the hostname capitlized followed by Administrator.
+
+Ex: `WCA4Z-ADDI-Administrator`
+
+Also the `SAPWD` password should be set to your Windows Administrator password.
+
+```powershell
+
+.\setup.exe /Q /IACCEPTSQLSERVERLICENSETERMS /ACTION=install /TCPENABLED=1 /UpdateEnabled=0 /SQLSYSADMINACCOUNTS="WCA4Z-ADDI\Administrator" /FEATURES=SQLENGINE /SECURITYMODE=SQL /INSTANCENAME=MSSQLSERVER /AGTSVCSTARTUPTYPE=Automatic /BROWSERSVCSTARTUPTYPE=Automatic /PRODUCTCOVEREDBYSA="False" /NPENABLED=1 /SAPWD="<ADMIN PASSWORD>"
+
+```
+
+Run the setup command.
+
+
+### MS SQL Management Studio
+
+MSSMS can be downloaded [here](https://aka.ms/ssmsfullsetup). Download it and install it with default options. It will require a restart of the ADDI host.
+
+#### Setting up an SQL User Account
+
+Locate the `SQL Server Management Studio 19` in Program Files and start it up.
+
+![SQL SMS](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/a06f4ce8-d08e-4701-af43-90b470ca2e43)
+
+Click `Connect`
+
+
+
+Start SQL Server Management Studio.
+		- Expand Security > Logins then right-click Logins and choose New Login. Add a login name, select SQL Server Authentication, add a password, and make sure that the default database is set to master. This user is referred to as **IBM AD SQL Identity**. 
+		- Make sure the `addi_user` is NOT required to change his password on first login.
+        - Our user is `addi_user` and his password is `p@ssw0rd`
+
+![SQL SMS](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/1db25218-70dc-491c-a0c5-6889f4528827)
+
+		- Under User Mapping, add this user to the master database.
+2. Expand Databases > System Databases > master then right-click master and choose Properties. Go to Permissions tab and for the **IBM AD SQL Identity** and make sure that permissions are granted for: Create database, Create function, Create procedure, Create table, and Create view.
+
+![SQL SMS](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/05743182-f4ab-48fb-823d-3f4e5a9e6a68)
+
+3. The following permission must be granted only if the **Rename project** feature is used in IBM AD Build, otherwise it is not needed. Right-click on the SQL server instance and then select Properties. In the Server Properties window select Permissions: From the roles list, select the **IBM AD SQL Identity** and then select Grant for _Alter any database_ permission.
+
+### Install Java JDK
+
+Our JAVA SDK will be the open version from Adoptium. It can be downloaded from the following link. Be sure it's vers 11.
+
+https://adoptium.net/temurin/archive/?version=11
+
+Make sure to set both JAVA_HOME and JavaSoft to full install of feature set to local drive
+
+![java_install1](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/905b2903-fb90-4778-a476-6d848d60691b)
+
+### Firewall Ports
+
+Open the Powershell and run the following command to open all required ports:
+
+```powershell
+New-NetFirewallRule -DisplayName "ADDIandSQLPorts" -Direction inbound -Profile Any -Action Allow -LocalPort 1433,3000,9080,9443,2181,2281,2424,2430,2434,2440,7600,7700,7800,7900,7650,7850,9999 -Protocol TCP
+
+```
+### Installing ADDI
+
+https://w3south-limited-use.cpc.ibm.com/software/xl/download/ticket.wss
+
+Retrieve the ADDI installer from IBM's software repository
+
+https://www.ibm.com/docs/en/watsonx-code-assistant-4z/1.0?topic=installing-components-addi-installer
+
+Once we have downloaded the installation file, it should show up as a zip file in our `Downloads` folder called `ADDI_FOR_IBM_Z_612_WIN.zip`.
+
+Right click the zip file and extract it.
+
+In the File Explorer window, go to `C:\Users\Administrator.WCA4Z-ADDI\Downloads\ADDI_FOR_IBM_Z_612_WIN\IBM ADDI`
+
+Double click the installer.
+
+`IBM_Application_Discovery_and_Delivery_Intelligence_Installer-6.1.2-ifix1.exe`
+
+
+#### Configuration of ADDI
+
+https://www.ibm.com/docs/en/watsonx-code-assistant-4z/1.0?topic=configuring-by-using-ad-configuration-wizard
+
+Most of these settings are defaults.
+
+![ADDI Install1](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/6f00c1eb-9925-4d32-a432-b02e31d04ca6)
+
+![ADDI Install2](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/d65a3836-ab7a-4723-ae1a-0f743521dacc)
+
+![ADDI Install3](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/eeaebe77-1d1d-4133-b88f-3a8ed59c2048)
+
+Enable the DEX server
+
+![ADDI Install4](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/2a93a1c1-2628-450c-9961-8f2d44ed7e37)
+
+![ADDI Install5](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/e24deb17-565c-467c-b192-52b6e2204641)
+
+Keep our external IP as the Config service IP. In this case, our VM is `10.241.64.4`.
+
+![ADDI Install6](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/7cae894a-9b5c-425a-b197-77befe8054bd)
+
+![ADDI Install7](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/1f5e2187-cd26-4198-833b-0bb990090ab7)
+
+At some point, the installer will spin up the ADDI web dashboard to continue the installation
+![CleanShot 2024-02-09 at 15 40 39](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/68df8096-4c29-4dc1-b008-8e81481fbd0d)
+
+Set our Relational Database Server info to point to our local SQL Server. Use the `addi_user` we configured with his password `p@ssw0rd`.
+
+![CleanShot 2024-02-09 at 15 19 11](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/50e58f92-936d-4f84-a12f-c288cb7d8933)
+
+In our instance we're setting "D:" to be our data drive, so let's set it up that way.
+
+![ADDI Install8](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/3c79da98-db57-4b33-abd9-70704e1c1e56)
+
+
+On the Relational Database Server page, enter the following information:
+
+![ADDI Install9](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/f636ac82-4f44-4a06-b882-22b4afcf5cd6)
+
+Database names can stay default
+
+We set the Graph Database user password to `P@ssw0rd`
+
+![ADDI Install10](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/88064467-ba41-409c-9010-ba8ed5180372)
+
+Batch server settings can stay default
+
+Allow the Health Check to create the `GenApp` project.
+
+![ADDI Install11](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/22b86cad-35d3-4760-9523-bd9b72515e45)
+
+Cross your fingers and commit.
+
+![ADDI Install12](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/7916f02d-5729-4dce-bd71-368565a627e5)
+
+So this is expected behavior:
+
+![ADDI Install13](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/177d1fa7-1a4f-4940-abdb-e2f1cce15b3a)
+
+Click `Done` and the ADDI Dashboard should open.
+
+The following services should be offline or disabled in the Dashboard
+- Authentication server (DEX)
+- Catalog service
+- Validation service
