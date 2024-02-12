@@ -253,6 +253,75 @@ Open the Powershell and run the following command to open all required ports:
 New-NetFirewallRule -DisplayName "ADDIandSQLPorts" -Direction inbound -Profile Any -Action Allow -LocalPort 1433,3000,9080,9443,2181,2281,2424,2430,2434,2440,7600,7700,7800,7900,7650,7850,9999 -Protocol TCP
 
 ```
+
+### TLS Certs and Keystores
+
+Create some keystores for stuff. For real, DEX needs this and we're ultimately going to import our root cert from the refactor assistant into this keystore.
+
+:::info
+
+Useful links for this section
+
+https://www.ibm.com/docs/en/watsonx-code-assistant-4z/1.0.1?topic=ad-prepare-files-enabling-secure-communication#securing_prepare_files__prepare_key_crt__title__1
+
+:::
+
+Each server must have a keystore that contains the following entries:
+
+- A `PrivateKeyEntry` of the CA signed certificate.
+- A `TrustedCertEntry` of the root CA certificate.
+
+It's apparently optional to generate a self-signed key cert. We're going to generate one as while it's best practices to have a key cert signed by a real CA, we don't have a real CA.
+
+This will be our local keystore.
+
+Make sure that `C:\certificates` exists as this is where we will store these keys.
+
+Our alias here is our hostname, which in this case is `wca4z-addi`. We're also setting our key password to `p@ssw0rd`.
+
+```powershell
+keytool -genkeypair -alias "wca4z-addi" -keyalg RSA -keysize 2048 -dname "cn=wca4z-addi" -keypass "p@ssw0rd" -keystore "C:\certificates\server_keystore.p12" -storepass "p@ssw0rd" -storetype PKCS12 -ext BasicConstraints:critical=ca:true -ext san=dns:wca4z-addi
+```
+
+Now we have a keystore sitting at `C:\Users\Administrator.WCA4Z-ADDI\server_keystore.p12`
+
+
+Let's now export the cert
+
+```powershell
+keytool -exportcert -alias "wca4z-addi" -keystore "C:\certificates\server_keystore.p12" -file "C:\certificates\server_certificate.crt" -storepass "p@ssw0rd"
+```
+
+Now let's re-import the certificate into the keystore under the alias of `self-signed-root`
+
+```powershell
+keytool -keystore "C:\certificates\server_keystore.p12" -import -file "C:\certificates\server_certificate.crt" -alias "self-signed-root" -storepass "p@ssw0rd"
+```
+
+If you have the DB2 SSL certificate for the cloud instance of DB2, import it into the keystore as well.
+
+```powershell
+keytool -import -trustcacerts -alias "DB2-ssl-cert" -file "C:\certificates\<DB2 SSL certificate file> -keystore server_keystore.p12 -storepass "p@ssw0rd"
+```
+
+Delete the `server_certificate.crt` file as this is not needed now and we are apparently going to recreate it.
+
+Now let's use OpenSSL to generate the `server.key`
+
+Open up Cygwin Terminal App
+
+Use the **OpenSSL** tool from **Cygwin** to export the certificates in a dedicated location. 
+
+To generate the server.key file, run the following command in the Cygwin Terminal App.
+
+```bash
+openssl pkcs12 -in "C:\certificates\server_keystore.p12" -nocerts -nodes -out "C:\certificates\server.key"
+```
+
+Generate the `server_certificate.crt` file again, but _different_.
+
+
+
 ### Installing ADDI
 
 https://w3south-limited-use.cpc.ibm.com/software/xl/download/ticket.wss
@@ -338,3 +407,65 @@ The following services should be offline or disabled in the Dashboard
 - Authentication server (DEX)
 - Catalog service
 - Validation service
+
+#### Configuring the DEX server on ADDI host
+
+
+Let's generate a hashed SHA256 password on the linux refactor host
+
+```bash
+openssl passwd -5 p@ssw0rd
+$5$aPcZ8PYGME9ztCKm$if2XAAOQVnlD4iLDQgq0a5A982LM5Kyg./czg23g647
+```
+
+Under `C:\Program Files\IBM Application Discovery and Delivery Intelligence\Authentication Server (DEX)\conf`
+
+Our `issuer` should be either the FQDN or the IP of the ADDI host
+
+We're going update the `dex.yaml` with the following
+```yaml
+issuer: https://10.241.64.4:7600/dex
+storage:
+  type: sqlite3
+  config:
+  file: dex.db
+frontend:
+  theme: addi
+web:
+  TLSCert: conf/root.crt
+  TLSKey: conf/root.key
+  https: 0.0.0.0:7600
+oauth2:
+  skipApprovalScreen: true
+  passwordConnector: ldap
+connectors: []
+
+enablePasswordDB: true
+staticClients:
+  - id: refactoring-assistant
+    redirectURIs:
+      - https://10.241.64.5:9443
+    name: Refactoring Assistant
+    secret: pkce
+staticPasswords:
+  - email: addi_user@ibm.com
+    hash: $5$aPcZ8PYGME9ztCKm$if2XAAOQVnlD4iLDQgq0a5A982LM5Kyg./czg23g647
+    username: addi_user
+    userID: null
+```
+
+Open the admin dashboard and click Configure at the top
+https://localhost:9443/ad/admin/dashboard
+
+Click on the Default env
+
+Go to Servers and Security
+
+Select Security from the choices on the left and then select HTTPS as the protocol type
+
+At the bottom go to "Drag and Drop files here..." and upload the following files from `C:\certificates`
+- `server_keystore.p12`
+- `server_certificate.crt`
+- `server.key`
+
+Set the password to `p@ssw0rd`.
