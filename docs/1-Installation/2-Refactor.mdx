@@ -1,0 +1,241 @@
+---
+id: Refactor
+sidebar_position: 1
+title: Refactor Assistant
+custom_edit_url: null
+---
+
+:::note
+This guide assumes you have an IBM Cloud account that is accessible. It also assumes you have the `ibmcloud` cli installed and configured. The installation of `ibmcloud` cli can be found [here](https://cloud.ibm.com/docs/cli?topic=cli-install-ibmcloud-cli). 
+
+Mileage may vary on different cloud providers.
+:::
+
+## Pre-Requisites
+
+- Watsonx Code Assistant instance deployed in IBM Cloud
+- IBM® Application Discovery and Delivery Intelligence (ADDI)
+- IBM Application Discovery Connect for Mainframe (IBM AD Connect for Mainframe)
+
+## Hardware
+
+For this build, we will be deploying a Linux Virtual Server Instance in IBM Cloud. It require the following:
+
+Refactor Host
+- OS: Red Hat Enterprise Linux 8x/9x
+- RAM: 16G
+- Storage: 100G for local, 400G for data
+- Cores: 4
+
+## Software to be installed
+
+Refactoring Assistant
+- Podman
+- Refactor Containers
+
+## Refactor Host
+
+### Creating the instance in IBM Cloud
+
+Install the ibmcloud plugin for infrastructure service
+
+_note to RK: Add the cli commands to create the instance here_
+
+:::note
+When you create your RHEL instance, make sure you created it with your SSH key installed.
+:::
+
+Make sure to add an external floating ip to your RHEL instance in IBM Cloud. This will allow us to SSH in using our SSH key.
+
+### Accessing the instance in IBM Cloud
+
+```tsx
+ibmcloud plugin install infrastructure-service
+```
+Our instance name for RHEL 9.x is called "wca4z-refactor"
+
+### Configure the data disk
+
+On our IBM Cloud VSI RHEL9 host, we aren't using anything fancy like LVM2. So we're going to just spin this out as a regular disk and hang it on.
+
+1. Find the disk
+
+```tsx
+[root@wca4z-refactor ~]# lsblk
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+vda    252:0    0  100G  0 disk
+├─vda1 252:1    0    1M  0 part
+├─vda2 252:2    0  200M  0 part /boot/efi
+├─vda3 252:3    0  500M  0 part /boot
+                                /
+    // highlight-start
+vdb    252:16   0  500G  0 disk
+    // highlight-end
+vdc    252:32   0  392K  0 disk
+vdd    252:48   0   44K  0 disk
+```
+
+Create the primary partition on the new disk
+
+:::note
+This assumes the customer is using XFS as their filesystem for their RHEL host. Mileage may vary.
+:::
+
+```tsx
+parted -s -a optimal /dev/vdb mklabel gpt 'mkpart primary xfs 1 -1'
+
+mkfs.xfs /dev/vdb1
+
+```
+
+Create the necessary directory path. We want to mount all our podman storage on the data filesystem we just created
+```tsx
+mkdir -p /var/lib/containers/storage
+
+echo "/dev/vdb1	/var/lib/containers/storage xfs	defaults 0 0" >> /etc/fstab
+
+mount -a
+```
+
+You should now see the new filesystem mounted.
+
+```tsx
+df -h
+
+[root@wca4z-refactor containers]# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        4.0M     0  4.0M   0% /dev
+tmpfs           7.9G   84K  7.9G   1% /dev/shm
+tmpfs           3.2G  351M  2.8G  11% /run
+/dev/vda4       100G   11G   89G  11% /
+/dev/vda3       495M  247M  249M  50% /boot
+/dev/vda2       200M  7.0M  193M   4% /boot/efi
+tmpfs           1.6G     0  1.6G   0% /run/user/0
+/dev/vdb1       500G  5.6G  495G   2% /var/lib/containers/storage
+```
+
+### Install pre-req packages
+
+```tsx
+sudo dnf -y install podman unzip wget java-11-openjdk.x86_64
+```
+
+Enable podman and start it up.
+
+```tsx
+sudo systemctl start podman
+sudo systemctl enable podman
+
+```
+
+### Retrieve and install the Refactor Assistant
+
+Go to IBM's internal download [site](https://w3south-limited-use.cpc.ibm.com/software/xl/download/ticket.wss) and download `IBM watsonx Code Assistant for Z Refactoring Assistant 1.0.1 Linux Multilingual`.
+
+:::info
+As of this writing, we are working with Watson Code Assistant for z 1.0.1.
+:::
+
+We are extracting this package to the root directory. 
+
+```tsx
+unzip wCAZ_RA_z_OS_1.0.1_Linux_ML.zip
+Archive:  wCAZ_RA_z_OS_1.0.1_Linux_ML.zip
+   creating: IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual/
+ extracting: IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual/refactoring-assistant-1.1.0.zip
+
+cd IBM\ watsonx\ Code\ Assistant\ for\ Z\ Refactoring\ Assistant\ 1.1.0\ Linux\ Multilingual/
+
+unzip refactoring-assistant-1.1.0.zip
+Archive:  refactoring-assistant-1.1.0.zip
+  inflating: PRD0013118key.pem.cer
+  inflating: PRD0013118key.pem.chain
+  inflating: PRD0013118key.pem.pub.key
+  inflating: refactoring-assistant-1.1.0.tgz
+  inflating: refactoring-assistant-1.1.0.tgz.sig
+  inflating: WCA4Z-Data-Generator-1.1.1.zip
+  inflating: WCA4Z-Data-Generator-1.1.1.zip.sig
+
+tar zxf refactoring-assistant-1.1.0.tgz
+
+mv refactoring-assistant ~/
+```
+:::info
+More installation info can be found here.
+
+https://www.ibm.com/docs/en/watsonx-code-assistant-4z/1.0?topic=installing-setting-up
+:::
+
+In your IBM watsonx Code Assistant for Z Refactoring Assistant root directory, run the following command to install the IBM watsonx Code Assistant for Z Refactoring Assistant container images.
+
+
+```plaintext-ibm
+cd ~/refactoring-assistant
+./setup.sh
+```
+
+Copy the `config/template.properties` file to `config/config.properties`. Open `config/config.properties` in an editor and enter the values inside as instructed. You can refer to the following example:
+
+Important values here are:
+
+- `CERTS_LOCATION` will be created if it doesn't exist when we run the start command. We are using `/root/certs` in our environment.
+- `AD_HOST_PORT` this is the ip or FQDN of the ADDI host.
+- `ENVIRONMENT_ID` can be obtained from the ADDI dashboard on the ADDI Host.
+
+https://localhost:9443/ad/admin/configure?tab=environments
+![ENV_ID](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/79683afe-f0b4-483d-bd98-5a9c7af03655)
+
+
+```tsx
+# *******************************************************************************
+# Licensed Materials - Property of IBM
+# © Copyright IBM Corporation 2022, 2023
+#
+# Note to U.S. Government Users Restricted Rights:
+# Use, duplication or disclosure restricted by GSA ADP Schedule
+# Contract with IBM Corp.
+# *******************************************************************************
+
+# Absolute path to directory where certificates and keys are kept
+CERTS_LOCATION=/root/certs
+
+# Protocol to use to communicate with AD services
+PROTOCOL=https
+
+# The IBM AD configuration (ZooKeeper) connection string, e.g. hostname.mydomain.com:2281 (use port 2181 if connection is unsecured)
+AD_HOST_PORT=10.241.64.4:2181
+
+# Ports of the AD mainframe projects and file services respectively
+# AD_PROJ_PORT=7650
+# AD_FILE_PORT=7700
+
+# The environment ID, which can be obtained from the IBM Application Discovery Configuration Service Admin dashboard
+# https://www.ibm.com/docs/en/addi/latest?topic=configuring-by-using-ad-configuration-service
+ENVIRONMENT_ID=8a714d09-f67a-4891-8071-7d581959dbcc
+
+# The location of the DEX authentication server, defaults to $PROTOCOL://$AD_HOST:7600 if unset
+# DEX_HOST_PORT=
+
+# Outbound mail settings to enable email notifications
+# MAIL_HOST=
+# MAIL_PORT=
+# MAIL_USERNAME=
+# MAIL_PASSWORD=
+
+# Extra Java mail properties, which can be specified by using MAIL_PROPERTIES_ prefix
+# followed by the property name with dot separators replaced by underscores
+# MAIL_PROPERTIES_MAIL_SMTP_AUTH=true
+
+```
+
+Generate the TLS certs that will be required for ADDI Host and Refactor host to talk to each other.
+
+```tsx
+./start.sh --prepare-only /root/certs
+```
+
+This will generate a bunch of certs in that directory.
+
+In the `/root/certs` directory, a self-signed certificate named `root.crt` is generated from the preparatory step. Copy this certificate to the IBM ADDI host where IBM AD Configuration Server is running, and import it into the `truststore` file that ADDI uses.
+
+In our case it was just easier to create the `root.crt` file and copy the contents over.
