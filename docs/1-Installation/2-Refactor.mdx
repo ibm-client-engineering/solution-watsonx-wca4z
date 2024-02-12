@@ -239,3 +239,93 @@ This will generate a bunch of certs in that directory.
 In the `/root/certs` directory, a self-signed certificate named `root.crt` is generated from the preparatory step. Copy this certificate to the IBM ADDI host where IBM AD Configuration Server is running, and import it into the `truststore` file that ADDI uses.
 
 In our case it was just easier to create the `root.crt` file and copy the contents over.
+
+### Configuring Certs
+
+Log back into the ADDI host.
+
+Import the certificate by running the following command:
+    
+```powershell
+keytool -importcert -alias ad-core-server -keystore "C:\certificates\server_keystore.p12" -storetype PKCS12 -storepass "p@ssw0rd" -file "C:\certificates\root.crt"
+```
+    
+Restart the IBM Application Discovery Configuration Service.
+
+The root CA certificate or the self-signed certificate must be installed into the local machine's trusted root certificate authorities.
+
+Presumably once we have a DB2 instance on cloud, we will get another cert that will have to be imported and installed as well.
+
+- On Windows:
+    1. Right-click the certificate and then click Install Certificate.
+    2. Select Local Machine and click Next.
+    3. Select Place all certificates in the following store.
+    4. Click Browse... and select Trusted Root Certificate Authorities.
+    5. Click OK and then Next.
+    6. Click Finish to complete the certificate import wizard.
+
+#### Import the certificate to Java runtime keystore
+
+To import the certificate to Java runtime keystore, complete the following steps:
+
+1. Open a Command Prompt (on Windows) or a Terminal (on Linux) and go to the folder containing the newly prepared server_keystore.p12.
+2. Execute the following command to import all certificates from server_keystore.p12 to the Java's cacerts keystore.
+
+Run this in a regular dos shell. Powershell will not have the JAVA_HOME env set correctly.
+
+```tsx
+keytool -importkeystore -srckeystore "C:\certificates\server_keystore.p12" -srcstorepass "p@ssw0rd" -destkeystore "%JAVA_HOME%\lib\security\cacerts" -deststorepass "changeit"
+        
+```
+:::info
+The default cacerts password is `changeit`.
+:::
+
+![ADDI](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/5a80ddf9-2b8e-46d1-82b5-bfa48a5fdadb)
+
+WIll probably have to repeat when we have a cert for the db2 instance
+
+From the **ADDI Dashboard**, restart the Configuration service.
+
+https://localhost:9443/ad/admin/dashboard
+
+Export the zookeeper.crt from the keystore... (not sure what the deal is with this). I think this is just literally the same server_cert we created before, but we're calling it zookeeper instead.
+
+```powershell
+
+keytool -exportcert -alias "wca4z-addi" -keystore "C:\certificates\server_keystore.p12" -rfc -file "C:\certificates\zookeeper.crt" -storepass "p@ssw0rd" -ext BasicConstraints:critical=ca:true -ext san=dns:wca4z-addi
+
+```
+
+Ok, this is what we're importing to our Refactor linux host. So let's just copy the contents over.
+
+Now let's make some copies on the refactor host
+
+```bash
+cp /root/certs/zookeeper.crt /root/certs/ad.crt
+cp /root/certs/zookeeper.crt /root/certs/dex.crt
+```
+
+now let's start things up
+
+### Start up Refactor
+
+```tsx
+./start.sh
+```
+
+:::info
+Once the start command is run, you will be asked what image registry to download the `orientdb` container image from. We've selected the `docker.io` repo in this example.
+:::
+
+Set the orientdb pass to `inittest`
+
+Once things are happier, podman should show the following:
+```tsx
+[root@wca4z-refactor refactoring-assistant]# podman ps -a
+CONTAINER ID  IMAGE                                            COMMAND               CREATED        STATUS        PORTS                   NAMES
+39ee821934ad  docker.io/library/orientdb:3.2.18                /orientdb/bin/ser...  6 minutes ago  Up 6 minutes                          orientdb
+2ea1ed0227ae  localhost/ibm/ra/ad-core-server:1.1.0                                  3 minutes ago  Up 3 minutes  0.0.0.0:4001->4001/tcp  ad-core-server
+5728a7c116d4  localhost/ibm/ra/refactoring-assistant:1.1.0                           3 minutes ago  Up 3 minutes  0.0.0.0:8081->8081/tcp  refactoring-assistant
+88c2177e3de6  localhost/ibm/ra/refactoring-assistant-ui:1.1.0  /bin/sh -c nginx ...  3 minutes ago  Up 3 minutes  0.0.0.0:9080->9080/tcp  refactoring-assistant-ui
+```
