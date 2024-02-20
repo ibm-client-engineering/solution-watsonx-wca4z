@@ -244,18 +244,21 @@ In our case it was just easier to create the `root.crt` file and copy the conten
 
 Log back into the ADDI host.
 
-Import the certificate by running the following command:
+If you've followed the steps [here](ADDI#tls-certs-and-keystores), you should have the following files in `C:\certificates` on the ADDI host.
+
+![ADDI_HOST](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/e244991c-fe4e-4982-9ed9-ec55019180b2)
+
+Create a new file called `root.crt` in the `C:\certificates` directory and past the contents in from `/root/certs/root.crt`.
+
+Now import the certificate by running the following command in powershell:
     
 ```powershell
-keytool -importcert -alias ad-core-server -keystore "C:\certificates\server_keystore.p12" -storetype PKCS12 -storepass "p@ssw0rd" -file "C:\certificates\root.crt"
+keytool -importcert -alias ad-core-server -keystore "C:\certificates\server_keystore.p12" -storetype PKCS12 -storepass "p@ssw0rd" -file "C:\certificates\root.crt" -storepass p@ssw0rd -ext BasicConstraints:critical=ca:true -ext san=dns:10.241.64.4
 ```
     
 Restart the IBM Application Discovery Configuration Service.
 
-The root CA certificate or the self-signed certificate must be installed into the local machine's trusted root certificate authorities.
-
-Presumably once we have a DB2 instance on cloud, we will get another cert that will have to be imported and installed as well.
-
+The root CA certificate or the self-signed certificate must be installed into the local machine's trusted root certificate authorities. These certs should be the `server_certificate.crt` and `root.crt`. Also the DB2 SSL cert if you received one. These certs should all be in the `C:\certificates` directory since that's where we've been putting them.
 - On Windows:
     1. Right-click the certificate and then click Install Certificate.
     2. Select Local Machine and click Next.
@@ -264,16 +267,16 @@ Presumably once we have a DB2 instance on cloud, we will get another cert that w
     5. Click OK and then Next.
     6. Click Finish to complete the certificate import wizard.
 
-#### Import the certificate to Java runtime keystore
+### Import the certificate to Java runtime keystore
 
 To import the certificate to Java runtime keystore, complete the following steps:
 
-1. Open a Command Prompt (on Windows) or a Terminal (on Linux) and go to the folder containing the newly prepared server_keystore.p12.
+1. Open a Command Prompt (on Windows) or a Terminal (on Linux) and go to the folder containing the newly prepared `server_keystore.p12`. This would be `C:\certificates`.
 2. Execute the following command to import all certificates from server_keystore.p12 to the Java's cacerts keystore.
 
 Run this in a regular dos shell. Powershell will not have the JAVA_HOME env set correctly.
 
-```tsx
+```dos
 keytool -importkeystore -srckeystore "C:\certificates\server_keystore.p12" -srcstorepass "p@ssw0rd" -destkeystore "%JAVA_HOME%\lib\security\cacerts" -deststorepass "changeit"
         
 ```
@@ -289,17 +292,17 @@ From the **ADDI Dashboard**, restart the Configuration service.
 
 https://localhost:9443/ad/admin/dashboard
 
-Export the zookeeper.crt from the keystore... (not sure what the deal is with this). I think this is just literally the same server_cert we created before, but we're calling it zookeeper instead.
+In powershell on the ADDI host, export the zookeeper.crt from the keystore.
 
 ```powershell
 
-keytool -exportcert -alias "wca4z-addi" -keystore "C:\certificates\server_keystore.p12" -rfc -file "C:\certificates\zookeeper.crt" -storepass "p@ssw0rd" -ext BasicConstraints:critical=ca:true -ext san=dns:wca4z-addi
+keytool -exportcert -alias "10.241.64.4" -keystore "C:\certificates\server_keystore.p12" -rfc -file "C:\certificates\zookeeper.crt" -storepass "p@ssw0rd" -ext BasicConstraints:critical=ca:true -ext san=dns:10.241.64.4
 
 ```
 
-Ok, this is what we're importing to our Refactor linux host. So let's just copy the contents over.
+Create a new file on the Refactor host called `zookeeper.crt` in `/root/certs` and copy/paste the contents over.
 
-Now let's make some copies on the refactor host
+Now copy `zookeeper.crt` to `ad.crt` and `dex.crt`.
 
 ```bash
 cp /root/certs/zookeeper.crt /root/certs/ad.crt
@@ -329,3 +332,11 @@ CONTAINER ID  IMAGE                                            COMMAND          
 5728a7c116d4  localhost/ibm/ra/refactoring-assistant:1.1.0                           3 minutes ago  Up 3 minutes  0.0.0.0:8081->8081/tcp  refactoring-assistant
 88c2177e3de6  localhost/ibm/ra/refactoring-assistant-ui:1.1.0  /bin/sh -c nginx ...  3 minutes ago  Up 3 minutes  0.0.0.0:9080->9080/tcp  refactoring-assistant-ui
 ```
+
+Let's set refactor as a systemd service. The service script will ask you for the orientdb password, which we set to `inittest`.
+
+```tsx
+./install-as-service.sh
+```
+
+This will configure the services as a systemd service that will start on reboots.

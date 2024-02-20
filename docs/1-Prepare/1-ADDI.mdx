@@ -134,6 +134,12 @@ We'll call our volume label `AD Data`
 
 Confirm and Create
 
+### Install Cygwin
+
+Download the installer from [here](https://www.cygwin.com/setup-x86_64.exe)
+
+Run and install it.
+
 ### Installing Microsoft SQL Server
 
 As of this writing, the following versions of MS SQL Server are compatible with ADDI:
@@ -194,7 +200,7 @@ Let's build our install command here:
 
 Options like `SQLSYSADMINACCOUNTS` are the admin user. Typically this is the hostname capitlized followed by Administrator.
 
-Ex: `WCA4Z-ADDI-Administrator`
+Ex: `WCA4Z-ADDI\Administrator`
 
 Also the `SAPWD` password should be set to your Windows Administrator password.
 
@@ -253,6 +259,77 @@ Open the Powershell and run the following command to open all required ports:
 New-NetFirewallRule -DisplayName "ADDIandSQLPorts" -Direction inbound -Profile Any -Action Allow -LocalPort 1433,3000,9080,9443,2181,2281,2424,2430,2434,2440,7600,7700,7800,7900,7650,7850,9999 -Protocol TCP
 
 ```
+
+### TLS Certs and Keystores
+
+Create some keystores for stuff. For real, DEX needs this and we're ultimately going to import our root cert from the refactor assistant into this keystore.
+
+:::info
+
+Useful links for this section
+
+https://www.ibm.com/docs/en/watsonx-code-assistant-4z/1.0.1?topic=ad-prepare-files-enabling-secure-communication#securing_prepare_files__prepare_key_crt__title__1
+
+:::
+
+Each server must have a keystore that contains the following entries:
+
+- A `PrivateKeyEntry` of the CA signed certificate.
+- A `TrustedCertEntry` of the root CA certificate.
+
+It's apparently optional to generate a self-signed key cert. We're going to generate one as while it's best practices to have a key cert signed by a real CA, we don't have a real CA.
+
+This will be our local keystore.
+
+Make sure that `C:\certificates` exists as this is where we will store these keys.
+
+In our example environment we do not have DNS configured and our host technically does not have an FQDN, so we will be using the host ip address which is `10.241.64.4`. In an actual client configuration we would recommend a FQDN but for now we are going to use the host ip as the alias. We're also setting our key password to `p@ssw0rd`.
+
+```powershell
+keytool -genkeypair -alias "10.241.64.4" -keyalg RSA -keysize 2048 -dname "cn=10.241.64.4" -keypass "p@ssw0rd" -keystore "C:\certificates\server_keystore.p12" -storepass "p@ssw0rd" -storetype PKCS12 -ext BasicConstraints:critical=ca:true -ext san=dns:10.241.64.4
+```
+
+Now we have a keystore sitting at `C:\Users\Administrator.WCA4Z-ADDI\server_keystore.p12`
+
+
+Let's now export the cert
+
+```powershell
+keytool -exportcert -alias "10.241.64.4" -keystore "C:\certificates\server_keystore.p12" -file "C:\certificates\server_certificate.crt" -storepass "p@ssw0rd"
+```
+
+Now let's re-import the certificate into the keystore under the alias of `self-signed-root`
+
+```powershell
+keytool -keystore "C:\certificates\server_keystore.p12" -import -file "C:\certificates\server_certificate.crt" -alias "self-signed-root" -storepass "p@ssw0rd"
+```
+
+If you have the DB2 SSL certificate for the cloud instance of DB2, import it into the keystore as well.
+
+```powershell
+keytool -import -trustcacerts -alias "DB2-ssl-cert" -file "C:\certificates\DigiCertGlobalRootCA.crt" -keystore "C:\certificates\server_keystore.p12" -storepass "p@ssw0rd"
+```
+
+Delete the `server_certificate.crt` file as this is not needed now and we are apparently going to recreate it.
+
+Now let's use OpenSSL to generate the `server.key`
+
+Open up Cygwin Terminal App
+
+Use the **OpenSSL** tool from **Cygwin** to export the certificates in a dedicated location. 
+
+To generate the server.key file, run the following command in the Cygwin Terminal App.
+
+```bash
+openssl pkcs12 -in "C:\certificates\server_keystore.p12" -nocerts -nodes -out "C:\certificates\server.key"
+```
+
+Generate the `server_certificate.crt` file again, but _different_ in your Powershell window.
+
+```tsx
+keytool -list -keystore "C:\certificates\server_keystore.p12" -rfc > "C:\certificates\server_certificate.crt"
+```
+
 ### Installing ADDI
 
 https://w3south-limited-use.cpc.ibm.com/software/xl/download/ticket.wss
@@ -271,8 +348,98 @@ Double click the installer.
 
 `IBM_Application_Discovery_and_Delivery_Intelligence_Installer-6.1.2-ifix1.exe`
 
+#### Installation of ADDI via CMDLINE
 
-#### Configuration of ADDI
+Alternatively, we can run this installer in quiet mode.
+
+We can create the following file on the desktop called `auto-install.xml`
+
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<AutomatedInstallation langpack="eng">
+    <com.izforge.izpack.panels.hello.HelloPanel id="HelloPanel_0"/>
+    <com.izforge.izpack.panels.licence.LicencePanel id="LicencePanel_1"/>
+    <com.izforge.izpack.panels.target.TargetPanel id="TargetPanel_2">
+        <installpath>C:\Program Files\IBM Application Discovery and Delivery Intelligence</installpath>
+    </com.izforge.izpack.panels.target.TargetPanel>
+    <com.izforge.izpack.panels.packs.PacksPanel id="PacksPanel_3">
+        <pack index="0" name="IBM Application Discovery Servers and Services" selected="true"/>
+        <pack index="1" name="IBM Application Discovery Build Client" selected="true"/>
+        <pack index="2" name="Authentication Server (DEX)" selected="true"/>
+        <pack index="3" name="Stop Running Services" selected="true"/>
+        <pack index="4" name="IBM Application Discovery Web Services" selected="true"/>
+        <pack index="5" name="@AN_SERVER_NAME@" selected="true"/>
+        <pack index="6" name="IBM Application Discovery Batch Server" selected="true"/>
+        <pack index="7" name="IBM Application Discovery Configuration Service" selected="true"/>
+        <pack index="8" name="IBM Application Discovery Cross Applications Service" selected="true"/>
+        <pack index="9" name="IBM Application Discovery Service Manager" selected="true"/>
+        <pack index="10" name="IBM Application Discovery File Service" selected="true"/>
+        <pack index="11" name="IBM Application Discovery Mainframe Projects Service" selected="true"/>
+        <pack index="12" name="IBM Application Discovery Manual Resolutions Service" selected="true"/>
+        <pack index="13" name="IBM Application Discovery Search Service" selected="true"/>
+        <pack index="14" name="Open Wizard" selected="true"/>
+        <pack index="15" name="Upgrade Wizard" selected="false"/>
+        <pack index="16" name="Installer files" selected="true"/>
+    </com.izforge.izpack.panels.packs.PacksPanel>
+    <com.izforge.izpack.panels.userinput.UserInputPanel id="openConfigWizard">
+        <entry key="OpenWizard" value="on"/>
+    </com.izforge.izpack.panels.userinput.UserInputPanel>
+    <com.izforge.izpack.panels.userinput.UserInputPanel id="userInput">
+        <entry key="CCS_IP" value="<HOST IP>"/>
+        <entry key="CCS_PORT" value="2181"/>
+    </com.izforge.izpack.panels.userinput.UserInputPanel>
+    <com.izforge.izpack.panels.install.InstallPanel id="InstallPanel_7"/>
+    <com.izforge.izpack.panels.shortcut.ShortcutPanel id="ShortcutPanel_8">
+        <createMenuShortcuts>true</createMenuShortcuts>
+        <programGroup>IBM Application Discovery and Delivery Intelligence</programGroup>
+        <createDesktopShortcuts>false</createDesktopShortcuts>
+        <createStartupShortcuts>false</createStartupShortcuts>
+        <shortcutType>all</shortcutType>
+    </com.izforge.izpack.panels.shortcut.ShortcutPanel>
+    <com.izforge.izpack.panels.finish.FinishPanel id="FinishPanel_9"/>
+</AutomatedInstallation>
+```
+Update `<HOST IP>` to our ADDI host address.
+
+Now open a PowerShell window and navigate to the ADDI install path and run the installer.
+
+```powershell
+cd "C:\Users\Administrator\Downloads\ADDI_FOR_IBM_Z_612_WIN\IBM ADDI"`
+
+java -jar .\IBM_Application_Discovery_and_Delivery_Intelligence_Installer-6.1.2-ifix1.exe -f "C:\Users\Administrator\Desktop\auto-install.xml"
+
+Command line arguments: -f C:\Users\Administrator\Desktop\auto-install.xml
+[ Starting automated installation ]
+====================
+Installation started
+Framework: 5.1.3-84aaf (IzPack)
+Platform: windows,version=10.0,arch=x64,symbolicName=WINDOWS_10,javaVersion=11.0.22
+[ Starting to unpack ]
+[ Processing package: IBM Application Discovery Servers and Services (1/16) ]
+[ Processing package: IBM Application Discovery Build Client (2/16) ]
+[ Processing package: Authentication Server (DEX) (16/16) ]
+[ Processing package:  (3/16) ]
+[ Processing package:  (4/16) ]
+Cleaning up the target folder ...
+[ Processing package:  (5/16) ]
+[ Processing package:  (6/16) ]
+[ Processing package:  (7/16) ]
+[ Processing package:  (8/16) ]
+[ Processing package:  (9/16) ]
+[ Processing package:  (10/16) ]
+[ Processing package:  (11/16) ]
+[ Processing package:  (12/16) ]
+[ Processing package:  (13/16) ]
+[ Processing package:  (14/16) ]
+[ Processing package:  (15/16) ]
+[ Unpacking finished ]
+Installation finished
+[ Writing the uninstaller data ... ]
+[ Automated installation done ]
+```
+
+
+#### Installation of ADDI via UI
 
 https://www.ibm.com/docs/en/watsonx-code-assistant-4z/1.0?topic=configuring-by-using-ad-configuration-wizard
 
@@ -297,6 +464,9 @@ Keep our external IP as the Config service IP. In this case, our VM is `10.241.6
 ![ADDI Install7](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/1f5e2187-cd26-4198-833b-0bb990090ab7)
 
 At some point, the installer will spin up the ADDI web dashboard to continue the installation
+
+#### Configuring ADDI via WEBUI
+
 ![CleanShot 2024-02-09 at 15 40 39](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/68df8096-4c29-4dc1-b008-8e81481fbd0d)
 
 Set our Relational Database Server info to point to our local SQL Server. Use the `addi_user` we configured with his password `p@ssw0rd`.
@@ -338,3 +508,160 @@ The following services should be offline or disabled in the Dashboard
 - Authentication server (DEX)
 - Catalog service
 - Validation service
+
+
+
+Let's generate a hashed SHA256 password on the linux refactor host
+
+```bash
+openssl passwd -5 p@ssw0rd
+$5$aPcZ8PYGME9ztCKm$if2XAAOQVnlD4iLDQgq0a5A982LM5Kyg./czg23g647
+```
+
+Under `C:\Program Files\IBM Application Discovery and Delivery Intelligence\Authentication Server (DEX)\conf`
+
+Our `issuer` should be either the FQDN or the IP of the ADDI host
+
+We're going update the `dex.yaml` with the following
+```yaml
+issuer: https://10.241.64.4:7600/dex
+storage:
+  type: sqlite3
+  config:
+  file: dex.db
+frontend:
+  theme: addi
+web:
+  TLSCert: conf/root.crt
+  TLSKey: conf/root.key
+  https: 0.0.0.0:7600
+oauth2:
+  skipApprovalScreen: true
+  passwordConnector: ldap
+connectors: []
+
+enablePasswordDB: true
+staticClients:
+  - id: refactoring-assistant
+    redirectURIs:
+      - https://10.241.64.5:9443
+    name: Refactoring Assistant
+    secret: pkce
+staticPasswords:
+  - email: addi_user@ibm.com
+    hash: $5$aPcZ8PYGME9ztCKm$if2XAAOQVnlD4iLDQgq0a5A982LM5Kyg./czg23g647
+    username: addi_user
+    userID: null
+```
+
+Open the admin dashboard and click Configure at the top
+https://localhost:9443/ad/admin/dashboard
+
+Click on the Default env
+
+Go to Servers and Security
+
+Select Security from the choices on the left and then select HTTPS as the protocol type
+
+At the bottom go to "Drag and Drop files here..." and upload the following files from `C:\certificates`
+- `server_keystore.p12`
+- `server_certificate.crt`
+- `server.key`
+
+Set the password to `p@ssw0rd`.
+
+### Installing/Configuring DB2 Client 
+
+:::note
+Data Server Client 11.5.4 is available [here](https://www.ibm.com/support/pages/download-initial-version-115-clients-and-drivers)
+It typically installs to `C:\Program Files\IBM\IBM DATA SERVER\`
+:::
+
+	
+Determine the FQDN of your DB2 on Cloud instance:
+
+_Add methods of retrieving the FQDN here_
+
+Our example FQDN is `ab4681b0-3825-47d4-b26b-3636795d5ca5.bv7c3o6d0vfhru3npds0.databases.appdomain.cloud`
+
+Once you have the instance up and you have the FQDN, run the following commands in Powershell on the ADDI Host:
+
+```powershell
+db2cli writecfg add -database bludb -host ab4681b0-3825-47d4-b26b-3636795d5ca5.bv7c3o6d0vfhru3npds0.databases.appdomain.cloud -port 31447
+db2cli writecfg add -dsn dashdb -database bludb -host ab4681b0-3825-47d4-b26b-3636795d5ca5.bv7c3o6d0vfhru3npds0.databases.appdomain.cloud -port 31447
+db2cli writecfg add -database bludb -host ab4681b0-3825-47d4-b26b-3636795d5ca5.bv7c3o6d0vfhru3npds0.databases.appdomain.cloud -port 31447 -parameter "SecurityTransportMode=SSL"
+```
+
+[`db2configuration.bat`](../../deployment_files/db2configuration.bat)
+
+The script above adds the DB2 database to ADDI instead of having to do it manually through the UI
+
+```powershell
+db2configuration.bat dbName=BLUDB db2Host=ab4681b0-3825-47d4-b26b-3636795d5ca5.bv7c3o6d0vfhru3npds0.databases.appdomain.cloud db2Port=31447 db2User=5f5cb4ff db2Password=yK5mnXMS1XbQr8yM useTLS=true
+```
+- upload the certs/keys/stores
+- if hang, just refresh browser
+- verify that dex.yaml has been updated
+- Windows service restart liberty 
+
+Db2 connect
+- requires install of Db2 client on Windows system (for db2cli), get link from github
+- For commands and definition of DB2 in ADDI see section above
+
+Data Generator
+- This is something already in the Velocity images
+- Download latest zip from https://eu.artifactory.swg-devops.com/ui/native/zeus-ez-public/ez/sd/wca4z-data-generator/ (requires w3 login)
+- Can't download, either no access or it doesn't exist at that spot
+
+- Found zip file WCA4Z-Data-Generator.zip in box somewhere and downloaded it
+
+`README.txt`
+```
+Watson Code Assistant for Z Data Generator - 1.0.0
+
+Generates Control Flow data and DDL database information from an extracted service and writes the information in a DB2 on Cloud database.
+
+
+### Prerequisites
+
+1. The basic requirements for running the Watson Code Assistant for Z Data Generator (WCA4Z) are the same as IBM Application Discovery and Delivery Intelligence (ADDI) and can be found at https://www.ibm.com/docs/en/addi/6.1.2?topic=installing-prerequisites.
+1. ADDI is already installed and configured on the same machine where Watson Code Assistant for Z Data Generator is going to be installed. More information available at https://www.ibm.com/docs/en/addi/6.1.2?topic=guide-installing
+
+
+### Setup
+
+1. Extract the contents of the WCA4Z Data Generator ZIP file into the `<ADDI_INSTALLATION_FOLDER>` folder. The ZIP file contains a folder called `WCA4Z Data Generator` so after extracting, the contents of that folder should be available in `<ADDI_INSTALLATION_FOLDER>\WCA4Z Data Generator`.
+2. Add an IBM Db2 relational database server from `IBM Application Discovery Configuration Service Admin > Configure > <ENV_NAME> > Servers and security > Relational database servers.`. This should be an instance of IBM Db2 on Cloud.
+3. Create a new mainframe project:
+    - Open `IBM Application Discovery Build Client`.
+    - Select `File > New Project`.
+    - Choose `Mainframe main languages` as the project type and click on the `Next` button.
+    - Enter a the project name, for example `ExtractedServices`. 
+    - Select the `Project DB Type` and choose the IBM Db2 on Cloud database server added in the previous step.
+    - Click on the `Finish` button to create the new project.
+4. Create a new GitHub repository for the source files extracted from IBM Refactoring Assistant. The structure of the repository should the following folders:
+    - `Cobol Programs`
+    - `Copybooks`
+    - `DDL`
+5. Enable project file synchronization. More information available at https://www.ibm.com/docs/en/addi/6.1.2?topic=configurations-filling-ad-build-client-install-configuration-page
+    - Copy the file `<ADDI_INSTALLATION_FOLDER>\WCA4Z Data Generator\samples\SyncFile.txt` to a new location, for example the ADDI project sources folder `C:\IBM AD\Mainframe Sources`.
+    - Open `IBM Application Discovery Configuration Service Admin > Configure > Install configurations > IBM Application Discovery Build Client install configuration`.
+    - Check the "Enable members synchronization" option.
+    - Fill in the full path to the `SyncFile.txt`, for example `C:\IBM AD\Mainframe Sources\SyncFile.txt`.
+    - Save the changes by clicking on the `Save` button.
+6. Open the configuration file located in `<ADDI_INSTALLATION_FOLDER>\WCA4Z Data Generator\conf.properties`.
+7. Edit the values to match your ADDI installation details. Default values are provided as an example and they could be used as is or modified.
+    - `ADDI_PROJECT_NAME=ExtractedServices` - This is the project created in IBM Application Discovery Build Client and will be used to build the extracted services COBOL files.
+    - `ADDI_PROJECTS_FOLDER=C:\IBM AD\Mainframe Projects` - This is the root folder for all projects. It has been configured during the ADDI initial setup and it can be accessed from `IBM Application Discovery Configuration Service Admin > Configure > Install configurations > IBM Application Discovery Build Client install configuration`.
+    - `PROJECT_GITHUB_CLONE_FOLDER=C:\Extracted-Services` - This is the GitHub repository folder where the extracted services COBOL files are committed and updated.
+    - `DDL_FOLDER=C:\Extracted-Services\DDL` - This is the folder where DDL and JCL files containing database information are added. Multiple files can be added to the folder but only the most recently updated one will be processed.
+
+### Run
+
+1. Run the `automation.bat` script with no additional arguments from Command Prompt.
+2. The script is executing synchronously and will return a zero exit code for a successful execution or a non zero exit code otherwise.
+3. If new programs have been built successfully but the metadata import fails for any reason, those programs will be saved for retry with the next run.
+4. A new `runControlFlowGenerator.log` log file will be generated in the same folder containing the full output of the execution.
+```
+
+- TODO: Check that RA is still running after https set up
