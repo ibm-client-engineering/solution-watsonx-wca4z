@@ -253,7 +253,7 @@ Create a new file called `root.crt` in the `C:\certificates` directory and past 
 Now import the certificate by running the following command in powershell:
     
 ```powershell
-keytool -importcert -alias ad-core-server -keystore "C:\certificates\server_keystore.p12" -storetype PKCS12 -storepass "p@ssw0rd" -file "C:\certificates\root.crt" -storepass p@ssw0rd -ext BasicConstraints:critical=ca:true -ext san=dns:wca4z-addi
+keytool -importcert -alias ad-core-server -keystore "C:\certificates\server_keystore.p12" -storetype PKCS12 -storepass "p@ssw0rd" -file "C:\certificates\root.crt" -storepass p@ssw0rd -ext BasicConstraints:critical=ca:true -ext san=dns:10.241.64.4
 ```
     
 Restart the IBM Application Discovery Configuration Service.
@@ -296,7 +296,7 @@ In powershell on the ADDI host, export the zookeeper.crt from the keystore.
 
 ```powershell
 
-keytool -exportcert -alias "wca4z-addi" -keystore "C:\certificates\server_keystore.p12" -rfc -file "C:\certificates\zookeeper.crt" -storepass "p@ssw0rd" -ext BasicConstraints:critical=ca:true -ext san=dns:wca4z-addi
+keytool -exportcert -alias "10.241.64.4" -keystore "C:\certificates\server_keystore.p12" -rfc -file "C:\certificates\zookeeper.crt" -storepass "p@ssw0rd" -ext BasicConstraints:critical=ca:true -ext san=dns:10.241.64.4
 
 ```
 
@@ -332,3 +332,11 @@ CONTAINER ID  IMAGE                                            COMMAND          
 5728a7c116d4  localhost/ibm/ra/refactoring-assistant:1.1.0                           3 minutes ago  Up 3 minutes  0.0.0.0:8081->8081/tcp  refactoring-assistant
 88c2177e3de6  localhost/ibm/ra/refactoring-assistant-ui:1.1.0  /bin/sh -c nginx ...  3 minutes ago  Up 3 minutes  0.0.0.0:9080->9080/tcp  refactoring-assistant-ui
 ```
+
+Let's set refactor as a systemd service. The service script will ask you for the orientdb password, which we set to `inittest`.
+
+```tsx
+./install-as-service.sh
+```
+
+This will configure the services as a systemd service that will start on reboots.
