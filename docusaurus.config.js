@@ -143,7 +143,7 @@ async function createconfig() {
             {to: "/", label: "Flight Path", position: "right"},
             {to: "blog", label: "Flight Logs", position: "right"},
             {
-              href: "https://github.com/ibm-client-engineering/solution-watsonx-wca4z",
+              href: "https://github.ibm.com/ibm-client-engineering/solution-watsonx-wca4z",
               className: "header-github-link",
               position: "right",
             },
