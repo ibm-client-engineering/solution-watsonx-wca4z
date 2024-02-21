@@ -227,6 +227,7 @@ ENVIRONMENT_ID=8a714d09-f67a-4891-8071-7d581959dbcc
 # MAIL_PROPERTIES_MAIL_SMTP_AUTH=true
 
 ```
+### Generate the TLS Certs for Refactor
 
 Generate the TLS certs that will be required for ADDI Host and Refactor host to talk to each other.
 
@@ -240,74 +241,7 @@ In the `/root/certs` directory, a self-signed certificate named `root.crt` is ge
 
 In our case it was just easier to create the `root.crt` file and copy the contents over.
 
-### Configuring Certs
 
-Log back into the ADDI host.
-
-If you've followed the steps [here](ADDI#tls-certs-and-keystores), you should have the following files in `C:\certificates` on the ADDI host.
-
-![ADDI_HOST](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/e244991c-fe4e-4982-9ed9-ec55019180b2)
-
-Create a new file called `root.crt` in the `C:\certificates` directory and past the contents in from `/root/certs/root.crt`.
-
-Now import the certificate by running the following command in powershell:
-    
-```powershell
-keytool -importcert -alias ad-core-server -keystore "C:\certificates\server_keystore.p12" -storetype PKCS12 -storepass "p@ssw0rd" -file "C:\certificates\root.crt" -storepass p@ssw0rd -ext BasicConstraints:critical=ca:true -ext san=dns:10.241.64.4
-```
-    
-Restart the IBM Application Discovery Configuration Service.
-
-The root CA certificate or the self-signed certificate must be installed into the local machine's trusted root certificate authorities. These certs should be the `server_certificate.crt` and `root.crt`. Also the DB2 SSL cert if you received one. These certs should all be in the `C:\certificates` directory since that's where we've been putting them.
-- On Windows:
-    1. Right-click the certificate and then click Install Certificate.
-    2. Select Local Machine and click Next.
-    3. Select Place all certificates in the following store.
-    4. Click Browse... and select Trusted Root Certificate Authorities.
-    5. Click OK and then Next.
-    6. Click Finish to complete the certificate import wizard.
-
-### Import the certificate to Java runtime keystore
-
-To import the certificate to Java runtime keystore, complete the following steps:
-
-1. Open a Command Prompt (on Windows) or a Terminal (on Linux) and go to the folder containing the newly prepared `server_keystore.p12`. This would be `C:\certificates`.
-2. Execute the following command to import all certificates from server_keystore.p12 to the Java's cacerts keystore.
-
-Run this in a regular dos shell. Powershell will not have the JAVA_HOME env set correctly.
-
-```dos
-keytool -importkeystore -srckeystore "C:\certificates\server_keystore.p12" -srcstorepass "p@ssw0rd" -destkeystore "%JAVA_HOME%\lib\security\cacerts" -deststorepass "changeit"
-        
-```
-:::info
-The default cacerts password is `changeit`.
-:::
-
-![ADDI](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/5a80ddf9-2b8e-46d1-82b5-bfa48a5fdadb)
-
-WIll probably have to repeat when we have a cert for the db2 instance
-
-From the **ADDI Dashboard**, restart the Configuration service.
-
-https://localhost:9443/ad/admin/dashboard
-
-In powershell on the ADDI host, export the zookeeper.crt from the keystore.
-
-```powershell
-
-keytool -exportcert -alias "10.241.64.4" -keystore "C:\certificates\server_keystore.p12" -rfc -file "C:\certificates\zookeeper.crt" -storepass "p@ssw0rd" -ext BasicConstraints:critical=ca:true -ext san=dns:10.241.64.4
-
-```
-
-Create a new file on the Refactor host called `zookeeper.crt` in `/root/certs` and copy/paste the contents over.
-
-Now copy `zookeeper.crt` to `ad.crt` and `dex.crt`.
-
-```bash
-cp /root/certs/zookeeper.crt /root/certs/ad.crt
-cp /root/certs/zookeeper.crt /root/certs/dex.crt
-```
 
 now let's start things up
 
