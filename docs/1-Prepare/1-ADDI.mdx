@@ -110,6 +110,59 @@ ibmcloud is floating-ip-reserve <FLOATING_IP_NAME> --nic <NIC>
 
 You now have what you need to connect to your Windows instance: a decrypted password and a floating IP address. Use your preferred Remote Desktop client to connect to your instance. To connect to your instance, provide the floating IP address and the decrypted password. The username is `Administrator` by default. If you're connecting from a client that is running the Windows Administrator account, use `.\administrator` as the user ID to log on to RDP.
 
+### Disable public RDP access
+
+It is against IBM security policy to have Remote Desktop Protocol enabled on a public IP address.
+
+Change RDP listening port for hardening
+- Needs to be set to something other than the default ports 3389/3388, in this guide we will change it to 3390
+- For VPC infrastructure, go to IBM Cloud and open the virtual instance, on the network interface click on the security group, manage rules, add port 3390 to rule with 3389
+- https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/clients/change-listening-port
+- Check current port (via PowerShell)  
+	```
+  Get-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "PortNumber"
+  ```
+- Change port to 3390 (via PowerShell, start as Administrator)
+  ```
+  #Run Powershell as an administrator#
+
+  #Allow powershell commands to run
+  Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Confirm:$False -Force
+
+  #Get current port number
+  Get-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "PortNumber"
+
+  #Change port # assigned to RDP. You can assign any port between 1024 to 49151
+  #$portvalue = Read-Host -Prompt 'Input new PORT number between 1024 to 49151'
+  $portvalue = 3390
+
+  Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "PortNumber" -Value $portvalue 
+
+  New-NetFirewallRule -DisplayName 'RDPPORTLatest-TCP-In' -Profile 'Public' -Direction Inbound -Action Allow -Protocol TCP -LocalPort $portvalue 
+  New-NetFirewallRule -DisplayName 'RDPPORTLatest-UDP-In' -Profile 'Public' -Direction Inbound -Action Allow -Protocol UDP -LocalPort $portvalue
+
+  #Confirm port number has been changed
+  Get-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "PortNumber"
+
+  #Once powershell commands are complete, reset the powershell execution policy
+  Set-ExecutionPolicy -ExecutionPolicy Restricted -Confirm:$False -Force
+  ```
+- Restart RDP (via PowerShell as Administrator)
+  ```
+  Restart-Service -Force -DisplayName "Remote Desktop Services"
+  ```
+
+- Test RDP to port 3390 (e.g. x.x.x.x:3390)
+- For VPC infrastructure, go to IBM Cloud and open the virtual instance, on the network interface click on the security group, manage rules, remove port 3389 from any rules
+
+- On your workstation, start SSH tunneling command (-N prevents a shell from starting)
+  ```
+  ssh -L 13389:<private address of Windows server>:3390 root@<public address of linux server that can access private address of Windows server> -i ~/.ssh/rhel-wca4z-key_rsa.prv -N
+  ```
+- While the ssh command is running, open RDP against localhost:13389 to test log in
+
+- For VPC infrastructure, go to IBM Cloud and open the virtual instance, on the network interface click on the security group, manage rules, remove rule containing remaining port 3390
+
 ### Configure the data disk
 
 Open the server manager on the ADDI host and select the 300 gig disk:
