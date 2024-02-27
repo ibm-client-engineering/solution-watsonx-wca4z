@@ -1,0 +1,240 @@
+---
+id: TLS
+sidebar_position: 3
+title: TLS Connections
+custom_edit_url: null
+---
+
+:::note
+This section will assume you have completed most of the major tasks in [ADDI](ADDI) and [Refactor](Refactor)
+:::
+
+### TLS Certs and Keystores
+
+The following is a complicated dance between our two hosts, Refactor and ADDI. We need to generate our TLS certs.
+
+Create some keystores for stuff. For real, DEX needs this and we're ultimately going to import our root cert from the refactor assistant into this keystore.
+
+:::info
+
+Useful links for this section
+
+https://www.ibm.com/docs/en/watsonx-code-assistant-4z/1.0.1?topic=ad-prepare-files-enabling-secure-communication#securing_prepare_files__prepare_key_crt__title__1
+
+:::
+
+:::warning
+As of windows server 2022 and newer, (win11x), the default output from any cmdlet in PowerShell automatically encodes the output as UTF-16E. This causes a problem for the configuration service when it tries to import the certificate chain we will be generating. 
+
+Ref: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_character_encoding?view=powershell-7.4
+
+To set the output encoding correctly, add the following to the PowerShell profile if you can.
+
+```powershell
+$PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
+```
+
+Otherwise run that powershell command each time you open a PowerShell instance.
+
+:::
+
+Each server must have a keystore that contains the following entries:
+
+- A `PrivateKeyEntry` of the CA signed certificate.
+- A `TrustedCertEntry` of the root CA certificate.
+
+It's apparently optional to generate a self-signed key cert. We're going to generate one as while it's best practices to have a key cert signed by a real CA, we don't have a real CA.
+
+This will be our local keystore.
+
+Make sure that `D:\certificates` exists as this is where we will store these keys.
+ 
+It's best to use the FQDN of your ADDI host if you have one. Ours in this example is `wca4z2-winaddi.fyre.ibm.com`. However you can also just use the host ip address.
+
+```powershell
+keytool -genkeypair -alias "wca4z2-winaddi.fyre.ibm.com" -keyalg RSA -keysize 2048 -dname "cn=wca4z2-winaddi.fyre.ibm.com" -keypass "p@ssw0rd" -keystore "D:\certificates\server_keystore.p12" -storepass "p@ssw0rd" -storetype PKCS12 -ext BasicConstraints:critical=ca:true -ext san=dns:wca4z2-winaddi.fyre.ibm.com
+```
+
+Now we have a keystore sitting at `C:\Users\Administrator.WCA4Z-ADDI\server_keystore.p12`
+
+
+Let's now export the cert
+
+```powershell
+keytool -exportcert -alias "wca4z2-winaddi.fyre.ibm.com" -keystore "D:\certificates\server_keystore.p12" -file "D:\certificates\server_certificate.crt" -storepass "p@ssw0rd"
+```
+
+Now let's re-import the certificate into the keystore under the alias of `self-signed-root`
+
+```powershell
+keytool -keystore "D:\certificates\server_keystore.p12" -import -file "D:\certificates\server_certificate.crt" -alias "self-signed-root" -storepass "p@ssw0rd"
+```
+
+If you have the DB2 SSL certificate for the cloud instance of DB2, import it into the keystore as well.
+
+```powershell
+keytool -import -trustcacerts -alias "DB2-ssl-cert" -file "D:\certificates\DigiCertGlobalRootCA.crt" -keystore "D:\certificates\server_keystore.p12" -storepass "p@ssw0rd"
+```
+
+Delete the `server_certificate.crt` file as this is not needed now and we are apparently going to recreate it.
+
+Now let's use OpenSSL to generate the `server.key`
+
+Open up Cygwin Terminal App
+
+Use the **OpenSSL** tool from **Cygwin** to export the certificates in a dedicated location. 
+
+To generate the server.key file, run the following command in the Cygwin Terminal App.
+
+```bash
+openssl pkcs12 -in "D:\certificates\server_keystore.p12" -nocerts -nodes -out "D:\certificates\server.key"
+```
+
+
+### Configuring Certs
+
+Log back into the ADDI host.
+
+If you've followed the above steps, you should have the following files in `D:\certificates` on the ADDI host.
+
+![ADDI_HOST](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/e244991c-fe4e-4982-9ed9-ec55019180b2)
+
+In that vein, if you followed the TLS setup [here](Refactor#generate-the-tls-certs-for-refactor), you should have a `root.crt` in `/root/certs`.
+
+Create a new file called `root.crt` in the `D:\certificates` directory on the ADDI host and paste the contents in from `/root/certs/root.crt`.
+
+Now import the certificate by running the following command in powershell:
+    
+```powershell
+keytool -importcert -alias ad-core-server -keystore "D:\certificates\server_keystore.p12" -storetype PKCS12 -storepass "p@ssw0rd" -file "D:\certificates\root.crt" -storepass p@ssw0rd -ext BasicConstraints:critical=ca:true -ext san=dns:wca4z2-winaddi.fyre.ibm.com
+```
+Generate the `server_certificate.crt` file again, but _different_ in your Powershell window.
+
+```tsx
+$PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
+keytool -list -keystore "D:\certificates\server_keystore.p12" -rfc > "D:\certificates\server_certificate.crt"
+```
+
+    
+Restart the IBM Application Discovery Configuration Service.
+
+The root CA certificate or the self-signed certificate must be installed into the local machine's trusted root certificate authorities. These certs should be the `server_certificate.crt` and `root.crt`. Also the DB2 SSL cert if you received one. These certs should all be in the `C:\certificates` directory since that's where we've been putting them.
+- On Windows:
+    1. Right-click the certificate and then click Install Certificate.
+    2. Select Local Machine and click Next.
+    3. Select Place all certificates in the following store.
+    4. Click Browse... and select Trusted Root Certificate Authorities.
+    5. Click OK and then Next.
+    6. Click Finish to complete the certificate import wizard.
+
+### Import the certificate to Java runtime keystore
+
+To import the certificate to Java runtime keystore, complete the following steps:
+
+1. Open a Command Prompt (on Windows) or a Terminal (on Linux) and go to the folder containing the newly prepared `server_keystore.p12`. This would be `C:\certificates`.
+2. Execute the following command to import all certificates from server_keystore.p12 to the Java's cacerts keystore.
+
+Run this in a regular dos shell. Powershell will not have the JAVA_HOME env set correctly.
+
+```dos
+keytool -importkeystore -srckeystore "D:\certificates\server_keystore.p12" -srcstorepass "p@ssw0rd" -destkeystore "%JAVA_HOME%\lib\security\cacerts" -deststorepass "changeit"
+        
+```
+:::info
+The default cacerts password is `changeit`.
+:::
+
+![ADDI](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/5a80ddf9-2b8e-46d1-82b5-bfa48a5fdadb)
+
+WIll probably have to repeat when we have a cert for the db2 instance
+
+From the **ADDI Dashboard**, restart the Configuration service.
+
+https://localhost:9443/ad/admin/dashboard
+
+In powershell on the ADDI host, export the zookeeper.crt from the keystore.
+
+```powershell
+
+keytool -exportcert -alias "wca4z2-winaddi.fyre.ibm.com" -keystore "D:\certificates\server_keystore.p12" -rfc -file "D:\certificates\zookeeper.crt" -storepass "p@ssw0rd" -ext BasicConstraints:critical=ca:true -ext san=dns:wca4z2-winaddi.fyre.ibm.com
+
+```
+On the RA host, create the `zookeeper.crt` file in `/etc/pki/ca-trust/source/anchors` and copy the contents of `zookeeper.crt` into it.
+
+Then run the following command on the Refactor host
+
+```tsx
+update-ca-trust extract
+```
+Create the following symlinks
+
+```bash
+ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/ad.crt
+ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/dex.crt
+ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/zookeeper.crt
+```
+
+### DEX Server configuration
+
+Let's generate a hashed SHA256 password on the linux refactor host
+
+```bash
+openssl passwd -5 p@ssw0rd
+$5$aPcZ8PYGME9ztCKm$if2XAAOQVnlD4iLDQgq0a5A982LM5Kyg./czg23g647
+```
+
+On the ADDI host, copy `D:\certificates\server_certificate.crt` and `D:\certificates\server.key` to `C:\Program Files\IBM Application Discovery and Delivery Intelligence\Authentication Server (DEX)\conf`.
+
+
+We're going update the `dex.yaml` with the following
+Now open the `dex.yaml` file in that folder and edit it.
+
+- Our `issuer` should be either the FQDN or the IP of the ADDI host
+- The `redirectURIs:` should point to the ip of the Refactor server.
+- `staticPasswords.hash` should be the generated SHA256 password from above
+
+```yaml
+issuer: https://wca4z2-winaddi.fyre.ibm.com:7600/dex
+storage:
+  type: sqlite3
+  config:
+  file: dex.db
+frontend:
+  theme: addi
+web:
+  TLSCert: conf/server_certificate.crt
+  TLSKey: conf/server.key
+  https: 0.0.0.0:7600
+connectors: []
+
+enablePasswordDB: true
+staticClients:
+  - id: refactoring-assistant
+    redirectURIs:
+      - https://9.66.242.37:9443
+    name: Refactoring Assistant
+    secret: pkce
+staticPasswords:
+  - email: addi_user@ibm.com
+    hash: $5$aPcZ8PYGME9ztCKm$if2XAAOQVnlD4iLDQgq0a5A982LM5Kyg./czg23g647
+    username: addi_user
+    userID: null
+```
+
+Open the admin dashboard and click Configure at the top
+https://localhost:9443/ad/admin/dashboard
+
+Click on the Default env
+
+Go to Servers and Security
+
+Select Security from the choices on the left and then select HTTPS as the protocol type
+
+At the bottom go to "Drag and Drop files here..." and upload the following files from `D:\certificates`
+- `server_keystore.p12`
+- `server_certificate.crt`
+- `server.key`
+
+Set the password to `p@ssw0rd`.
+
+
