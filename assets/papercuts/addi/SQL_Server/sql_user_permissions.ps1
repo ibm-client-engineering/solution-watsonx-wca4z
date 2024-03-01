@@ -89,35 +89,29 @@ function Step7 {
     ConfirmAndExecute "Step 7"
     ConfigureSSLForAdComponents
 }
+#  Configure TLS Certs && KeyStores
 function Step8 {
-    # ConfirmAndExecute "Step 8"
-    #  Configure TLS Certs && KeyStores
-    # TODO #1 Fix env vars
-    $DnsName = "localhost"
-    $KeyPass = "p@ssw0rd"
-    $KeyStorePath = "D:\certificates\server_keystore.p12"
-    $MyHost = "0.0.0.0"
-    $CertificatePathRootCertificatePath = "D:\certificates\server_certificate.crt"
-    $CertificatePathRoot = "D:\certificates\root.crt"
+    # env vars
+    $DnsName = $env:dnsName
+    $KeyPass = $env:keyPass
+    $KeyStorePath = $env:keyStorePath
+    $MyHost = $env:host
+    $CertificatePathRootCertificatePath = $env:certificatePath
+    $CertificatePathRoot = $env:certificatePathRoot
 
+    # Generate key pair, export and import cert to keystore
     GenerateKeyPair -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath -StorePass $KeyPass -MyHost $MyHost
     Export-CeritficateToPfx -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath
     Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath CertificatePath -Password $KeyPass
 
     # Optional
-    Db2SSL -DB2SSLCert KeyStorePath -CertificatePath $CertificatePath -KeyStorePath $KeyStorePath -Password $KeyPass
+    Db2SSL -DB2SSLCert $KeyStorePath -CertificatePath $CertificatePath -KeyStorePath $KeyStorePath -Password $KeyPass
 
     # Delete certs
     DeleteServerCertificate -CertificatePath $CertificatePath
 
     # Cofigure certs
     ConfigureCertificates -KeyStorePath $KeyStorePath -KeyPass $KeyPass -CertificatePathRoot $CertificatePathRoot -MyHost $MyHost -CertificatePathRootCertificatePath $CertificatePathRootCertificatePath
-
-    # otherstuff
-#    $cert = New-SelfSignedCertificate -DnsName $env:dnsName
-#    Export-CertificateToPfx -Certificate $cert -FilePath $env:certificatePath -Password $env:certificatePassword
-#    Import-CertificateToKeystore -KeystorePath $env:keystorePath -CertificatePath $env:certificatePath -Password $env:certificatePassword
-#    Additional-KeystoreConfiguration -KeystorePath $env:keystorePath
 }
 
 Main

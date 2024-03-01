@@ -59,17 +59,9 @@ function GenerateKeyPair {
         [string]$StorePass,
         [string]$MyHost
     )
-    # Additional configuration steps
-    # ...
-#    Write-Host "GenerateKeyPair"
-#    Write-Host "KeyPass $DnsName"
-#    Write-Host "KeyPass $KeyPass"
-#    Write-Host "KeyStorePath $KeyStorePath"
-#    Write-Host "StorePass $StorePass"
-#    Write-Host "Host $MyHost"
-
     keytool -genkeypair -alias $DnsName -keyalg RSA -keysize 2048 -dname "cn=$DnsName" -keypass $KeyPass -keystore $KeyStorePath -storepass $StorePass -storetype PKCS12 -ext BasicConstraints:critical=ca:true -ext san=$MyHost
 }
+
 
 function DeleteServerCertificate {
     param(
@@ -98,13 +90,12 @@ function ConfigureCertificates {
     )
     keytool -importcert -alias ad-core-server -keystore $KeyStorePath -storetype PKCS12 -storepass $KeyPass -file $CertificatePathRoot -storepass $KeyPass -ext BasicConstraints:critical=ca:true -ext san=dns:$MyHost
 
-    # If you run windows 2022 or higher you have to use UTF 16
+    # TODO #3 If you run windows 2022 or higher you have to use UTF 16
     $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
     keytool -list -keystore $KeyStorePath -rfc > $CertificatePathRootCertificatePath
 
     Get-Service | Select-Object DisplayName, ServiceName
 
-    # TODO Restart the IBM Application Discovery Configuration Service.
     Restart-Service -Name "IBM Application Discovery Configuration"
 
     Import-PfxCertificate -FilePath $CertificatePathRootCertificatePath -Password $KeyPass
