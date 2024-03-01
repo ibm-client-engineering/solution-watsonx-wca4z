@@ -111,7 +111,7 @@ function Step8 {
     DeleteServerCertificate -CertificatePath $CertificatePath
 
     # Cofigure certs
-    ConfigureCertificates KeyStorePath $KeyStorePath KeyPass $KeyPass CertificatePathRoot $CertificatePathRoot MyHost $MyHost
+    ConfigureCertificates -KeyStorePath $KeyStorePath -KeyPass $KeyPass -CertificatePathRoot $CertificatePathRoot -MyHost $MyHost -CertificatePathRootCertificatePath $CertificatePathRootCertificatePath
 
     # otherstuff
 #    $cert = New-SelfSignedCertificate -DnsName $env:dnsName

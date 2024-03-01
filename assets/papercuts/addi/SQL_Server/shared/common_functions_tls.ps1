@@ -93,7 +93,24 @@ function ConfigureCertificates {
         [string]$KeyStorePath,
         [string]$KeyPass,
         [string]$CertificatePathRoot,
-        [string]$MyHost
+        [string]$MyHost,
+        [string]$CertificatePathRootCertificatePath
     )
     keytool -importcert -alias ad-core-server -keystore $KeyStorePath -storetype PKCS12 -storepass $KeyPass -file $CertificatePathRoot -storepass $KeyPass -ext BasicConstraints:critical=ca:true -ext san=dns:$MyHost
+
+    # If you run windows 2022 or higher you have to use UTF 16
+    $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
+    keytool -list -keystore $KeyStorePath -rfc > $CertificatePathRootCertificatePath
+
+    Get-Service | Select-Object DisplayName, ServiceName
+
+    # TODO Restart the IBM Application Discovery Configuration Service.
+    Restart-Service -Name "IBM Application Discovery Configuration"
+
+    Import-PfxCertificate -FilePath $CertificatePathRootCertificatePath -Password $KeyPass
+
+    # lists the certificates in the path
+    Get-ChildItem -Path $CertificatePathRootCertificatePath
+
 }
+
