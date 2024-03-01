@@ -92,23 +92,26 @@ function Step7 {
 function Step8 {
     # ConfirmAndExecute "Step 8"
     #  Configure TLS Certs && KeyStores
+    # TODO #1 Fix env vars
     $DnsName = "localhost"
     $KeyPass = "p@ssw0rd"
     $KeyStorePath = "D:\certificates\server_keystore.p12"
     $MyHost = "0.0.0.0"
-    $CertificatePath = "D:\certificates\server_certificate.crt"
+    $CertificatePathRootCertificatePath = "D:\certificates\server_certificate.crt"
+    $CertificatePathRoot = "D:\certificates\root.crt"
 
     GenerateKeyPair -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath -StorePass $KeyPass -MyHost $MyHost
     Export-CeritficateToPfx -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath
     Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath CertificatePath -Password $KeyPass
+
     # Optional
     Db2SSL -DB2SSLCert KeyStorePath -CertificatePath $CertificatePath -KeyStorePath $KeyStorePath -Password $KeyPass
+
+    # Delete certs
     DeleteServerCertificate -CertificatePath $CertificatePath
 
-    # Create KEY pair
-    # TODO Create Certificate Signing Request (CSR)
-    # TODO Submit CSR to CA
-    # TODO  Set up TLS on your server application
+    # Cofigure certs
+    ConfigureCertificates KeyStorePath $KeyStorePath KeyPass $KeyPass CertificatePathRoot $CertificatePathRoot MyHost $MyHost
 
     # otherstuff
 #    $cert = New-SelfSignedCertificate -DnsName $env:dnsName

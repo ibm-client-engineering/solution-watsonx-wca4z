@@ -85,3 +85,15 @@ function GenerateServerKey {
 
     openssl pkcs12 -in $KeyStorePath -nocerts -nodes -out "D:\certificates\server.key"
 }
+
+function ConfigureCertificates {
+    # TODO #2 Verify that server.key, server_certificate, server_keystore exist guardrail
+
+    param(
+        [string]$KeyStorePath,
+        [string]$KeyPass,
+        [string]$CertificatePathRoot,
+        [string]$MyHost
+    )
+    keytool -importcert -alias ad-core-server -keystore $KeyStorePath -storetype PKCS12 -storepass $KeyPass -file $CertificatePathRoot -storepass $KeyPass -ext BasicConstraints:critical=ca:true -ext san=dns:$MyHost
+}
