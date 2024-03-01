@@ -1,5 +1,6 @@
 # import the common functions script
 . ".\shared\common_functions.ps1"
+. ".\shared\common_functions_tls.ps1"
 . ".\shared\get_set_env_vars.ps1"
 
 function Main {
@@ -89,19 +90,31 @@ function Step7 {
     ConfigureSSLForAdComponents
 }
 function Step8 {
-    ConfirmAndExecute "Step 8"
+    # ConfirmAndExecute "Step 8"
     #  Configure TLS Certs && KeyStores
+    $DnsName = "localhost"
+    $KeyPass = "p@ssw0rd"
+    $KeyStorePath = "D:\certificates\server_keystore.p12"
+    $MyHost = "0.0.0.0"
+    $CertificatePath = "D:\certificates\server_certificate.crt"
 
-    # TODO Generate keypair
+    GenerateKeyPair -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath -StorePass $KeyPass -MyHost $MyHost
+    Export-CeritficateToPfx -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath
+    Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath CertificatePath -Password $KeyPass
+    # Optional
+    Db2SSL -DB2SSLCert KeyStorePath -CertificatePath $CertificatePath -KeyStorePath $KeyStorePath -Password $KeyPass
+    DeleteServerCertificate -CertificatePath $CertificatePath
+
+    # Create KEY pair
     # TODO Create Certificate Signing Request (CSR)
     # TODO Submit CSR to CA
     # TODO  Set up TLS on your server application
 
     # otherstuff
-    $cert = New-SelfSignedCertificate -DnsName $env:dnsName
-    Export-CertificateToPfx -Certificate $cert -FilePath $env:certificatePath -Password $env:certificatePassword
-    Import-CertificateToKeystore -KeystorePath $env:keystorePath -CertificatePath $env:certificatePath -Password $env:certificatePassword
-    Additional-KeystoreConfiguration -KeystorePath $env:keystorePath
+#    $cert = New-SelfSignedCertificate -DnsName $env:dnsName
+#    Export-CertificateToPfx -Certificate $cert -FilePath $env:certificatePath -Password $env:certificatePassword
+#    Import-CertificateToKeystore -KeystorePath $env:keystorePath -CertificatePath $env:certificatePath -Password $env:certificatePassword
+#    Additional-KeystoreConfiguration -KeystorePath $env:keystorePath
 }
 
 Main
