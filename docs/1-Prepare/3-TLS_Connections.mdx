@@ -76,7 +76,15 @@ If you have the DB2 SSL certificate for the cloud instance of DB2, import it int
 keytool -import -trustcacerts -alias "DB2-ssl-cert" -file "D:\certificates\DigiCertGlobalRootCA.crt" -keystore "D:\certificates\server_keystore.p12" -storepass "p@ssw0rd"
 ```
 
-Delete the `server_certificate.crt` file as this is not needed now and we are apparently going to recreate it.
+In that vein, if you followed the TLS setup [here](Refactor#generate-the-tls-certs-for-refactor), you should have a `root.crt` in `/root/certs`.
+
+Create a new file called `root.crt` in the `D:\certificates` directory on the ADDI host and paste the contents in from `/root/certs/root.crt`.
+
+Now import the certificate by running the following command in powershell:
+    
+```powershell
+keytool -importcert -alias ad-core-server -keystore "D:\certificates\server_keystore.p12" -storetype PKCS12 -storepass "p@ssw0rd" -file "D:\certificates\root.crt" -storepass p@ssw0rd -ext BasicConstraints:critical=ca:true -ext san=dns:wca4z2-winaddi.fyre.ibm.com
+```
 
 Now let's use OpenSSL to generate the `server.key`
 
@@ -99,15 +107,7 @@ If you've followed the above steps, you should have the following files in `D:\c
 
 ![ADDI_HOST](https://github.com/ibm-client-engineering/solution-watsonx-ca4z/assets/102995992/e244991c-fe4e-4982-9ed9-ec55019180b2)
 
-In that vein, if you followed the TLS setup [here](Refactor#generate-the-tls-certs-for-refactor), you should have a `root.crt` in `/root/certs`.
 
-Create a new file called `root.crt` in the `D:\certificates` directory on the ADDI host and paste the contents in from `/root/certs/root.crt`.
-
-Now import the certificate by running the following command in powershell:
-    
-```powershell
-keytool -importcert -alias ad-core-server -keystore "D:\certificates\server_keystore.p12" -storetype PKCS12 -storepass "p@ssw0rd" -file "D:\certificates\root.crt" -storepass p@ssw0rd -ext BasicConstraints:critical=ca:true -ext san=dns:wca4z2-winaddi.fyre.ibm.com
-```
 Generate the `server_certificate.crt` file again, but _different_ in your Powershell window.
 
 ```tsx
@@ -115,8 +115,69 @@ $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
 keytool -list -keystore "D:\certificates\server_keystore.p12" -rfc > "D:\certificates\server_certificate.crt"
 ```
 
+Open that `server_certificate.crt` in notepad and reset the order of certs. We want the root cert to be at the top.
+
+```tsx
+Keystore type: PKCS12
+Keystore provider: SUN
+
+Your keystore contains 4 entries
+//highlight-start
+Alias name: wca4z2-winaddi.fyre.ibm.com
+Creation date: Mar 1, 2024
+Entry type: PrivateKeyEntry
+Certificate chain length: 1
+Certificate[1]:
+-----BEGIN CERTIFICATE-----
+<CERT HERE>
+-----END CERTIFICATE-----
+//highlight-end
+
+*******************************************
+*******************************************
+
+
+Alias name: ad-core-server
+Creation date: Mar 1, 2024
+Entry type: trustedCertEntry
+
+-----BEGIN CERTIFICATE-----
+<CERT HERE>
+-----END CERTIFICATE-----
+
+
+*******************************************
+*******************************************
+
+
+Alias name: db2-ssl-cert
+Creation date: Mar 1, 2024
+Entry type: trustedCertEntry
+
+-----BEGIN CERTIFICATE-----
+<CERT HERE>
+-----END CERTIFICATE-----
+
+
+*******************************************
+*******************************************
+
+
+Alias name: self-signed-root
+Creation date: Mar 1, 2024
+Entry type: trustedCertEntry
+
+-----BEGIN CERTIFICATE-----
+<CERT HERE>
+-----END CERTIFICATE-----
+
+
+*******************************************
+*******************************************
+
+
+```
     
-Restart the IBM Application Discovery Configuration Service.
 
 The root CA certificate or the self-signed certificate must be installed into the local machine's trusted root certificate authorities. These certs should be the `server_certificate.crt` and `root.crt`. Also the DB2 SSL cert if you received one. These certs should all be in the `C:\certificates` directory since that's where we've been putting them.
 - On Windows:
@@ -202,8 +263,8 @@ storage:
 frontend:
   theme: addi
 web:
-  TLSCert: conf/server_certificate.crt
-  TLSKey: conf/server.key
+  TLSCert: D:\certificates\server_certificate.crt
+  TLSKey: D:\certificates\server.key
   https: 0.0.0.0:7600
 connectors: []
 
@@ -237,4 +298,9 @@ At the bottom go to "Drag and Drop files here..." and upload the following files
 
 Set the password to `p@ssw0rd`.
 
+Successful import should look like this
+![cert import](https://media.github.ibm.com/user/20330/files/21d267db-6649-4407-bc52-823a89fb2918)
+
+
+Restart the IBM Application Discovery Configuration Service.
 
