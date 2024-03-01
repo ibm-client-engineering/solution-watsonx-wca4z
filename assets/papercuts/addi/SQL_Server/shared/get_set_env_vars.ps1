@@ -3,17 +3,21 @@ function Set-EnvVariables {
     param (
         [string]$FilePath
     )
-
+    # TODO Fix env
     $envFileContent = Get-Content -Path $FilePath -Raw
-
-    $envFileContent -split " n" | ForEach-Object {
-
+    Write-Host "ALPHA"
+    Write-Host $envFileContent
+    # Split content by new line using a \
+    $envFileContent -split "\n" | ForEach-Object {
         #split each line into key and value
         $key, $value = $_ -split '=', 2
 
         # set the environment variable
-        [System.Environment]::SetEnvironmentVariable(($key, $value, [System.EnvironmentVariableTarget]::Process))
+        [System.Environment]::SetEnvironmentVariable($key, $value, [System.EnvironmentVariableTarget]::Process)
     }
+
+    #Get-ChildItem Env:
+
 }
 
 function Get-AllEnvVariables {
