@@ -3,10 +3,10 @@ function Set-EnvVariables {
     param (
         [string]$FilePath
     )
-
+    # TODO Fix env
     $envFileContent = Get-Content -Path $FilePath -Raw
-
-    $envFileContent -split " n" | ForEach-Object {
+    Write-Host
+    $envFileContent -split "\n" | ForEach-Object {
 
         #split each line into key and value
         $key, $value = $_ -split '=', 2
