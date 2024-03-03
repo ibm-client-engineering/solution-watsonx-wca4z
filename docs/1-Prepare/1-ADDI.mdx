@@ -494,7 +494,29 @@ The following services should be offline or disabled in the Dashboard
 - Catalog service
 - Validation service
 
+#### Activating the ADDI License
+
+TBD
+
 ### Installing/Configuring DB2 Client 
+
+You will need the following:
+
+- DB2 FQDN
+- DB2 port 
+- DB2 user 
+- DB2 Password 
+
+As of this writing, you can't determine this stuff via the `ibmcloud` cli. You have to open the webui for the DB2 cloud instance.
+
+Open the webui and follow the below images
+
+![CleanShot 2024-03-03 at 12 14 21](https://media.github.ibm.com/user/20330/files/5ffae607-c786-4c48-947e-51f370694581)
+
+![CleanShot 2024-03-03 at 12 15 41](https://media.github.ibm.com/user/20330/files/ce46c70f-7edc-4317-823a-9f8a6892fdf4)
+
+![CleanShot 2024-03-03 at 12 16 47](https://media.github.ibm.com/user/20330/files/8c4595c2-7a43-4b21-800d-1d50aad991a8)
+
 
 1. Download Windows driver package
 Download Windows driver package from driver [list](https://www.ibm.com/support/fixcentral/swg/quickorder?parent=ibm%2FInformation%20Management&product=ibm/Information+Management/IBM+Data+Server+Client+Packages&release=11.5.8.0&platform=Windows+64-bit,+x86&function=fixId&fixids=DSClients-ntx64-dsdriver-11.5.9000.352-FP000&includeRequisites=1&includeSupersedes=0&downloadMethod=http&source=fc)
@@ -507,29 +529,37 @@ For ODBC apps, add new entries to the db2dsdriver.cfg driver configuration file 
 	
 Determine the FQDN of your DB2 on Cloud instance:
 
-_Add methods of retrieving the FQDN here_
+From the above image our example FQDN for DB2 is `3b84375f-36fb-42b0-8241-ac0e7840e5dc.bpe60pbd01oinge4psd0.databases.appdomain.cloud` and our port is `31838`.
 
-Our example FQDN is `ab4681b0-3825-47d4-b26b-3636795d5ca5.bv7c3o6d0vfhru3npds0.databases.appdomain.cloud`
-
-:::warning
-These following commands might be different depending on your DB2 on cloud instance. The FQDN and port milage may vary.
-:::
-
-Once you have the instance up and you have the FQDN, run the following commands in Powershell on the ADDI Host:
+Once you have the instance up and you have the FQDN, run the following db2 local config commands in Powershell on the ADDI Host as illustrated from the db2 webui:
 
 ```powershell
-db2cli writecfg add -database bludb -host ab4681b0-3825-47d4-b26b-3636795d5ca5.bv7c3o6d0vfhru3npds0.databases.appdomain.cloud -port 31447
-db2cli writecfg add -dsn dashdb -database bludb -host ab4681b0-3825-47d4-b26b-3636795d5ca5.bv7c3o6d0vfhru3npds0.databases.appdomain.cloud -port 31447
-db2cli writecfg add -database bludb -host ab4681b0-3825-47d4-b26b-3636795d5ca5.bv7c3o6d0vfhru3npds0.databases.appdomain.cloud -port 31447 -parameter "SecurityTransportMode=SSL"
+db2cli writecfg add -database bludb -host 3b84375f-36fb-42b0-8241-ac0e7840e5dc.bpe60pbd01oinge4psd0.databases.appdomain.cloud-port 31838
+db2cli writecfg add -dsn dashdb -database bludb -host3b84375f-36fb-42b0-8241-ac0e7840e5dc.bpe60pbd01oinge4psd0.databases.appdomain.cloud -port 31838
+db2cli writecfg add -database bludb -host 3b84375f-36fb-42b0-8241-ac0e7840e5dc.bpe60pbd01oinge4psd0.databases.appdomain.cloud-port 31838 -parameter "SecurityTransportMode=SSL"
 ```
+
+In the webui for DB2, let's also create a user to admin this database:
+
+![CleanShot 2024-03-03 at 12 30 49](https://media.github.ibm.com/user/20330/files/606791f4-a38b-4975-bdb0-54bc76ec766e)
+
+In our case, we created a user called `wca4z_db2` and gave him the password `yhJ_sBvn7qx-B6YXJjBA`
+
+![CleanShot 2024-03-03 at 12 33 48](https://media.github.ibm.com/user/20330/files/5854e74c-5b89-4645-99af-aeff51c6cb61)
+
 
 [`db2configuration.bat`](../../deployment_files/db2configuration.bat)
 
-The script above adds the DB2 database to ADDI instead of having to do it manually through the UI
+Download the above script and run it with your DB2 FQDN. At this point you should have the FQDN, port, User, and password.
 
 ```powershell
-db2configuration.bat dbName=BLUDB db2Host=ab4681b0-3825-47d4-b26b-3636795d5ca5.bv7c3o6d0vfhru3npds0.databases.appdomain.cloud db2Port=31447 db2User=5f5cb4ff db2Password=yK5mnXMS1XbQr8yM useTLS=true
+PS D:\> .\db2configuration.bat dbName=BLUDB db2Host=3b84375f-36fb-42b0-8241-ac0e7840e5dc.bpe60pbd01oinge4psd0.databases.appdomain.cloud db2Port=31838 db2User=wca4z_db2 db2Password=yhJ_sBvn7qx-B6YXJjBA useTLS=true
+Adding new DB2 database instance into ADDI
+Success.
 ```
+
+This will add the appropriate entries into ADDI.
+
 - upload the certs/keys/stores
 - if hang, just refresh browser
 - verify that dex.yaml has been updated
