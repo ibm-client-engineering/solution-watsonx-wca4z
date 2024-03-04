@@ -494,82 +494,8 @@ The following services should be offline or disabled in the Dashboard
 - Catalog service
 - Validation service
 
-#### Activating the ADDI License
+### Data Generator
 
-TBD
-
-### Installing/Configuring DB2 Client 
-
-You will need the following:
-
-- DB2 FQDN
-- DB2 port 
-- DB2 user 
-- DB2 Password 
-
-As of this writing, you can't determine this stuff via the `ibmcloud` cli. You have to open the webui for the DB2 cloud instance.
-
-Open the webui and follow the below images
-
-![CleanShot 2024-03-03 at 12 14 21](https://media.github.ibm.com/user/20330/files/5ffae607-c786-4c48-947e-51f370694581)
-
-![CleanShot 2024-03-03 at 12 15 41](https://media.github.ibm.com/user/20330/files/ce46c70f-7edc-4317-823a-9f8a6892fdf4)
-
-![CleanShot 2024-03-03 at 12 16 47](https://media.github.ibm.com/user/20330/files/8c4595c2-7a43-4b21-800d-1d50aad991a8)
-
-
-1. Download Windows driver package
-Download Windows driver package from driver [list](https://www.ibm.com/support/fixcentral/swg/quickorder?parent=ibm%2FInformation%20Management&product=ibm/Information+Management/IBM+Data+Server+Client+Packages&release=11.5.8.0&platform=Windows+64-bit,+x86&function=fixId&fixids=DSClients-ntx64-dsdriver-11.5.9000.352-FP000&includeRequisites=1&includeSupersedes=0&downloadMethod=http&source=fc)
-File name: ibm_data_server_driver_package_win64_v11.5.exe (104 MB)
-2. Install the drivers by running the `ibm_data_server_driver_package_win64_v11.5.exe` file as an administrator.
-3. In The Connection configuration resources section, select whether or not you want to secure your connections by using SSL.
-If your application uses its own driver and you want to connect with SSL, download the SSL certificate (DigiCertGlobalRootCA.crt).
-For Java apps, use the JDBC string as the database URL in your call to the JDBC getConnection method.
-For ODBC apps, add new entries to the db2dsdriver.cfg driver configuration file by running the following commands:
-	
-Determine the FQDN of your DB2 on Cloud instance:
-
-From the above image our example FQDN for DB2 is `3b84375f-36fb-42b0-8241-ac0e7840e5dc.bpe60pbd01oinge4psd0.databases.appdomain.cloud` and our port is `31838`.
-
-Once you have the instance up and you have the FQDN, run the following db2 local config commands in Powershell on the ADDI Host as illustrated from the db2 webui:
-
-```powershell
-db2cli writecfg add -database bludb -host 3b84375f-36fb-42b0-8241-ac0e7840e5dc.bpe60pbd01oinge4psd0.databases.appdomain.cloud-port 31838
-db2cli writecfg add -dsn dashdb -database bludb -host3b84375f-36fb-42b0-8241-ac0e7840e5dc.bpe60pbd01oinge4psd0.databases.appdomain.cloud -port 31838
-db2cli writecfg add -database bludb -host 3b84375f-36fb-42b0-8241-ac0e7840e5dc.bpe60pbd01oinge4psd0.databases.appdomain.cloud-port 31838 -parameter "SecurityTransportMode=SSL"
-```
-
-In the webui for DB2, let's also create a user to admin this database:
-
-![CleanShot 2024-03-03 at 12 30 49](https://media.github.ibm.com/user/20330/files/606791f4-a38b-4975-bdb0-54bc76ec766e)
-
-In our case, we created a user called `wca4z_db2` and gave him the password `yhJ_sBvn7qx-B6YXJjBA`
-
-![CleanShot 2024-03-03 at 12 33 48](https://media.github.ibm.com/user/20330/files/5854e74c-5b89-4645-99af-aeff51c6cb61)
-
-
-[`db2configuration.bat`](../../deployment_files/db2configuration.bat)
-
-Download the above script and run it with your DB2 FQDN. At this point you should have the FQDN, port, User, and password.
-
-```powershell
-PS D:\> .\db2configuration.bat dbName=BLUDB db2Host=3b84375f-36fb-42b0-8241-ac0e7840e5dc.bpe60pbd01oinge4psd0.databases.appdomain.cloud db2Port=31838 db2User=wca4z_db2 db2Password=yhJ_sBvn7qx-B6YXJjBA useTLS=true
-Adding new DB2 database instance into ADDI
-Success.
-```
-
-This will add the appropriate entries into ADDI.
-
-- upload the certs/keys/stores
-- if hang, just refresh browser
-- verify that dex.yaml has been updated
-- Windows service restart liberty 
-
-Db2 connect
-- requires install of Db2 client on Windows system (for db2cli), get link from github
-- For commands and definition of DB2 in ADDI see section above
-
-Data Generator
 - This is something already in the Velocity images
 - Download latest zip from https://eu.artifactory.swg-devops.com/ui/native/zeus-ez-public/ez/sd/wca4z-data-generator/ (requires w3 login)
 - Can't download, either no access or it doesn't exist at that spot
@@ -577,19 +503,18 @@ Data Generator
 - Found zip file WCA4Z-Data-Generator.zip in box somewhere and downloaded it
 
 `README.txt`
-```
 Watson Code Assistant for Z Data Generator - 1.0.0
 
 Generates Control Flow data and DDL database information from an extracted service and writes the information in a DB2 on Cloud database.
 
 
-### Prerequisites
+#### Prerequisites
 
 1. The basic requirements for running the Watson Code Assistant for Z Data Generator (WCA4Z) are the same as IBM Application Discovery and Delivery Intelligence (ADDI) and can be found at https://www.ibm.com/docs/en/addi/6.1.2?topic=installing-prerequisites.
 1. ADDI is already installed and configured on the same machine where Watson Code Assistant for Z Data Generator is going to be installed. More information available at https://www.ibm.com/docs/en/addi/6.1.2?topic=guide-installing
 
 
-### Setup
+#### Setup
 
 1. Extract the contents of the WCA4Z Data Generator ZIP file into the `<ADDI_INSTALLATION_FOLDER>` folder. The ZIP file contains a folder called `WCA4Z Data Generator` so after extracting, the contents of that folder should be available in `<ADDI_INSTALLATION_FOLDER>\WCA4Z Data Generator`.
 2. Add an IBM Db2 relational database server from `IBM Application Discovery Configuration Service Admin > Configure > <ENV_NAME> > Servers and security > Relational database servers.`. This should be an instance of IBM Db2 on Cloud.
@@ -623,6 +548,5 @@ Generates Control Flow data and DDL database information from an extracted servi
 2. The script is executing synchronously and will return a zero exit code for a successful execution or a non zero exit code otherwise.
 3. If new programs have been built successfully but the metadata import fails for any reason, those programs will be saved for retry with the next run.
 4. A new `runControlFlowGenerator.log` log file will be generated in the same folder containing the full output of the execution.
-```
 
 - TODO: Check that RA is still running after https set up
