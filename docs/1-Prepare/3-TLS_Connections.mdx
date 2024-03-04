@@ -240,19 +240,17 @@ ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/zookeeper.crt
 Let's generate a hashed SHA256 password on the linux refactor host
 
 ```bash
-openssl passwd -5 p@ssw0rd
-$5$aPcZ8PYGME9ztCKm$if2XAAOQVnlD4iLDQgq0a5A982LM5Kyg./czg23g647
+htpasswd -nbBC 10 addi_user p@ssw0rd
+addi_user:$2y$10$vAk2SLjHIU2x2dNuzwDxDuq6TwdnLK1XeO8OCzxNqXK3yv3ObYfIy
 ```
 
-On the ADDI host, copy `D:\certificates\server_certificate.crt` and `D:\certificates\server.key` to `C:\Program Files\IBM Application Discovery and Delivery Intelligence\Authentication Server (DEX)\conf`.
-
-
-We're going update the `dex.yaml` with the following
 Now open the `dex.yaml` file in that folder and edit it.
+
+The cert paths will be updated when the certs are imported into ADDI.
 
 - Our `issuer` should be either the FQDN or the IP of the ADDI host
 - The `redirectURIs:` should point to the ip of the Refactor server.
-- `staticPasswords.hash` should be the generated SHA256 password from above
+- `staticPasswords.hash` should be the generated bcrypt password from above
 
 ```yaml
 issuer: https://wca4z2-winaddi.fyre.ibm.com:7600/dex
@@ -263,8 +261,8 @@ storage:
 frontend:
   theme: addi
 web:
-  TLSCert: D:\certificates\server_certificate.crt
-  TLSKey: D:\certificates\server.key
+  TLSCert: conf/server_certificate.crt
+  TLSKey: conf/server.key
   https: 0.0.0.0:7600
 connectors: []
 
@@ -277,7 +275,7 @@ staticClients:
     secret: pkce
 staticPasswords:
   - email: addi_user@ibm.com
-    hash: $5$aPcZ8PYGME9ztCKm$if2XAAOQVnlD4iLDQgq0a5A982LM5Kyg./czg23g647
+    hash: $2y$10$vAk2SLjHIU2x2dNuzwDxDuq6TwdnLK1XeO8OCzxNqXK3yv3ObYfIy 
     username: addi_user
     userID: null
 ```
