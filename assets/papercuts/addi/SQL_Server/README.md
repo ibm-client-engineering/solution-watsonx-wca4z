@@ -51,3 +51,6 @@ Microsoft SQL Server 2019 (RTM) - 15.0.2000.5 (X64)
 (1 rows affected)
 PS C:\Users\Administrator>
 ```
+
+## Update .env file
+Update `sqlUser`, `serverInstance`, `sqlPassword`, `sqlDatabase`, `sqlCredential`
