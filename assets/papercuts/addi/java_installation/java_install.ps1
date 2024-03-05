@@ -21,5 +21,5 @@ Expand-Archive -Path $downloadPath -DestinationPath $extractPath
 Remove-Item -Path $downloadPath
 
 [Environment]::SetEnvironmentVariable('JAVA_HOME', $installerDir, [SetEnvironmentVariableTarget]::Machine)
-Start-Process -FilePath $installerPath -ArgumentList "/s", "/INSTALLERDIR=$installerDir" -Wait
+[Environment]::SetEnvironmentVariable('PATH', $installerDir, [SetEnvironmentVariableTarget]::Machine)
 Write-Host "JAVA_HOME env variable set to $installerDir"
