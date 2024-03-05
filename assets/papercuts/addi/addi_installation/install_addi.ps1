@@ -4,6 +4,7 @@ function DownloadBinary {
     )
 
     # Download binary
+    $ProgressPreference = 'SilentlyContinue'
     Invoke-WebRequest -Uri $url -OutFile "addi_endpoint_install_binary.zip"
 
     # Unzip the binary
