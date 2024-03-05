@@ -86,6 +86,7 @@ if (!$IsoPath) {
             $proxy = if ($ENV:HTTP_PROXY) { @{ ProxyList = $ENV:HTTP_PROXY -replace 'http?://'; ProxyUsage = 'Override' }} else { @{} }
             Start-BitsTransfer -Source $isoPath -Destination $saveDir @proxy
         }  else {
+            $ProgressPreference = 'SilentlyContinue'
             Invoke-WebRequest $IsoPath -OutFile $savePath -UseBasicParsing -Proxy $ENV:HTTP_PROXY
         }
 
