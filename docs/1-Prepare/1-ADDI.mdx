@@ -192,12 +192,6 @@ We'll call our volume label `AD Data`
 
 Confirm and Create
 
-### Install Cygwin
-
-Download the installer from [here](https://www.cygwin.com/setup-x86_64.exe)
-
-Run and install it.
-
 ### Installing Git for Windows
 
 Download the installer from [here](https://github.com/git-for-windows/git/releases/download/v2.44.0.windows.1/Git-2.44.0-64-bit.exe)
@@ -276,6 +270,18 @@ Also the `SAPWD` password should be set to your Windows Administrator password.
 
 Run the setup command.
 
+#### Manual SQL Server Configuration
+
+Tip: If ADDI configuration has trouble connecting to SQL Server, ensure that the below are set up correctly
+
+The command line based install of SQL Server above should properly set the server configuration (`/TCPENABLED=1`), but here are the manual instructions if needed.
+
+- Open SQL Server Configuration Manager (Start > Microsoft SQL Server 2019 > SQL Server 2019 Configuration Manager)
+- Click `Client Protocols` under `SQL Native Client 11.0 Configuration (32bit)` and ensure `TCP/IP` is set to `Enabled`
+- Click `Protocols for MSSQLSERVER` under `SQL Server Network Configuration` and ensure `Shared Memory` and `TCP/IP` are set to `Enabled`
+- Click `Client Protocols` under `SQL Native Client Configuration` and ensure `Shared Memory` and `TCP/IP` are set to `Enabled`
+- Close SQL Server Configuration Manager
+- Open Windows Services and restart service `SQL Server (MSSQLSERVER)`
 
 ### MS SQL Management Studio
 
