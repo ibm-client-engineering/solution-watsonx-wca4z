@@ -20,6 +20,8 @@ Expand-Archive -Path $downloadPath -DestinationPath $extractPath
 # Optional: Remove the downloaded zip file after extraction
 Remove-Item -Path $downloadPath
 
+$existingPath = [Environment]::GetEnvironmentVariable('PATH', [System.EnvironmentVariableTarget]::Machine)
+$newPathValue = "$existingPath;$installerDir"
 [Environment]::SetEnvironmentVariable('JAVA_HOME', $installerDir, [SetEnvironmentVariableTarget]::Machine)
-[Environment]::SetEnvironmentVariable('PATH', $installerDir, [SetEnvironmentVariableTarget]::Machine)
+[Environment]::SetEnvironmentVariable('PATH', $newPathValue, [SetEnvironmentVariableTarget]::Machine)
 Write-Host "JAVA_HOME env variable set to $installerDir"
