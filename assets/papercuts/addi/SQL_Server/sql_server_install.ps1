@@ -67,7 +67,7 @@ function Main {
     $start = Get-Date
     Start-Transcript "$PSScriptRoot\$scriptName-$($start.ToString('s').Replace(':','-')).log"
 
-    if (!$env:pathToIsoPath) {
+    if (!$IsoPath) {
         Write-Host "SQLSERVER_ISOPATH environment variable not specified, using defaults"
         $IsoPath = "https://download.microsoft.com/download/7/c/1/7c14e92e-bdcb-4f89-b7cf-93543e7112d1/SQLServer2019-x64-ENU-Dev.iso"
 
@@ -102,9 +102,9 @@ function Main {
         $IsoPath = $savePath
     }
 
-    Write-Host "`IsoPath: " $env:pathToIsoPath
+    Write-Host "`IsoPath: " $IsoPath
 
-    $volume = Mount-DiskImage $env:pathToIsoPath -StorageType ISO -PassThru | Get-Volume
+    $volume = Mount-DiskImage $IsoPath -StorageType ISO -PassThru | Get-Volume
     $iso_drive = if ($volume) {
         $volume.DriveLetter + ':'
     } else {
@@ -185,7 +185,7 @@ function Main {
 
     "`nInstallation length: {0:f1} minutes" -f ((Get-Date) - $start).TotalMinutes
 
-    Dismount-DiskImage $env:pathToIsoPath
+    Dismount-DiskImage $IsoPath
     #Stop-Transcript
     #trap { Stop-Transcript; if ($IsoPath) { Dismount-DiskImage $IsoPath -ErrorAction 0 } }
 
