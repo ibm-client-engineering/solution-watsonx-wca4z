@@ -123,9 +123,10 @@ function CheckSQLUserPrivileges {
 
 # Functions sets up sql user account and nakes sure the sql user is NOT required to change his password on first login.
 function SetUpSQLUserAccount {
+    #TODO Resolve
     $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
 
-    Invoke-SqlCmd -ServerInstance $serverInstance -Query $queryCreateLogin
+    Invoke-SqlCmd -ServerInstance $env:serverInstance -Query $queryCreateLogin
 
     $queryGrantPermissions = @"
     USE $env:sqlDatabase;

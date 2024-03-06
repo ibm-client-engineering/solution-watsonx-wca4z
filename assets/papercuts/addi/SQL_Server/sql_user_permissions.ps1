@@ -10,16 +10,12 @@ function Main {
     Write-Host "Starting sql_user_permissions.ps1 script"
     Confirm-EnvVariables
     Write-Host "Chose a step to proceed:"
-    Write-Host "1. Step 1. Checks if SSL encryption is enabled."
-    Write-Host "2. Step 2. Configure SQL For TCP"
+    Write-Host "1. Step 1. Checks if SSL encryption is enabled." # recommended, optional
+    Write-Host "2. Step 2. Configure SQL For TCP" # recommended
     Write-Host "3. Step 3. Set up SQL User Account" ## required
     Write-Host "4. Step 4. Checks if SQL user has all required privileges on $env:serverInstance" ## required
-
     Write-Host "5. Step 5. Configure SSL For ADD components"
-
     Write-Host "6. Step 6. Check and configure collation" ## required, this should be after step 2.
-
-
     Write-Host "7. Step 7. Configure TLS Certs and Keystores" ## required
 
     $choice = Read-Host "Enter the step number"
