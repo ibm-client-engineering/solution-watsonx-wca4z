@@ -136,7 +136,7 @@ function Main {
     #Security
         "/SQLSYSADMINACCOUNTS=""$SystemAdminAccounts"""
         '/SECURITYMODE=SQL'                 # Specifies the security mode for SQL Server. By default, Windows-only authentication mode is supported.
-        "/SAPWD="$env:sqlPassword""            # Sa user password
+        "/SAPWD=""$env:sqlPassword"""            # Sa user password
 
         "/INSTANCENAME=$env:serverInstance"       # Server instance name
 
