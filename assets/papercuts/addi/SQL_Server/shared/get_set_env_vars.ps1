@@ -3,7 +3,6 @@ function Set-EnvVariables {
     param (
         [string]$FilePath
     )
-    # TODO Fix env
     $envFileContent = Get-Content -Path $FilePath -Raw
     Write-Host "ALPHA"
     Write-Host $envFileContent
