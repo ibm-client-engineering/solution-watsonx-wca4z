@@ -86,6 +86,7 @@ function CheckSQLUserPrivileges {
                   HAS_PERMS_BY_NAME('$env:sqlUser', 'SERVER', 'VIEW ANY DATABASE') AS CanViewDatabase;"
 
     $privileges = Invoke-Sqlcmd -Query $query -ServerInstance "."
+    Write-Host $privileges
 
     # Display result
     Write-Host "SQL User Privileges for $env:sqlUser on $env:serverInstance"
