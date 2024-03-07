@@ -73,37 +73,32 @@ function CheckAndConfigureCollation {
 
 # function to check SQL user privileges
 function CheckSQLUserPrivileges {
-    param (
-        [string]$env:serverInstance,
-        [string]$sqlUser
-    )
     # Check if the user has the required privileges
-    $query = "SELECT HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'CREATE TABLE') AS CanCreateTable,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'ALTER ANY TABLE') AS CanAlterTable,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'DROP TABLE') AS CanDropTable,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'CREATE INDEX') AS CanCreateIndex,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'ALTER ANY INDEX') AS CanAlterIndex,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'DROP INDEX') AS CanDropIndex,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'SERVER', 'ALTER ANY LOGIN') AS CanAlterLogin,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'SERVER', 'ALTER ANY DATABASE') AS CanAlterDatabase,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'SERVER', 'CREATE ANY DATABASE') AS CanCreateDatabase,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'SERVER', 'VIEW ANY DATABASE') AS CanViewDatabase;"
+    $query = "SELECT HAS_PERMS_BY_NAME('$env:sqlUser', 'DATABASE', 'CREATE TABLE') AS CanCreateTable,
+                  HAS_PERMS_BY_NAME('$env:sqlUser', 'DATABASE', 'ALTER ANY TABLE') AS CanAlterTable,
+                  HAS_PERMS_BY_NAME('$env:sqlUser', 'DATABASE', 'DROP TABLE') AS CanDropTable,
+                  HAS_PERMS_BY_NAME('$env:sqlUser', 'DATABASE', 'CREATE INDEX') AS CanCreateIndex,
+                  HAS_PERMS_BY_NAME('$env:sqlUser', 'DATABASE', 'ALTER ANY INDEX') AS CanAlterIndex,
+                  HAS_PERMS_BY_NAME('$env:sqlUser', 'DATABASE', 'DROP INDEX') AS CanDropIndex,
+                  HAS_PERMS_BY_NAME('$env:sqlUser', 'SERVER', 'ALTER ANY LOGIN') AS CanAlterLogin,
+                  HAS_PERMS_BY_NAME('$env:sqlUser', 'SERVER', 'ALTER ANY DATABASE') AS CanAlterDatabase,
+                  HAS_PERMS_BY_NAME('$env:sqlUser', 'SERVER', 'CREATE ANY DATABASE') AS CanCreateDatabase,
+                  HAS_PERMS_BY_NAME('$env:sqlUser', 'SERVER', 'VIEW ANY DATABASE') AS CanViewDatabase;"
 
     $privileges = Invoke-Sqlcmd -Query $query -ServerInstance "."
 
-
     # Display result
-    Write-Host "SQL User Privileges for $sqlUser on $env:serverInstance"
-    Write-Host "Can Create Table: $($userPrivileges.CanCreateTable)"
-    Write-Host "Can Alter Table: $($userPrivileges.CanAlterTable)"
-    Write-Host "Can Drop Table: $($userPrivileges.CanDropTable)"
-    Write-Host "Can Create Index: $($userPrivileges.CanCreateIndex)"
-    Write-Host "Can Alter Index: $($userPrivileges.CanAlterIndex)"
-    Write-Host "Can Drop Index: $($userPrivileges.CanDropIndex)"
-    Write-Host "Can Alter Login: $($userPrivileges.CanAlterLogin)"
-    Write-Host "Can Alter Database: $($userPrivileges.CanAlterDatabase)"
-    Write-Host "Can Create Database: $($userPrivileges.CanCreateDatabase)"
-    Write-Host "Can View Database: $($userPrivileges.CanViewDatabase)"
+    Write-Host "SQL User Privileges for $env:sqlUser on $env:serverInstance"
+    Write-Host "Can Create Table: $($privileges.CanCreateTable)"
+    Write-Host "Can Alter Table: $($privileges.CanAlterTable)"
+    Write-Host "Can Drop Table: $($privileges.CanDropTable)"
+    Write-Host "Can Create Index: $($privileges.CanCreateIndex)"
+    Write-Host "Can Alter Index: $($privileges.CanAlterIndex)"
+    Write-Host "Can Drop Index: $($privileges.CanDropIndex)"
+    Write-Host "Can Alter Login: $($privileges.CanAlterLogin)"
+    Write-Host "Can Alter Database: $($privileges.CanAlterDatabase)"
+    Write-Host "Can Create Database: $($privileges.CanCreateDatabase)"
+    Write-Host "Can View Database: $($privileges.CanViewDatabase)"
 
     $hasAllPrivileges = $privileges.CanRead -eq 1 -and
             $privileges.CanWrite -eq 1 -and
@@ -125,9 +120,8 @@ function CheckSQLUserPrivileges {
 function SetUpSQLUserAccount {
     Write-Host "env sql user" $env:sqlUser
     Write-Host "env sql password" $env:sqlPassword
-    #TODO Resolve
-    $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
 
+    $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
     Invoke-SqlCmd -ServerInstance "." -Database "master" -Query $queryCreateLogin
 
     $queryGrantPermissions = @"
