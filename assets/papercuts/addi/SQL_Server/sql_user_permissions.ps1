@@ -66,9 +66,9 @@ function Step4 {
     $currentSQLUserHasPrivileges = CheckSQLUserPrivileges
 
     if ($currentSQLUserHasPrivileges) {
-        Write-Host "The current SQL user $env:sqlUser has all required privileges on $env:serverInstance"
+        Write-Host "The current SQL user has all required privileges on $env:serverInstance"
     } else {
-        Write-Host "The current SQL user $env:sqlUser does not have all required privileges on $env:serverInstance"
+        Write-Host "The current SQL user does not have all required privileges on $env:serverInstance"
         # Step 3
         $setUpSqlUser = Read-Host "Do you want to set up the SQL user $env:sqlUser? (Y/N)"
         if($setUpSqlUser) {
