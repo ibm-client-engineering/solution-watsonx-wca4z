@@ -8,7 +8,7 @@ function IsSSLEncryptionEnabled {
     $query = "SELECT value_in_use FROM sys.configurations WHERE name = 'force protocol encryption';"
 
     # Get SSL encryption status
-    $encryptionStatus = Invoke-Sqlcmd -Query $query -ServerInstance $env:serverInstance
+    $encryptionStatus = Invoke-Sqlcmd -Query $query -ServerInstance "."
 
     # check if tls is enabled
     if ($encryptionStatus.value_in_use -eq 1) {
@@ -89,7 +89,7 @@ function CheckSQLUserPrivileges {
                   HAS_PERMS_BY_NAME('$sqlUser', 'SERVER', 'CREATE ANY DATABASE') AS CanCreateDatabase,
                   HAS_PERMS_BY_NAME('$sqlUser', 'SERVER', 'VIEW ANY DATABASE') AS CanViewDatabase;"
 
-    $privileges = Invoke-Sqlcmd -Query $query -ServerInstance $env:serverInstance
+    $privileges = Invoke-Sqlcmd -Query $query -ServerInstance "."
 
 
     # Display result
@@ -163,9 +163,7 @@ function Get-SqlUsernames {
     ##  Invoke-Sqlcmd -ServerInstance "." -Database "master" -Query "SELECT name FROM sys.databases;"
 
     $query = "SELECT name, type_desc FROM sys.database_principals"
-    Write-Host "THETA" $ServerInstance
-    Write-Host "THETA" $query
-    $result = Invoke-Sqlcmd -ServerInstance "." -Query "SELECT name, type_desc FROM sys.database_principals"
+    $result = Invoke-Sqlcmd -ServerInstance "." -Query $query
 
     return $result | ForEach-Object {
         $_.name
@@ -176,7 +174,7 @@ function Get-SqlUsernames {
 ## Invoke-Sqlcmd -ServerInstance . -Database "master" -Query "SELECT name FROM sys.databases;"
 function createDatabase {
     $query_create_db = "CREATE DATABASE my_db";
-    Invoke-Sqlcmd -ServerInstance $ServerInstance -Database $Database -Query $query_create_db
+    Invoke-Sqlcmd -ServerInstance "." -Database $Database -Query $query_create_db
 }
 
 ## Default databases master, tempdb, model and msdb
@@ -191,7 +189,7 @@ function Get-SqlDatabases {
     #Invoke-SqlCmd -ServerInstance $env:serverInstance -Query $queryCreateLogin
 
     $query = "SELECT name FROM sys.databases"
-    $result = Invoke-Sqlcmd -ServerInstance $ServerInstance -Database $Database -Query $query
+    $result = Invoke-Sqlcmd -ServerInstance "." -Database $Database -Query $query
 
     return $result | ForEach-Object {
         $_.name
