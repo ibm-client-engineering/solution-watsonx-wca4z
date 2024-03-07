@@ -126,9 +126,9 @@ function SetUpSQLUserAccount {
     Write-Host "env sql user" $env:sqlUser
     Write-Host "env sql password" $env:sqlPassword
     #TODO Resolve
-    $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
-
-     Invoke-SqlCmd -ServerInstance $env:serverInstance -Database "master" -Query $queryCreateLogin
+#    $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
+#
+#    Invoke-SqlCmd -ServerInstance $env:serverInstance -Database "master" -Query $queryCreateLogin
 
     $queryGrantPermissions = @"
     USE $env:sqlDatabase;
