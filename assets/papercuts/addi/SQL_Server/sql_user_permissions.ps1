@@ -17,6 +17,8 @@ function Main {
     Write-Host "5. Step 5. Configure SSL For ADD components"
     Write-Host "6. Step 6. Check and configure collation" ## required, this should be after step 2.
     Write-Host "7. Step 7. Configure TLS Certs and Keystores" ## required
+    Write-Host "8. Step 8. Get existing usernames" ## required
+    Write-Host "9. Step 9. Get existing databases" ## required
 
     $choice = Read-Host "Enter the step number"
 
@@ -28,6 +30,8 @@ function Main {
         5 { Step5 }
         6 { Step6 }
         7 { Step7 }
+        8 { Step8 }
+        9 { Step9 }
         default { Write-Host "Invalid choise. Exiting." }
     }
 }
@@ -52,10 +56,6 @@ function Step2 {
 ## Required
 function Step3 {
     ConfirmAndExecute "Step 3"
-    $usernames = Get-SqlUsernames -ServerInstance $env:serverInstance -Database $env:sqlDatabase -SqlUser $env:sqlUser -SqlPassword $env:sqlPassword
-    $databases = Get-SqlDatabases -ServerInstance $env:serverInstance -Database $env:sqlDatabase -SqlUser $env:sqlUser -SqlPassword $env:sqlPassword
-    Write-Output "usernames:" $usernames
-    Write-Output "databases:" $databases
     SetUpSQLUserAccount
     Write-Host "SQL user set up successfully"
 }
@@ -64,14 +64,14 @@ function Step4 {
     ## TODO at some point we need to create login
     ConfirmAndExecute "Step 4"
 
-    $currentSQLUserHasPrivileges = CheckSQLUserPrivileges -serverInstance $env:serverInstance -sqlUser $env:sqlUser
+    $currentSQLUserHasPrivileges = CheckSQLUserPrivileges
 
     if ($currentSQLUserHasPrivileges) {
-        Write-Host "The current SQL user has all required privileges on $env:serverInstance"
+        Write-Host "The current SQL user $env:sqlUser has all required privileges on $env:serverInstance"
     } else {
-        Write-Host "The current SQL user does not have all required privileges on $env:serverInstance"
+        Write-Host "The current SQL user $env:sqlUser does not have all required privileges on $env:serverInstance"
         # Step 3
-        $setUpSqlUser = Read-Host "Do you want to set up the SQL user? (Y/N)"
+        $setUpSqlUser = Read-Host "Do you want to set up the SQL user $env:sqlUser? (Y/N)"
         if($setUpSqlUser) {
             SetUpSQLUserAccount
             Write-Host "SQL user set up successfully"
@@ -114,4 +114,12 @@ function Step7 {
     ConfigureCertificates -KeyStorePath $KeyStorePath -KeyPass $KeyPass -CertificatePathRoot $CertificatePathRoot -MyHost $MyHost -CertificatePathRootCertificatePath $CertificatePathRootCertificatePath
 }
 
+function Step8 {
+    $usernames = Get-SqlUsernames -ServerInstance $env:serverInstance -Database $env:sqlDatabase -SqlUser $env:sqlUser -SqlPassword $env:sqlPassword
+    Write-Output "usernames:" $usernames
+}
+function Step9 {
+    $databases = Get-SqlDatabases -ServerInstance $env:serverInstance -Database $env:sqlDatabase -SqlUser $env:sqlUser -SqlPassword $env:sqlPassword
+    Write-Output "databases:" $databases
+}
 Main
