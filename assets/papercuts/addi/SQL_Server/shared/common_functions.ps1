@@ -146,7 +146,7 @@ function SetUpSQLUserAccount {
 }
 
 ## Default users db0, guest, information_schema, sys, MS_PolicyEventProcessingLogin
-## current sql user is dbo
+## current sql user is dbo aka database owner
 function Get-SqlUsernames {
     param(
         [string] $ServerInstance,
@@ -154,8 +154,11 @@ function Get-SqlUsernames {
         [string] $SqlUser,
         [string] $SqlPassword
     )
+    $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
+    Invoke-SqlCmd -ServerInstance $env:serverInstance -Query $queryCreateLogin
+
     $query = "SELECT name, type_desc FROM sys.database_principals WHERE type_desc=$SqlUser"
-    $result = Invoke-Sqlcmd -ServerInstance $ServerInstance -Database $Database -Query $query -Username $SqlUser -Password $SqlPassword
+    $result = Invoke-Sqlcmd -ServerInstance $ServerInstance -Database $Database -Query $query
 
     return $result | ForEach-Object {
         $_.name
@@ -170,8 +173,11 @@ function Get-SqlDatabases {
         [string] $SqlUser,
         [string] $SqlPassword
     )
+    $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
+    Invoke-SqlCmd -ServerInstance $env:serverInstance -Query $queryCreateLogin
+
     $query = "SELECT name FROM sys.databases"
-    $result = Invoke-Sqlcmd -ServerInstance $ServerInstance -Database $Database -Query $query -Username $SqlUser -Password $SqlPassword
+    $result = Invoke-Sqlcmd -ServerInstance $ServerInstance -Database $Database -Query $query
 
     return $result | ForEach-Object {
         $_.name
