@@ -79,7 +79,6 @@ function CheckSQLUserPrivileges {
         [string]$sqlPassword,
         [string]$sqlDatabase
     )
-    Write-Host "phi" $sqlDatabase
 
     # Check if the user has the required privileges
     $query = "SELECT HAS_PERMS_BY_NAME('master', 'DATABASE', 'CREATE TABLE') AS CanCreateTable,
@@ -110,9 +109,6 @@ function CheckSQLUserPrivileges {
 
 # Functions sets up sql user account and nakes sure the sql user is NOT required to change his password on first login.
 function SetUpSQLUserAccount {
-    Write-Host "env sql user" $env:sqlUser
-    Write-Host "env sql password" $env:sqlPassword
-
     $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
     Invoke-SqlCmd -ServerInstance "." -Query $queryCreateLogin
 
