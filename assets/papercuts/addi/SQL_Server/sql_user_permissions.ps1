@@ -12,7 +12,7 @@ function Main {
     Write-Host "Chose a step to proceed:"
     Write-Host "1. Step 1. Checks if SSL encryption is enabled." # recommended, optional
     Write-Host "2. Step 2. Configure SQL For TCP" # recommended
-    Write-Host "3. Step 3. Set up SQL User Account" ## required
+    Write-Host "3. Step 3. Set up SQL User Account" ## required default user is dbo
     Write-Host "4. Step 4. Checks if SQL user has all required privileges on $env:serverInstance" ## required
     Write-Host "5. Step 5. Configure SSL For ADD components"
     Write-Host "6. Step 6. Check and configure collation" ## required, this should be after step 2.
@@ -52,8 +52,8 @@ function Step2 {
 ## Required
 function Step3 {
     ConfirmAndExecute "Step 3"
-    $usernames = Get-SqlUsernames -ServerInstance $env:serverInstance -Database $env:sqlDatabase -SqlUser $env:sqlUser
-    $databases = Get-SqlDatabases -ServerInstance $env:serverInstance -Database $env:sqlDatabase
+    $usernames = Get-SqlUsernames -ServerInstance $env:serverInstance -Database $env:sqlDatabase -SqlUser $env:sqlUser -SqlPassword $env:sqlPassword
+    $databases = Get-SqlDatabases -ServerInstance $env:serverInstance -Database $env:sqlDatabase -SqlUser $env:sqlUser -SqlPassword $env:sqlPassword
     Write-Output "usernames:" $usernames
     Write-Output "databases:" $databases
     SetUpSQLUserAccount
