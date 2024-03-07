@@ -88,21 +88,12 @@ function CheckSQLUserPrivileges {
                   HAS_PERMS_BY_NAME('MSSQL', 'SERVER', 'ALTER ANY DATABASE') AS CanAlterDatabase,
                   HAS_PERMS_BY_NAME('MSSQL', 'SERVER', 'CREATE ANY DATABASE') AS CanCreateDatabase,
                   HAS_PERMS_BY_NAME('MSSQL', 'SERVER', 'VIEW ANY DATABASE') AS CanViewDatabase;"
-    Write-Host "alpha1" $env:sqlPassword
-    Write-Host "alpha2" $sqlPassword
-    Write-Host "alpha2" $sqlDatabase
 
     $privileges = Invoke-Sqlcmd -ServerInstance "." -Username "my_user" -Password $env:sqlPassword -Query $query
-    Write-Host "phi" $privileges
 
     # Display result
     Write-Host "SQL User Privileges for $sqlUser on $serverInstance"
     Write-Host "Can Create Table: $($privileges.CanCreateTable)"
-#    Write-Host "Can Alter Table: $($privileges.CanAlterTable)"
-#    Write-Host "Can Drop Table: $($privileges.CanDropTable)"
-#    Write-Host "Can Create Index: $($privileges.CanCreateIndex)"
-#    Write-Host "Can Alter Index: $($privileges.CanAlterIndex)"
-#    Write-Host "Can Drop Index: $($privileges.CanDropIndex)"
     Write-Host "Can Alter Login: $($privileges.CanAlterLogin)"
     Write-Host "Can Alter Database: $($privileges.CanAlterDatabase)"
     Write-Host "Can Create Database: $($privileges.CanCreateDatabase)"
@@ -142,7 +133,6 @@ function SetUpSQLUserAccount {
     Invoke-Sqlcmd -ServerInstance "." -Query $queryGrantPermissions;
 }
 
-# Invoke-SqlCmd -ServerInstance MSSQLSERVER -Query $queryCreateLogin
 ## Default users dbo, guest, information_schema, sys, MS_PolicyEventProcessingLogin
 ## current sql user is dbo aka database owner
 function Get-SqlUsernames {
@@ -152,11 +142,6 @@ function Get-SqlUsernames {
         [string] $SqlUser,
         [string] $SqlPassword
     )
-    #$queryCreateLogin = "CREATE LOGIN $sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
-    #Invoke-SqlCmd -ServerInstance $env:serverInstance -Query $queryCreateLogin
-
-    ##  Invoke-Sqlcmd -ServerInstance "." -Database "master" -Query "SELECT name FROM sys.databases;"
-
     $query = "SELECT name, type_desc FROM sys.database_principals"
     $result = Invoke-Sqlcmd -ServerInstance "." -Query $query
 
@@ -165,8 +150,6 @@ function Get-SqlUsernames {
     }
 }
 
-## SQLCMD -s YourServerInstance -d master -U Username -P password, -Q "SELECT name FROM sys.databases" ;
-## Invoke-Sqlcmd -ServerInstance . -Database "master" -Query "SELECT name FROM sys.databases;"
 function createDatabase {
     $query_create_db = "CREATE DATABASE my_db";
     Invoke-Sqlcmd -ServerInstance "." -Query $query_create_db
@@ -190,8 +173,7 @@ function Get-SqlDatabases {
         $_.name
     }
 }
-# Test-NetConnection -ComputerName MSSQLSERVER -Port 1433
-# Get-NetFirewallRule -DisplayName "SQL Server*"
+
 function ConfirmAndExecute {
     param(
         [string]$stepName,
