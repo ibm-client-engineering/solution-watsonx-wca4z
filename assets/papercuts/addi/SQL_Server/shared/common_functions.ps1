@@ -145,6 +145,8 @@ function SetUpSQLUserAccount {
     Invoke-Sqlcmd -ServerInstance $env:serverInstance -Database $env:sqlDatabase -Query $queryGrantPermissions;
 }
 
+## Default users db0, guest, information_schema, sys, MS_PolicyEventProcessingLogin
+## current sql user is dbo
 function Get-SqlUsernames {
     param(
         [string] $ServerInstance,
@@ -159,6 +161,7 @@ function Get-SqlUsernames {
     }
 }
 
+## Default databases master, tempdb, model and msdb
 function Get-SqlDatabases {
     param(
         [string] $ServerInstance,
