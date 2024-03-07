@@ -56,7 +56,7 @@ function Step3 {
     $databases = Get-SqlDatabases -ServerInstance $env:serverInstance -Database $env:sqlDatabase -SqlUser $env:sqlUser -SqlPassword $env:sqlPassword
     Write-Output "usernames:" $usernames
     Write-Output "databases:" $databases
-    # SetUpSQLUserAccount
+    SetUpSQLUserAccount
     Write-Host "SQL user set up successfully"
 }
 ## Required
