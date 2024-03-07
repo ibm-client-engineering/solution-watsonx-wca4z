@@ -123,6 +123,8 @@ function CheckSQLUserPrivileges {
 
 # Functions sets up sql user account and nakes sure the sql user is NOT required to change his password on first login.
 function SetUpSQLUserAccount {
+    Write-Host "env sql user" $env:sqlUser
+    Write-Host "env sql password" $env:sqlPassword
     #TODO Resolve
     $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
 
@@ -145,6 +147,7 @@ function SetUpSQLUserAccount {
     Invoke-Sqlcmd -ServerInstance $env:serverInstance -Database $env:sqlDatabase -Query $queryGrantPermissions;
 }
 
+# Invoke-SqlCmd -ServerInstance MSSQLSERVER -Query $queryCreateLogin
 ## Default users dbo, guest, information_schema, sys, MS_PolicyEventProcessingLogin
 ## current sql user is dbo aka database owner
 function Get-SqlUsernames {
