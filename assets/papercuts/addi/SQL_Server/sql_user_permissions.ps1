@@ -63,7 +63,7 @@ function Step3 {
 function Step4 {
     ## TODO at some point we need to create login
     #ConfirmAndExecute "Step 4"
-    $currentSQLUserHasPrivileges = CheckSQLUserPrivileges -serverInstance $env:serverInstance -sqlUser $env:sqlUser
+    $currentSQLUserHasPrivileges = CheckSQLUserPrivileges -serverInstance $env:serverInstance -sqlUser $env:sqlUser -sqlPassword $env:sqlPassword -sqlDatabase $env:sqlDatabase
 
     if ($currentSQLUserHasPrivileges) {
         Write-Host "The current SQL user has all required privileges on $env:serverInstance"
