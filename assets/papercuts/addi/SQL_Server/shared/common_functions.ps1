@@ -128,7 +128,7 @@ function SetUpSQLUserAccount {
     #TODO Resolve
     $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
 
-    Invoke-SqlCmd -ServerInstance $env:serverInstance -Query $queryCreateLogin
+     Invoke-SqlCmd -ServerInstance $env:serverInstance -Database "master" -Query $queryCreateLogin
 
     $queryGrantPermissions = @"
     USE $env:sqlDatabase;
@@ -157,8 +157,8 @@ function Get-SqlUsernames {
         [string] $SqlUser,
         [string] $SqlPassword
     )
-    $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
-    Invoke-SqlCmd -ServerInstance $env:serverInstance -Query $queryCreateLogin
+    #$queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
+    #Invoke-SqlCmd -ServerInstance $env:serverInstance -Query $queryCreateLogin
 
     $query = "SELECT name, type_desc FROM sys.database_principals WHERE type_desc=$SqlUser"
     $result = Invoke-Sqlcmd -ServerInstance $ServerInstance -Database $Database -Query $query
@@ -166,6 +166,13 @@ function Get-SqlUsernames {
     return $result | ForEach-Object {
         $_.name
     }
+}
+
+## SQLCMD -s YourServerInstance -d master -U Username -P password, -Q "SELECT name FROM sys.databases" ;
+## Invoke-Sqlcmd -ServerInstance . -Database "master" -Query "SELECT name FROM sys.databases;"
+function createDatabase {
+    $query_create_db = "CREATE DATABASE my_db";
+    Invoke-Sqlcmd -ServerInstance $ServerInstance -Database $Database -Query $query_create_db
 }
 
 ## Default databases master, tempdb, model and msdb
@@ -176,8 +183,8 @@ function Get-SqlDatabases {
         [string] $SqlUser,
         [string] $SqlPassword
     )
-    $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
-    Invoke-SqlCmd -ServerInstance $env:serverInstance -Query $queryCreateLogin
+    #$queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
+    #Invoke-SqlCmd -ServerInstance $env:serverInstance -Query $queryCreateLogin
 
     $query = "SELECT name FROM sys.databases"
     $result = Invoke-Sqlcmd -ServerInstance $ServerInstance -Database $Database -Query $query

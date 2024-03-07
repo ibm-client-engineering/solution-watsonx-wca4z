@@ -61,6 +61,7 @@ function Step3 {
 }
 ## Required
 function Step4 {
+    ## TODO at some point we need to create login
     ConfirmAndExecute "Step 4"
 
     $currentSQLUserHasPrivileges = CheckSQLUserPrivileges -serverInstance $env:serverInstance -sqlUser $env:sqlUser
