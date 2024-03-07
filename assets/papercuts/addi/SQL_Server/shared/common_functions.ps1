@@ -145,6 +145,19 @@ function SetUpSQLUserAccount {
     Invoke-Sqlcmd -ServerInstance $env:serverInstance -Database $env:sqlDatabase -Query $queryGrantPermissions;
 }
 
+function Get-SqlUsernames {
+    param(
+        [string] $ServerInstance,
+        [string] $Database,
+        [string] $SqlUser
+    )
+    $query = "SELECT name, type_desc FROM sys.database_principals WHERE type_desc=$SqlUser"
+    $result = Invoke-Sqlcmd -ServerInstance $ServerInstance -Database $Database -Query $query
+
+    return $result | ForEach-Object {
+        $_.name
+    }
+}
 function ConfirmAndExecute {
     param(
         [string]$stepName,

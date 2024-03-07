@@ -52,6 +52,8 @@ function Step2 {
 ## Required
 function Step3 {
     ConfirmAndExecute "Step 3"
+    $usernames = Get-SqlUsernames -ServerInstance $env:serverInstance -Database $env:sqlDatabase
+    Write-Output $usernames
     SetUpSQLUserAccount
     Write-Host "SQL user set up successfully"
 }
