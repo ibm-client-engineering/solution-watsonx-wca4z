@@ -83,11 +83,7 @@ function CheckSQLUserPrivileges {
 
     # Check if the user has the required privileges
     $query = "SELECT HAS_PERMS_BY_NAME('master', 'DATABASE', 'CREATE TABLE') AS CanCreateTable,
-                  HAS_PERMS_BY_NAME('master', 'DATABASE', 'ALTER ANY TABLE') AS CanAlterTable,
                   HAS_PERMS_BY_NAME('master', 'DATABASE', 'DROP TABLE') AS CanDropTable,
-                  HAS_PERMS_BY_NAME('master', 'DATABASE', 'CREATE INDEX') AS CanCreateIndex,
-                  HAS_PERMS_BY_NAME('master', 'DATABASE', 'ALTER ANY INDEX') AS CanAlterIndex,
-                  HAS_PERMS_BY_NAME('master', 'DATABASE', 'DROP INDEX') AS CanDropIndex,
                   HAS_PERMS_BY_NAME('MSSQL', 'SERVER', 'ALTER ANY LOGIN') AS CanAlterLogin,
                   HAS_PERMS_BY_NAME('MSSQL', 'SERVER', 'ALTER ANY DATABASE') AS CanAlterDatabase,
                   HAS_PERMS_BY_NAME('MSSQL', 'SERVER', 'CREATE ANY DATABASE') AS CanCreateDatabase,
@@ -102,11 +98,11 @@ function CheckSQLUserPrivileges {
     # Display result
     Write-Host "SQL User Privileges for $sqlUser on $serverInstance"
     Write-Host "Can Create Table: $($privileges.CanCreateTable)"
-    Write-Host "Can Alter Table: $($privileges.CanAlterTable)"
-    Write-Host "Can Drop Table: $($privileges.CanDropTable)"
-    Write-Host "Can Create Index: $($privileges.CanCreateIndex)"
-    Write-Host "Can Alter Index: $($privileges.CanAlterIndex)"
-    Write-Host "Can Drop Index: $($privileges.CanDropIndex)"
+#    Write-Host "Can Alter Table: $($privileges.CanAlterTable)"
+#    Write-Host "Can Drop Table: $($privileges.CanDropTable)"
+#    Write-Host "Can Create Index: $($privileges.CanCreateIndex)"
+#    Write-Host "Can Alter Index: $($privileges.CanAlterIndex)"
+#    Write-Host "Can Drop Index: $($privileges.CanDropIndex)"
     Write-Host "Can Alter Login: $($privileges.CanAlterLogin)"
     Write-Host "Can Alter Database: $($privileges.CanAlterDatabase)"
     Write-Host "Can Create Database: $($privileges.CanCreateDatabase)"
