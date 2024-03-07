@@ -201,7 +201,7 @@ function ConfirmAndExecute {
 
     if ($confirmation -eq 'Y') {
         & $scriptBlock
-        Write-host "$stepName completed."
+        Write-Host "$stepName completed."
     }  else {
         Write-Host "$stepName skipped."
     }
