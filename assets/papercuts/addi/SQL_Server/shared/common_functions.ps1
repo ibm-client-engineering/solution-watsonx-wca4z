@@ -125,22 +125,22 @@ function CheckSQLUserPrivileges {
 
 # Functions sets up sql user account and nakes sure the sql user is NOT required to change his password on first login.
 function SetUpSQLUserAccount {
-    Write-Host "env sql user" $sqlUser
+    Write-Host "env sql user" $env:sqlUser
     Write-Host "env sql password" $env:sqlPassword
 
-    $queryCreateLogin = "CREATE LOGIN $sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
+    $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
     Invoke-SqlCmd -ServerInstance "." -Query $queryCreateLogin
 
     $queryGrantPermissions = @"
     USE $env:sqlDatabase;
-    CREATE USER $sqlUser FOR LOGIN $sqlUser;
-    GRANT CONNECT SQL TO $sqlUser;
-    GRANT CREATE PROCEDURE TO $sqlUser;
-    GRANT CREATE TABLE TO $sqlUser;
-    GRANT CREATE FUNCTION TO $sqlUser;
-    GRANT CREATE VIEW TO $sqlUser;
-    GRANT ALTER ANY DATABASE TO $sqlUser;
-    GRANT ALTER ANY LOGIN TO $sqlUser;
+    CREATE USER $env:sqlUser FOR LOGIN $env:sqlUser;
+    GRANT CONNECT SQL TO $env:sqlUser;
+    GRANT CREATE PROCEDURE TO $env:sqlUser;
+    GRANT CREATE TABLE TO $env:sqlUser;
+    GRANT CREATE FUNCTION TO $env:sqlUser;
+    GRANT CREATE VIEW TO $env:sqlUser;
+    GRANT ALTER ANY DATABASE TO $env:sqlUser;
+    GRANT ALTER ANY LOGIN TO $env:sqlUser;
 "@
 
     # Execute the query
