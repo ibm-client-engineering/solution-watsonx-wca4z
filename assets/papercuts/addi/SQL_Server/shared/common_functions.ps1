@@ -158,6 +158,19 @@ function Get-SqlUsernames {
         $_.name
     }
 }
+
+function Get-SqlDatabases {
+    param(
+        [string] $ServerInstance,
+        [string] $Database
+    )
+    $query = "SELECT name FROM sys.databases"
+    $result = Invoke-Sqlcmd -ServerInstance $ServerInstance -Database $Database -Query $query
+
+    return $result | ForEach-Object {
+        $_.name
+    }
+}
 function ConfirmAndExecute {
     param(
         [string]$stepName,
