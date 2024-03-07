@@ -177,6 +177,8 @@ function Get-SqlDatabases {
         $_.name
     }
 }
+# Test-NetConnection -ComputerName MSSQLSERVER -Port 1433
+# Get-NetFirewallRule -DisplayName "SQL Server*"
 function ConfirmAndExecute {
     param(
         [string]$stepName,
