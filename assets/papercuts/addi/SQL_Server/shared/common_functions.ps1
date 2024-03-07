@@ -165,7 +165,7 @@ function Get-SqlUsernames {
     $query = "SELECT name, type_desc FROM sys.database_principals"
     Write-Host "THETA" $ServerInstance
     Write-Host "THETA" $query
-    $result = Invoke-Sqlcmd -ServerInstance $ServerInstance -Query $query
+    $result = Invoke-Sqlcmd -ServerInstance "." -Query "SELECT name, type_desc FROM sys.database_principals"
 
     return $result | ForEach-Object {
         $_.name
