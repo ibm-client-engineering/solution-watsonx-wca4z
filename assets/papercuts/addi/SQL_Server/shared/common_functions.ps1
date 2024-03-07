@@ -123,12 +123,11 @@ function SetUpSQLUserAccount {
     Write-Host "env sql password" $env:sqlPassword
 
     $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
-    Invoke-SqlCmd -ServerInstance "." -Database "master" -Query $queryCreateLogin
+    Invoke-SqlCmd -ServerInstance "." -Query $queryCreateLogin
 
     $queryGrantPermissions = @"
     USE $env:sqlDatabase;
-    CREATE USER $env:sqlUser;
-    FOR LOGIN $env:sqlUser;
+    CREATE USER $env:sqlUser FOR LOGIN $env:sqlUser;
     GRANT CONNECT SQL TO $env:sqlUser;
     GRANT CREATE PROCEDURE TO $env:sqlUser;
     GRANT CREATE TABLE TO $env:sqlUser;
