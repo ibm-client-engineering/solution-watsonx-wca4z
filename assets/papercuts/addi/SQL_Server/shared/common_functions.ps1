@@ -108,14 +108,8 @@ function CheckSQLUserPrivileges {
     Write-Host "Can Create Database: $($privileges.CanCreateDatabase)"
     Write-Host "Can View Database: $($privileges.CanViewDatabase)"
 
-    $hasAllPrivileges = $privileges.CanRead -eq 1 -and
-            $privileges.CanWrite -eq 1 -and
-            $privileges.CanCreateTable -eq 1 -and
-            $privileges.CanAlterTable -eq 1 -and
+    $hasAllPrivileges = $privileges.CanCreateTable -eq 1 -and
             $privileges.CanDropTable -eq 1 -and
-            $privileges.CanCreateIndex -eq 1 -and
-            $privileges.CanAlterIndex -eq 1 -and
-            $privileges.CanDropIndex -eq 1 -and
             $privileges.CanAlterLogin -eq 1 -and
             $privileges.CanAlterDatabase -eq 1 -and
             $privileges.CanCreateDatabase -eq 1 -and
