@@ -82,12 +82,12 @@ function CheckSQLUserPrivileges {
     Write-Host "phi" $sqlDatabase
 
     # Check if the user has the required privileges
-    $query = "SELECT HAS_PERMS_BY_NAME($sqlUser, 'DATABASE', 'CREATE TABLE') AS CanCreateTable,
-                  HAS_PERMS_BY_NAME($sqlUser, 'DATABASE', 'ALTER ANY TABLE') AS CanAlterTable,
-                  HAS_PERMS_BY_NAME($sqlUser, 'DATABASE', 'DROP TABLE') AS CanDropTable,
-                  HAS_PERMS_BY_NAME($sqlUser, 'DATABASE', 'CREATE INDEX') AS CanCreateIndex,
-                  HAS_PERMS_BY_NAME($sqlUser, 'DATABASE', 'ALTER ANY INDEX') AS CanAlterIndex,
-                  HAS_PERMS_BY_NAME($sqlUser, 'DATABASE', 'DROP INDEX') AS CanDropIndex,
+    $query = "SELECT HAS_PERMS_BY_NAME($sqlDatabase, 'DATABASE', 'CREATE TABLE') AS CanCreateTable,
+                  HAS_PERMS_BY_NAME($sqlDatabase, 'DATABASE', 'ALTER ANY TABLE') AS CanAlterTable,
+                  HAS_PERMS_BY_NAME($sqlDatabase, 'DATABASE', 'DROP TABLE') AS CanDropTable,
+                  HAS_PERMS_BY_NAME($sqlDatabase, 'DATABASE', 'CREATE INDEX') AS CanCreateIndex,
+                  HAS_PERMS_BY_NAME($sqlDatabase, 'DATABASE', 'ALTER ANY INDEX') AS CanAlterIndex,
+                  HAS_PERMS_BY_NAME($sqlDatabase, 'DATABASE', 'DROP INDEX') AS CanDropIndex,
                   HAS_PERMS_BY_NAME('MSSQL', 'SERVER', 'ALTER ANY LOGIN') AS CanAlterLogin,
                   HAS_PERMS_BY_NAME('MSSQL', 'SERVER', 'ALTER ANY DATABASE') AS CanAlterDatabase,
                   HAS_PERMS_BY_NAME('MSSQL', 'SERVER', 'CREATE ANY DATABASE') AS CanCreateDatabase,
