@@ -151,10 +151,11 @@ function Get-SqlUsernames {
     param(
         [string] $ServerInstance,
         [string] $Database,
-        [string] $SqlUser
+        [string] $SqlUser,
+        [string] $SqlPassword
     )
     $query = "SELECT name, type_desc FROM sys.database_principals WHERE type_desc=$SqlUser"
-    $result = Invoke-Sqlcmd -ServerInstance $ServerInstance -Database $Database -Query $query
+    $result = Invoke-Sqlcmd -ServerInstance $ServerInstance -Database $Database -Query $query -Username $SqlUser -Password $SqlPassword
 
     return $result | ForEach-Object {
         $_.name
@@ -165,10 +166,12 @@ function Get-SqlUsernames {
 function Get-SqlDatabases {
     param(
         [string] $ServerInstance,
-        [string] $Database
+        [string] $Database,
+        [string] $SqlUser,
+        [string] $SqlPassword
     )
     $query = "SELECT name FROM sys.databases"
-    $result = Invoke-Sqlcmd -ServerInstance $ServerInstance -Database $Database -Query $query
+    $result = Invoke-Sqlcmd -ServerInstance $ServerInstance -Database $Database -Query $query -Username $SqlUser -Password $SqlPassword
 
     return $result | ForEach-Object {
         $_.name
