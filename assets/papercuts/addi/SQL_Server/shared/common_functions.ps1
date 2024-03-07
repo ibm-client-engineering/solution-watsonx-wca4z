@@ -141,6 +141,7 @@ function SetUpSQLUserAccount {
     CREATE USER $env:sqlUser FOR LOGIN $env:sqlUser;
     GRANT CONNECT SQL TO $env:sqlUser;
     GRANT CREATE PROCEDURE TO $env:sqlUser;
+    GRANT CREATE DATABASE TO $env:sqlUser;
     GRANT CREATE TABLE TO $env:sqlUser;
     GRANT CREATE FUNCTION TO $env:sqlUser;
     GRANT CREATE VIEW TO $env:sqlUser;
