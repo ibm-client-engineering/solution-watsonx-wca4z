@@ -144,7 +144,7 @@ function SetUpSQLUserAccount {
 "@
 
     # Execute the query
-    Invoke-Sqlcmd -ServerInstance "." -Database $env:sqlDatabase -Query $queryGrantPermissions;
+    Invoke-Sqlcmd -ServerInstance "." -Query $queryGrantPermissions;
 }
 
 # Invoke-SqlCmd -ServerInstance MSSQLSERVER -Query $queryCreateLogin
@@ -174,7 +174,7 @@ function Get-SqlUsernames {
 ## Invoke-Sqlcmd -ServerInstance . -Database "master" -Query "SELECT name FROM sys.databases;"
 function createDatabase {
     $query_create_db = "CREATE DATABASE my_db";
-    Invoke-Sqlcmd -ServerInstance "." -Database $Database -Query $query_create_db
+    Invoke-Sqlcmd -ServerInstance "." -Query $query_create_db
 }
 
 ## Default databases master, tempdb, model and msdb
@@ -189,7 +189,7 @@ function Get-SqlDatabases {
     #Invoke-SqlCmd -ServerInstance $env:serverInstance -Query $queryCreateLogin
 
     $query = "SELECT name FROM sys.databases"
-    $result = Invoke-Sqlcmd -ServerInstance "." -Database $Database -Query $query
+    $result = Invoke-Sqlcmd -ServerInstance "." -Query $query
 
     return $result | ForEach-Object {
         $_.name
