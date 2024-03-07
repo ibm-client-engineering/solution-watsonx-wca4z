@@ -52,10 +52,10 @@ function Step2 {
 ## Required
 function Step3 {
     ConfirmAndExecute "Step 3"
-    $usernames = Get-SqlUsernames -ServerInstance $env:serverInstance -Database $env:sqlDatabase -SqlUser $env:sqlUser -SqlPassword $env:sqlPassword
-    $databases = Get-SqlDatabases -ServerInstance $env:serverInstance -Database $env:sqlDatabase -SqlUser $env:sqlUser -SqlPassword $env:sqlPassword
-    Write-Output "usernames:" $usernames
-    Write-Output "databases:" $databases
+    #$usernames = Get-SqlUsernames -ServerInstance $env:serverInstance -Database $env:sqlDatabase -SqlUser $env:sqlUser -SqlPassword $env:sqlPassword
+    #$databases = Get-SqlDatabases -ServerInstance $env:serverInstance -Database $env:sqlDatabase -SqlUser $env:sqlUser -SqlPassword $env:sqlPassword
+    #Write-Output "usernames:" $usernames
+    #Write-Output "databases:" $databases
     SetUpSQLUserAccount
     Write-Host "SQL user set up successfully"
 }
