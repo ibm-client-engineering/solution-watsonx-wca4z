@@ -73,23 +73,29 @@ function CheckAndConfigureCollation {
 
 # function to check SQL user privileges
 function CheckSQLUserPrivileges {
+    param (
+        [string]$serverInstance,
+        [string]$sqlUser
+    )
+    Write-Host "phi" $sqlUser
+
     # Check if the user has the required privileges
-    $query = "SELECT HAS_PERMS_BY_NAME('$env:sqlUser', 'DATABASE', 'CREATE TABLE') AS CanCreateTable,
-                  HAS_PERMS_BY_NAME('$env:sqlUser', 'DATABASE', 'ALTER ANY TABLE') AS CanAlterTable,
-                  HAS_PERMS_BY_NAME('$env:sqlUser', 'DATABASE', 'DROP TABLE') AS CanDropTable,
-                  HAS_PERMS_BY_NAME('$env:sqlUser', 'DATABASE', 'CREATE INDEX') AS CanCreateIndex,
-                  HAS_PERMS_BY_NAME('$env:sqlUser', 'DATABASE', 'ALTER ANY INDEX') AS CanAlterIndex,
-                  HAS_PERMS_BY_NAME('$env:sqlUser', 'DATABASE', 'DROP INDEX') AS CanDropIndex,
-                  HAS_PERMS_BY_NAME('$env:sqlUser', 'SERVER', 'ALTER ANY LOGIN') AS CanAlterLogin,
-                  HAS_PERMS_BY_NAME('$env:sqlUser', 'SERVER', 'ALTER ANY DATABASE') AS CanAlterDatabase,
-                  HAS_PERMS_BY_NAME('$env:sqlUser', 'SERVER', 'CREATE ANY DATABASE') AS CanCreateDatabase,
-                  HAS_PERMS_BY_NAME('$env:sqlUser', 'SERVER', 'VIEW ANY DATABASE') AS CanViewDatabase;"
+    $query = "SELECT HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'CREATE TABLE') AS CanCreateTable,
+                  HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'ALTER ANY TABLE') AS CanAlterTable,
+                  HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'DROP TABLE') AS CanDropTable,
+                  HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'CREATE INDEX') AS CanCreateIndex,
+                  HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'ALTER ANY INDEX') AS CanAlterIndex,
+                  HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'DROP INDEX') AS CanDropIndex,
+                  HAS_PERMS_BY_NAME('$sqlUser', 'SERVER', 'ALTER ANY LOGIN') AS CanAlterLogin,
+                  HAS_PERMS_BY_NAME('$sqlUser', 'SERVER', 'ALTER ANY DATABASE') AS CanAlterDatabase,
+                  HAS_PERMS_BY_NAME('$sqlUser', 'SERVER', 'CREATE ANY DATABASE') AS CanCreateDatabase,
+                  HAS_PERMS_BY_NAME('$sqlUser', 'SERVER', 'VIEW ANY DATABASE') AS CanViewDatabase;"
 
     $privileges = Invoke-Sqlcmd -Query $query -ServerInstance "."
-    Write-Host $privileges
+    Write-Host "phi" $privileges
 
     # Display result
-    Write-Host "SQL User Privileges for $env:sqlUser on $env:serverInstance"
+    Write-Host "SQL User Privileges for $sqlUser on $serverInstance"
     Write-Host "Can Create Table: $($privileges.CanCreateTable)"
     Write-Host "Can Alter Table: $($privileges.CanAlterTable)"
     Write-Host "Can Drop Table: $($privileges.CanDropTable)"
@@ -119,22 +125,22 @@ function CheckSQLUserPrivileges {
 
 # Functions sets up sql user account and nakes sure the sql user is NOT required to change his password on first login.
 function SetUpSQLUserAccount {
-    Write-Host "env sql user" $env:sqlUser
+    Write-Host "env sql user" $sqlUser
     Write-Host "env sql password" $env:sqlPassword
 
-    $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
+    $queryCreateLogin = "CREATE LOGIN $sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
     Invoke-SqlCmd -ServerInstance "." -Query $queryCreateLogin
 
     $queryGrantPermissions = @"
     USE $env:sqlDatabase;
-    CREATE USER $env:sqlUser FOR LOGIN $env:sqlUser;
-    GRANT CONNECT SQL TO $env:sqlUser;
-    GRANT CREATE PROCEDURE TO $env:sqlUser;
-    GRANT CREATE TABLE TO $env:sqlUser;
-    GRANT CREATE FUNCTION TO $env:sqlUser;
-    GRANT CREATE VIEW TO $env:sqlUser;
-    GRANT ALTER ANY DATABASE TO $env:sqlUser;
-    GRANT ALTER ANY LOGIN TO $env:sqlUser;
+    CREATE USER $sqlUser FOR LOGIN $sqlUser;
+    GRANT CONNECT SQL TO $sqlUser;
+    GRANT CREATE PROCEDURE TO $sqlUser;
+    GRANT CREATE TABLE TO $sqlUser;
+    GRANT CREATE FUNCTION TO $sqlUser;
+    GRANT CREATE VIEW TO $sqlUser;
+    GRANT ALTER ANY DATABASE TO $sqlUser;
+    GRANT ALTER ANY LOGIN TO $sqlUser;
 "@
 
     # Execute the query
@@ -151,7 +157,7 @@ function Get-SqlUsernames {
         [string] $SqlUser,
         [string] $SqlPassword
     )
-    #$queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
+    #$queryCreateLogin = "CREATE LOGIN $sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
     #Invoke-SqlCmd -ServerInstance $env:serverInstance -Query $queryCreateLogin
 
     ##  Invoke-Sqlcmd -ServerInstance "." -Database "master" -Query "SELECT name FROM sys.databases;"
@@ -179,7 +185,7 @@ function Get-SqlDatabases {
         [string] $SqlUser,
         [string] $SqlPassword
     )
-    #$queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
+    #$queryCreateLogin = "CREATE LOGIN $sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
     #Invoke-SqlCmd -ServerInstance $env:serverInstance -Query $queryCreateLogin
 
     $query = "SELECT name FROM sys.databases"
