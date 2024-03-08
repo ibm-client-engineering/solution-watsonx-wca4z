@@ -8,7 +8,7 @@ function IsSSLEncryptionEnabled {
     $query = "SELECT value_in_use FROM sys.configurations WHERE name = 'force protocol encryption';"
 
     # Get SSL encryption status
-    $encryptionStatus = Invoke-Sqlcmd -Query $query -ServerInstance $env:serverInstance
+    $encryptionStatus = Invoke-Sqlcmd -Query $query -ServerInstance "."
 
     # check if tls is enabled
     if ($encryptionStatus.value_in_use -eq 1) {
@@ -74,45 +74,31 @@ function CheckAndConfigureCollation {
 # function to check SQL user privileges
 function CheckSQLUserPrivileges {
     param (
-        [string]$env:serverInstance,
-        [string]$sqlUser
+        [string]$serverInstance,
+        [string]$sqlUser,
+        [string]$sqlPassword,
+        [string]$sqlDatabase
     )
+
     # Check if the user has the required privileges
-    $query = "SELECT HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'CREATE TABLE') AS CanCreateTable,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'ALTER ANY TABLE') AS CanAlterTable,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'DROP TABLE') AS CanDropTable,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'CREATE INDEX') AS CanCreateIndex,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'ALTER ANY INDEX') AS CanAlterIndex,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'DATABASE', 'DROP INDEX') AS CanDropIndex,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'SERVER', 'ALTER ANY LOGIN') AS CanAlterLogin,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'SERVER', 'ALTER ANY DATABASE') AS CanAlterDatabase,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'SERVER', 'CREATE ANY DATABASE') AS CanCreateDatabase,
-                  HAS_PERMS_BY_NAME('$sqlUser', 'SERVER', 'VIEW ANY DATABASE') AS CanViewDatabase;"
+    $query = "SELECT HAS_PERMS_BY_NAME('master', 'DATABASE', 'CREATE TABLE') AS CanCreateTable,
+                  HAS_PERMS_BY_NAME('master', 'DATABASE', 'DROP TABLE') AS CanDropTable,
+                  HAS_PERMS_BY_NAME('MSSQL', 'SERVER', 'ALTER ANY LOGIN') AS CanAlterLogin,
+                  HAS_PERMS_BY_NAME('MSSQL', 'SERVER', 'ALTER ANY DATABASE') AS CanAlterDatabase,
+                  HAS_PERMS_BY_NAME('MSSQL', 'SERVER', 'CREATE ANY DATABASE') AS CanCreateDatabase,
+                  HAS_PERMS_BY_NAME('MSSQL', 'SERVER', 'VIEW ANY DATABASE') AS CanViewDatabase;"
 
-    $privileges = Invoke-Sqlcmd -Query $query -ServerInstance $env:serverInstance
-
+    $privileges = Invoke-Sqlcmd -ServerInstance "." -Username "my_user" -Password $env:sqlPassword -Query $query
 
     # Display result
-    Write-Host "SQL User Privileges for $sqlUser on $env:serverInstance"
-    Write-Host "Can Create Table: $($userPrivileges.CanCreateTable)"
-    Write-Host "Can Alter Table: $($userPrivileges.CanAlterTable)"
-    Write-Host "Can Drop Table: $($userPrivileges.CanDropTable)"
-    Write-Host "Can Create Index: $($userPrivileges.CanCreateIndex)"
-    Write-Host "Can Alter Index: $($userPrivileges.CanAlterIndex)"
-    Write-Host "Can Drop Index: $($userPrivileges.CanDropIndex)"
-    Write-Host "Can Alter Login: $($userPrivileges.CanAlterLogin)"
-    Write-Host "Can Alter Database: $($userPrivileges.CanAlterDatabase)"
-    Write-Host "Can Create Database: $($userPrivileges.CanCreateDatabase)"
-    Write-Host "Can View Database: $($userPrivileges.CanViewDatabase)"
+    Write-Host "SQL User Privileges for $sqlUser on $serverInstance"
+    Write-Host "Can Create Table: $($privileges.CanCreateTable)"
+    Write-Host "Can Alter Login: $($privileges.CanAlterLogin)"
+    Write-Host "Can Alter Database: $($privileges.CanAlterDatabase)"
+    Write-Host "Can Create Database: $($privileges.CanCreateDatabase)"
+    Write-Host "Can View Database: $($privileges.CanViewDatabase)"
 
-    $hasAllPrivileges = $privileges.CanRead -eq 1 -and
-            $privileges.CanWrite -eq 1 -and
-            $privileges.CanCreateTable -eq 1 -and
-            $privileges.CanAlterTable -eq 1 -and
-            $privileges.CanDropTable -eq 1 -and
-            $privileges.CanCreateIndex -eq 1 -and
-            $privileges.CanAlterIndex -eq 1 -and
-            $privileges.CanDropIndex -eq 1 -and
+    $hasAllPrivileges = $privileges.CanCreateTable -eq 1 -and
             $privileges.CanAlterLogin -eq 1 -and
             $privileges.CanAlterDatabase -eq 1 -and
             $privileges.CanCreateDatabase -eq 1 -and
@@ -124,15 +110,14 @@ function CheckSQLUserPrivileges {
 # Functions sets up sql user account and nakes sure the sql user is NOT required to change his password on first login.
 function SetUpSQLUserAccount {
     $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
-
-    Invoke-SqlCmd -ServerInstance $serverInstance -Query $queryCreateLogin
+    Invoke-SqlCmd -ServerInstance "." -Query $queryCreateLogin
 
     $queryGrantPermissions = @"
     USE $env:sqlDatabase;
-    CREATE USER $env:sqlUser;
-    FOR LOGIN $env:sqlUser;
+    CREATE USER $env:sqlUser FOR LOGIN $env:sqlUser;
     GRANT CONNECT SQL TO $env:sqlUser;
     GRANT CREATE PROCEDURE TO $env:sqlUser;
+    GRANT CREATE ANY DATABASE TO $env:sqlUser;
     GRANT CREATE TABLE TO $env:sqlUser;
     GRANT CREATE FUNCTION TO $env:sqlUser;
     GRANT CREATE VIEW TO $env:sqlUser;
@@ -141,7 +126,48 @@ function SetUpSQLUserAccount {
 "@
 
     # Execute the query
-    Invoke-Sqlcmd -ServerInstance $env:serverInstance -Database $env:sqlDatabase -Query $queryGrantPermissions;
+    Invoke-Sqlcmd -ServerInstance "." -Query $queryGrantPermissions;
+}
+
+## Default users dbo, guest, information_schema, sys, MS_PolicyEventProcessingLogin
+## current sql user is dbo aka database owner
+function Get-SqlUsernames {
+    param(
+        [string] $ServerInstance,
+        [string] $Database,
+        [string] $SqlUser,
+        [string] $SqlPassword
+    )
+    $query = "SELECT name, type_desc FROM sys.database_principals"
+    $result = Invoke-Sqlcmd -ServerInstance "." -Query $query
+
+    return $result | ForEach-Object {
+        $_.name
+    }
+}
+
+function createDatabase {
+    $query_create_db = "CREATE DATABASE my_db";
+    Invoke-Sqlcmd -ServerInstance "." -Query $query_create_db
+}
+
+## Default databases master, tempdb, model and msdb
+function Get-SqlDatabases {
+    param(
+        [string] $ServerInstance,
+        [string] $Database,
+        [string] $SqlUser,
+        [string] $SqlPassword
+    )
+    #$queryCreateLogin = "CREATE LOGIN $sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
+    #Invoke-SqlCmd -ServerInstance $env:serverInstance -Query $queryCreateLogin
+
+    $query = "SELECT name FROM sys.databases"
+    $result = Invoke-Sqlcmd -ServerInstance "." -Query $query
+
+    return $result | ForEach-Object {
+        $_.name
+    }
 }
 
 function ConfirmAndExecute {
@@ -154,7 +180,7 @@ function ConfirmAndExecute {
 
     if ($confirmation -eq 'Y') {
         & $scriptBlock
-        Write-host "$stepName completed."
+        Write-Host "$stepName completed."
     }  else {
         Write-Host "$stepName skipped."
     }
