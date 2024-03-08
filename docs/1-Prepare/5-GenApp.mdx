@@ -1,0 +1,75 @@
+---
+id: genapp
+sidebar_position: 5
+title: GenApp
+custom_edit_url: null
+---
+
+## WCA4Z Data Generator
+
+The WCA4Z Data Generator is for generating data. It lives on the ADDI host.
+
+### Retrieving the installation file
+
+If you have already downloaded RA version 1.1.x, open up WinSCP on the ADDI host.
+
+Create a login to the RA host in WinSCP
+![CleanShot 2024-03-05 at 14 14 41](https://media.github.ibm.com/user/20330/files/f2cced1c-8810-4c16-9999-58922143b628)
+
+Save the login and connect.
+
+If you've already followed the directions [here](Refactor) for the config and install of RA, you should have the extracted folder sitting in your home directory:
+
+![CleanShot 2024-03-05 at 14 19 32](https://media.github.ibm.com/user/20330/files/9c73f00c-6fcd-4601-9ae4-28bf5561a3ae)
+
+Drag the WCA4Z-Data-Generator zip to your home documents folder on the ADDI host.
+
+![CleanShot 2024-03-05 at 14 24 37](https://media.github.ibm.com/user/20330/files/d9ad5ab6-c96a-48b2-b346-db579b969e37)
+
+Unzip the WCA4Z-Data-Generator zip file into `C:\Program Files\IBM Application Discovery and Delivery Intelligence`
+```powershell
+Expand-Archive -LiteralPath 'C:\Users\Administrator\Documents\WCA4Z-Data-Generator-1.1.2.zip' -DestinationPath 'C:\Program Files\IBM Application Discovery and Delivery Intelligence'
+```
+
+## Configuration and Build of GenApp project
+
+Download the CCS GenApp code zip to the ADDI host from [here](https://github.com/cicsdev/cics-genapp/archive/refs/heads/main.zip)
+
+Extract `C:\Users\Administrator\Downloads\cics-genapp-main.zip`.
+
+```powershell
+Expand-Archive -LiteralPath 'C:\Users\Administrator\Downloads\cics-genapp-main.zip' -DestinationPath 'D:\'
+```
+
+### Create a new Project
+
+Let's create an INI project file in D:\
+
+`project.ini`
+```tsx
+[ADNewProj]
+ProjectName = "GenAppSD"
+Path = "C:\IBM AD\Mainframe Projects\GenAppSD"
+Environment = "zOS"
+ProjectLanguages = "DT Cobol,Assembler,Cobol,Natural,PL1,Ads"
+DBTypes = "Datacom,IDMS,Adabas,Relational,IMS/DB"
+MapTypes = "Natural (LNM),CICS (BMS), IMS TM (MFS),ADS Map"
+ProjectDBType = "SQL"
+CCSEnvironment = "Default"
+DBServerName = "ADDI SQL [127.0.0.1:1433]"
+AttachToDB = "N"
+EnableCross = "N"
+```
+
+Make sure the directory for `Path` exists. Create the folder.
+```powershell
+mkdir 'C:\IBM AD\Mainframe Projects\GenAppSD'
+```
+
+Run the project creation command:
+
+```powershell
+cd "C:\Program Files\IBM Application Discovery and Delivery Intelligence\IBM Application Discovery Build Client\Bin\Release"
+.\IBMApplicationDiscoveryBuildClient.exe /np "D:\project.ini"
+
+```
