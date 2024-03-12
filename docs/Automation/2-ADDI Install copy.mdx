@@ -1,0 +1,77 @@
+---
+id: ADDI Install
+sidebar_position: 2
+title: 'ADDI Install'
+custom_edit_url: null
+---
+
+## Overview
+<div style={{ borderBottom: '1px solid #000', marginTop: '20px', marginBottom: '20px' }}></div>
+
+This section will walkthrough the automation scripts for the ADDI install. This install will consist of four components:
+- Adoptium Java Runtime Environment
+- Eclipse
+- SQL server and its user permissions
+- ADDI
+
+This section will also walkthorugh the configurations for:
+- TLS Connections
+- DB2 Cloud Database
+
+## Script Walkthrough
+<div style={{ borderBottom: '1px solid #000', marginTop: '20px', marginBottom: '20px' }}></div>
+
+### Adoptium Java Runtime Environment
+Navigate to the appropriate directory:
+```powershell
+cd assets/papercuts/addi/java_installation
+```
+Run the automation script
+```powershell
+./java_install.ps1
+```
+
+:::note
+To validate working Java version make sure to restart powershells
+:::
+
+### Eclipse Install
+:::warning
+Run Java Runtime install first
+:::
+
+Navigate to the appropriate directory:
+```powershell
+cd assets/papercuts/addi/java_installation
+```
+Run the automation script
+```powershell
+.\install_eclipse.ps1
+```
+
+### SQL Server Install and User Permissions
+
+#### **SQL Server Install**
+Navigate to the appropriate directory:
+```powershell
+cd assets/papercuts/addi/SQL_Server
+```
+
+```powershell
+.\sql_server_install.ps1
+```
+
+#### **SQL Server User Permissions**
+Navigate to the appropriate directory:
+```powershell
+cd assets/papercuts/addi/SQL_Server
+```
+
+```powershell
+.\sql_user_permissions.ps1
+```
+
+### ADDI Install
+
+
+

@@ -1,0 +1,49 @@
+---
+id: Pre-flight System Check
+sidebar_position: 1
+title: 'Pre-flight System Check'
+custom_edit_url: null
+---
+
+## Overview
+<div style={{ borderBottom: '1px solid #000', marginTop: '20px', marginBottom: '20px' }}></div>
+This section will walkthrough the automation script (insert link for system_check.sh) to check if the designated system for each install meets the appropriate system harware and software requirements:
+
+ADDI Host
+- OS: Windows 10 or 11 
+- RAM: 32 Gigs
+- Storage: 100G for local, 300G for AD components
+- Cores: 8
+
+Refactor Host
+- OS: Red Hat Enterprise Linux 8x/9x
+- RAM: 16G
+- Storage: 100G for local, 400G for data
+- Cores: 4
+
+## Script Walkthrough
+
+### ADDI Host check Script: system _check.ps1
+
+:::note
+Make sure you are in the ADDI host
+:::
+
+Open Powershell and run to allow the ability to run scripts
+```tsx
+Set-ExecutionPolicy Unrestricted
+```
+
+Run system check script:
+```tsx
+cd assets/papercuts/
+```
+```tsx
+.\system_check.ps1
+```
+
+### Refactor Host check Script
+:::note
+The preflight system check is incluided within the Refactor install script (ADD Link)
+:::
+
