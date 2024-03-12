@@ -73,9 +73,4 @@ mv refactoring-assistant ~/
 cd ~/refactoring-assistant
 ./setup.sh
 
-#copy config template and edit
-cp config/template.properties config/config.properties
 
-sed -i "s@CERTS_LOCATION=.*@CERTS_LOCATION=$0@" config.properties
-sed -i "s@HOST_PORT=.*@HOST_PORT=$1@" config.properties
-sed -i "s@ENVIRONMENT_ID=.*@ENVIRONMENT_ID==$2@" config.properties
