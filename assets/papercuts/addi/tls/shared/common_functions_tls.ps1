@@ -15,14 +15,14 @@ function Export-CertificateToPfx {
     param (
         # [System.Security.CryptoGraphy.x509Certificates.X509Certificates2]$Certificate,
         [string]$Fqdn,
-        [string]$Password,
+        [string]$KeyPass,
         [string]$KeyStorePath,
         [string]$CertificatePath
     )
 
     $fileName = "exported_certificate.cer"
     $fullFilePath = Join-Path $CertificatePath $fileName
-    keytool -exportcert -alias $Fqdn -keystore $KeyStorePath -file $fullFilePath -storepass $Password
+    keytool -exportcert -alias $Fqdn -keystore $KeyStorePath -file $fullFilePath -storepass $KeyPass
 }
 
 # Function to import a certificate into a keystore
