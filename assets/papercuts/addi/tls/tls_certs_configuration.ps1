@@ -20,12 +20,12 @@ function Main {
     Write-Host "KeyStorePath $KeyStorePath"
     Write-Host "MyHost $MyHost"
     Write-Host "CertificatePathRootCertificatePath $CertificatePathRootCertificatePath"
-    Write-Host "CertificatePathRoot $CertificatePathRoot"
+    Write-Host "env:certificatePath $env:certificatePath"
 
     #$directoryPath = "C:\certificates"
     if (-not (Test-Path $env:certificatePath -PathType Container)) {
         Write-Host "Directory $env:certificatePath does not exist... creating one now"
-        New-Item -ItemType Directory -Path $env:certificatePath
+        New-Item -ItemType Directory -LiteralPath $env:certificatePath
     } else {
         Write-Host "Directory $env:certificatePath already exists, skipping."
     }
