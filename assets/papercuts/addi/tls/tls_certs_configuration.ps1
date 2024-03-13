@@ -3,7 +3,7 @@
 . "..\SQL_Server\shared\get_set_env_vars.ps1"
 
 function Main {
-    Writing-Host "Configure TLS Certs and Keystores"
+    Write-Host "Configure TLS Certs and Keystores"
     $envFilePath = ".\.env"
     Set-EnvVariables -FilePath $envFilePath
     Confirm-EnvVariables
