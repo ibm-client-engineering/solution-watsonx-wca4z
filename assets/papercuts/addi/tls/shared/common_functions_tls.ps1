@@ -30,9 +30,9 @@ function Import-CertificateToKeystore {
     param(
         [string]$KeyStorePath,
         [string]$CertificatePath,
-        [string]$Password
+        [string]$KeyPass
     )
-    keytool -keystore KeyStorePath -import -file $CertificatePath -alias "self-signed-root" -storepass $Password
+    keytool -keystore KeyStorePath -import -file $CertificatePath -alias "self-signed-root" -storepass $KeyPass
 }
 
 # Function to peform additional steps like managing aliases, deleting uncessary files, etc.
