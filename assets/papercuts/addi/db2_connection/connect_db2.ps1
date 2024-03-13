@@ -23,6 +23,12 @@ if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 {  
   Throw "You must run this script as administrator"
 }
+#add TLS?
+[System.Net.ServicePointManager]::SecurityProtocol = (
+    [System.Net.ServicePointManager]::SecurityProtocol -bor 
+    [System.Net.SecurityProtocolType]::Tls12
+)
+
 
 
 
