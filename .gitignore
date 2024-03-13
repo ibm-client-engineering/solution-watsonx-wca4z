@@ -21,3 +21,7 @@ package-lock.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+'/assets/papercuts/refactor/IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual'
+/assets/papercuts/refactor/refactoring_assistant/*
+/assets/papercuts/refactor/wCAZ_RA_z_OS_1.0.1_Linux_ML.zip
