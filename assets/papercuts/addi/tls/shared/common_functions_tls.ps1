@@ -59,7 +59,7 @@ function GenerateKeyPair {
         [string]$StorePass,
         [string]$MyHost
     )
-    keytool -genkeypair -alias $DnsName -keyalg RSA -keysize 2048 -dname "cn=$DnsName" -keypass $KeyPass -keystore $KeyStorePath -storepass $StorePass -storetype PKCS12 -ext BasicConstraints:critical=ca:true -ext san=$MyHost
+    keytool -genkeypair -alias $DnsName -keyalg RSA -keysize 2048 -dname "cn=$DnsName" -keypass $KeyPass -keystore $KeyStorePath -storepass $StorePass -storetype PKCS12 -ext BasicConstraints:critical=ca:true -ext san=dns:$MyHost
 }
 
 
@@ -96,7 +96,7 @@ function ConfigureCertificates {
 
     Get-Service | Select-Object DisplayName, ServiceName
 
-    Restart-Service -Name "IBM Application Discovery Configuration"
+    Restart-Service -Name "IBM Application Discovery Configuration Service (IBMApplicationDiscoveryConfigurationService)"
 
     Import-PfxCertificate -FilePath $CertificatePathRootCertificatePath -Password $KeyPass
 
