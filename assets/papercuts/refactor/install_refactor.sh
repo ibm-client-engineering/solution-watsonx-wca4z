@@ -69,8 +69,8 @@ unzip wCAZ_RA_z_OS_1.0.1_Linux_ML.zip
 cd 'IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual'/
 unzip refactoring-assistant-1.1.0.zip 
 tar zxf refactoring-assistant-1.1.0.tgz
-mv refactoring-assistant ~/
-cd ~/refactoring-assistant
+mv refactoring-assistant ../refactoring_assistant
+cd ../refactoring-assistant
 ./setup.sh
 
 
