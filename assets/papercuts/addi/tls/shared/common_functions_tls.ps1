@@ -90,9 +90,12 @@ function ConfigureCertificates {
         [string]$KeyPass,
         [string]$CertificatePathRoot,
         [string]$MyHost,
-        [string]$CertificatePathRootCertificatePath
+        [string]$CertificatePathRootCertificatePath,
+        [string]$Fqdn
     )
-    keytool -importcert -alias ad-core-server -keystore $KeyStorePath -storetype PKCS12 -storepass $KeyPass -file $CertificatePathRoot -storepass $KeyPass -ext BasicConstraints:critical=ca:true -ext san=dns:$MyHost
+    $fileName = "exported_certificate.cer"
+    $fullFilePath = Join-Path $CertificatePath $fileName
+    keytool -importcert -alias ad-core-server -keystore $KeyStorePath -storetype PKCS12 -storepass $KeyPass -file $fullFilePath -storepass $KeyPass -ext BasicConstraints:critical=ca:true -ext san=dns:$Fqdn
 
     # TODO #3 If you run windows 2022 or higher you have to use UTF 16
     $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
