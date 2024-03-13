@@ -22,11 +22,10 @@ function Main {
     Write-Host "CertificatePathRootCertificatePath $CertificatePathRootCertificatePath"
     Write-Host "env:certificatePath $env:certificatePath"
 
-    $directoryPath = "$env:certificatePath"
-    Write-Host "directoryPath $directoryPath"
-    if (-not (Test-Path $directoryPath -PathType Container)) {
-        Write-Host "Directory $directoryPath does not exist... creating one now"
-        New-Item -ItemType Directory -Path $directoryPath
+    Write-Host "CertificatePathRootCertificatePath $CertificatePathRootCertificatePath"
+    if (-not (Test-Path $CertificatePathRootCertificatePath -PathType Container)) {
+        Write-Host "Directory $CertificatePathRootCertificatePath does not exist... creating one now"
+        New-Item -ItemType Directory -Path $CertificatePathRootCertificatePath
     } else {
         Write-Host "Directory $directoryPath already exists, skipping."
     }
