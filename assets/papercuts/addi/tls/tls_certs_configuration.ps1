@@ -43,7 +43,7 @@ function Main {
     # Db2SSL -DB2SSLCert $KeyStorePath -CertificatePath $CertificatePath -KeyStorePath $KeyStorePath -Password $KeyPass
 
     # Delete certs
-    # DeleteServerCertificate -CertificatePath $CertificatePath
+    DeleteServerCertificate -CertificatePath $CertificatePath
 
     # Cofigure certs
     # ConfigureCertificates -KeyStorePath $KeyStorePath -KeyPass $KeyPass -CertificatePathRoot $CertificatePathRoot -MyHost $MyHost -CertificatePathRootCertificatePath $CertificatePathRootCertificatePath
