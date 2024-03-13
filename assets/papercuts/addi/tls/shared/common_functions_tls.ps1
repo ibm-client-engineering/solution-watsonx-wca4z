@@ -56,10 +56,10 @@ function GenerateKeyPair {
     param(
         [string]$KeyPass,
         [string]$KeyStorePath,
-        [string]$StorePass,
-        [string]$Fqdn,
+        [string]$KeyPass,
+        [string]$Fqdn
     )
-    keytool -genkeypair -alias $Fqdn -keyalg RSA -keysize 2048 -dname "cn=$Fqdn" -keypass $KeyPass -keystore $KeyStorePath -storepass $StorePass -storetype PKCS12 -ext BasicConstraints:critical=ca:true -ext san=dns:$Fqdn
+    keytool -genkeypair -alias $Fqdn -keyalg RSA -keysize 2048 -dname "cn=$Fqdn" -keypass $KeyPass -keystore $KeyStorePath -storepass $KeyPass -storetype PKCS12 -ext BasicConstraints:critical=ca:true -ext san=dns:$Fqdn
 }
 
 
