@@ -22,7 +22,7 @@ function Main {
     Write-Host "CertificatePathRootCertificatePath $CertificatePathRootCertificatePath"
     Write-Host "CertificatePathRoot $CertificatePathRoot"
 
-    $directoryPath = $CertificatePathRootCertificatePath -replace '""', ''
+    $directoryPath = "C:\certificates"
     if (-not (Test-Path $directoryPath -PathType Container)) {
         Write-Host "Directory $directoryPath does not exist... creating one now"
         New-Item -ItemType Directory -Path $directoryPath
