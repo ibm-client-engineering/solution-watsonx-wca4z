@@ -34,7 +34,7 @@ function Main {
     $fqdn = [System.Net.Dns]::GetHostEntry($hostName).HostName
     Write-Host "FQDN: $fqdn"
     # Generate key pair, export and import cert to keystore
-    GenerateKeyPair -KeyPass $KeyPass -KeyStorePath $KeyStorePath -StorePass $KeyPass -Fqdn $fqdn
+    GenerateKeyPair -KeyPass $KeyPass -KeyStorePath $KeyStorePath -KeyPass $KeyPass -Fqdn $fqdn
 
     Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath
     # Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath CertificatePath -Password $KeyPass
