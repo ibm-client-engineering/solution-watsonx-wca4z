@@ -18,6 +18,40 @@ function Set-EnvVariables {
 
 }
 
+function Set-UseUnsafeHeaderParsing
+{
+    param(
+        [Parameter(Mandatory,ParameterSetName='Enable')]
+        [switch]$Enable,
+
+        [Parameter(Mandatory,ParameterSetName='Disable')]
+        [switch]$Disable
+    )
+
+    $ShouldEnable = $PSCmdlet.ParameterSetName -eq 'Enable'
+
+    $netAssembly = [Reflection.Assembly]::GetAssembly([System.Net.Configuration.SettingsSection])
+
+    if($netAssembly)
+    {
+        $bindingFlags = [Reflection.BindingFlags] 'Static,GetProperty,NonPublic'
+        $settingsType = $netAssembly.GetType('System.Net.Configuration.SettingsSectionInternal')
+
+        $instance = $settingsType.InvokeMember('Section', $bindingFlags, $null, $null, @())
+
+        if($instance)
+        {
+            $bindingFlags = 'NonPublic','Instance'
+            $useUnsafeHeaderParsingField = $settingsType.GetField('useUnsafeHeaderParsing', $bindingFlags)
+
+            if($useUnsafeHeaderParsingField)
+            {
+              $useUnsafeHeaderParsingField.SetValue($instance, $ShouldEnable)
+            }
+        }
+    }
+}
+
 #check if running as administrator
 if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))  
 {  
@@ -38,6 +72,7 @@ $url="https://ak-delivery04-mul.dhe.ibm.com/sdfdl/v2/sar/CM/IM/0bsy7/0/Xa.2/Xb.j
 $downloadPath="v11.5.9_ntx64_dsdriver_EN.exe"
 
 $ProgressPreference = 'SilentlyContinue'
+Set-UseUnsafeHeaderParsing -Enable
 Invoke-WebRequest -Uri $url -OutFile $downloadPath
 
 Start-Process -FilePath $downloadPath
