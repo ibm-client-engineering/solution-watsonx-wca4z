@@ -54,13 +54,12 @@ function Db2SSL {
 }
 function GenerateKeyPair {
     param(
-        [string]$DnsName,
         [string]$KeyPass,
         [string]$KeyStorePath,
         [string]$StorePass,
-        [string]$MyHost
+        [string]$Fqdn,
     )
-    keytool -genkeypair -alias $DnsName -keyalg RSA -keysize 2048 -dname "cn=$DnsName" -keypass $KeyPass -keystore $KeyStorePath -storepass $StorePass -storetype PKCS12 -ext BasicConstraints:critical=ca:true -ext san=dns:$MyHost
+    keytool -genkeypair -alias $Fqdn -keyalg RSA -keysize 2048 -dname "cn=$Fqdn" -keypass $KeyPass -keystore $KeyStorePath -storepass $StorePass -storetype PKCS12 -ext BasicConstraints:critical=ca:true -ext san=dns:$Fqdn
 }
 
 
