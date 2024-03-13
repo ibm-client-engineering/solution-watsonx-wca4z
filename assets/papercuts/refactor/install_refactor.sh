@@ -57,7 +57,7 @@ dnf install openssl
 echo "Installation completed."
 
 echo "Downloading Refactor Assistant"
-wget https://ak-dsw-mul.dhe.ibm.com/sdfdl/v2/fulfill/M0H0FML/Xa.2/Xb.htcOMovxHCAgZGRqiJYFDYk9OTYxxEpP/Xc.M0H0FML/wCAZ_RA_z_OS_1.0.1_Linux_ML.zip/Xd./Xf.lPr.A6VR/Xg.12697645/Xi./XY.knac/XZ.uRX389FVoW81YoJ7r4UuTV0D1cvQicYR/wCAZ_RA_z_OS_1.0.1_Linux_ML.zip
+wget https://ak-dsw-mul.dhe.ibm.com/sdfdl/v2/fulfill/M0H0FML/Xa.2/Xb.htcOMovxHCAgZGRqiJYFDYk9OTYxy-c7/Xc.M0H0FML/wCAZ_RA_z_OS_1.0.1_Linux_ML.zip/Xd./Xf.lPr.A6VR/Xg.12733994/Xi./XY.knac/XZ.1efcOXzSId6WTOO0hjQ6e7nxqkkooqVN/wCAZ_RA_z_OS_1.0.1_Linux_ML.zip -O wCAZ_RA_z_OS_1.0.1_Linux_ML.zip
 
 echo $(java --version)
 echo $(openssl version)
@@ -69,13 +69,8 @@ unzip wCAZ_RA_z_OS_1.0.1_Linux_ML.zip
 cd 'IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual'/
 unzip refactoring-assistant-1.1.0.zip 
 tar zxf refactoring-assistant-1.1.0.tgz
-mv refactoring-assistant ~/
-cd ~/refactoring-assistant
+mv refactoring-assistant ../refactoring_assistant
+cd ../refactoring-assistant
 ./setup.sh
 
-#copy config template and edit
-cp config/template.properties config/config.properties
 
-sed -i "s@CERTS_LOCATION=.*@CERTS_LOCATION=$0@" config.properties
-sed -i "s@HOST_PORT=.*@HOST_PORT=$1@" config.properties
-sed -i "s@ENVIRONMENT_ID=.*@ENVIRONMENT_ID==$2@" config.properties
