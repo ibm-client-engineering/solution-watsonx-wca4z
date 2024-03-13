@@ -22,27 +22,28 @@ function Main {
     Write-Host "CertificatePathRootCertificatePath $CertificatePathRootCertificatePath"
     Write-Host "CertificatePathRoot $CertificatePathRoot"
 
-    if (-not (Test-Path $CertificatePathRootCertificatePath -PathType Container)) {
-        Write-Host "Directory $CertificatePathRootCertificatePath does not exist... creating one now"
-        New-Item -ItemType Directory -Path $CertificatePathRootCertificatePath
+    $directoryPath = $CertificatePathRootCertificatePath -replace '""', ''
+    if (-not (Test-Path $directoryPath -PathType Container)) {
+        Write-Host "Directory $directoryPath does not exist... creating one now"
+        New-Item -ItemType Directory -Path $directoryPath
     } else {
-        Write-Host "Directory $CertificatePathRootCertificatePath already exists, skipping."
+        Write-Host "Directory $directoryPath already exists, skipping."
     }
 
 
     # Generate key pair, export and import cert to keystore
-    GenerateKeyPair -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath -StorePass $KeyPass -MyHost $MyHost
-    Export-CertificateToPfx -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath
-    Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath CertificatePath -Password $KeyPass
+#     GenerateKeyPair -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath -StorePass $KeyPass -MyHost $MyHost
+#     Export-CertificateToPfx -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath
+#     Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath CertificatePath -Password $KeyPass
 
     # Optional
     # Db2SSL -DB2SSLCert $KeyStorePath -CertificatePath $CertificatePath -KeyStorePath $KeyStorePath -Password $KeyPass
 
     # Delete certs
-    DeleteServerCertificate -CertificatePath $CertificatePath
+#     DeleteServerCertificate -CertificatePath $CertificatePath
 
     # Cofigure certs
-    ConfigureCertificates -KeyStorePath $KeyStorePath -KeyPass $KeyPass -CertificatePathRoot $CertificatePathRoot -MyHost $MyHost -CertificatePathRootCertificatePath $CertificatePathRootCertificatePath
+#     ConfigureCertificates -KeyStorePath $KeyStorePath -KeyPass $KeyPass -CertificatePathRoot $CertificatePathRoot -MyHost $MyHost -CertificatePathRootCertificatePath $CertificatePathRootCertificatePath
 }
 
 Main
