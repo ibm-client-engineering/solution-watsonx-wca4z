@@ -43,10 +43,12 @@ function Main {
     # Db2SSL -DB2SSLCert $KeyStorePath -CertificatePath $CertificatePath -KeyStorePath $KeyStorePath -Password $KeyPass
 
     # Delete certs
-    DeleteServerCertificate -CertificatePath $CertificatePath
+    # TODO Uncomment this to test it works to delte certs,
+    # DeleteServerCertificate -CertificatePath $CertificatePath
 
     # Cofigure certs
-    # ConfigureCertificates -KeyStorePath $KeyStorePath -KeyPass $KeyPass -CertificatePathRoot $CertificatePathRoot -MyHost $MyHost -CertificatePathRootCertificatePath $CertificatePathRootCertificatePath
+    # TODO Configure Certs and uncomment to test this piece works.
+    # ConfigureCertificates -KeyStorePath $KeyStorePath -KeyPass $KeyPass -CertificatePathRoot $CertificatePathRoot -MyHost $MyHost -CertificatePathRootCertificatePath $CertificatePathRootCertificatePath -Fqdn $fqdn
 }
 
 Main
