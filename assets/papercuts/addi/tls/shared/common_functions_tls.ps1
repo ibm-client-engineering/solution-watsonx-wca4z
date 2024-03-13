@@ -2,7 +2,6 @@
 # Function to generate a self-signed certificate
 function New-SelfSignedCertificate {
     param(
-        [string]$DnsName,
         [string]$CertStoreLocation = "Cert:\LocalMachine\My"
     )
     # Implementation using New-SelfSignedCertificate cmdlet
@@ -89,7 +88,6 @@ function ConfigureCertificates {
         [string]$KeyStorePath,
         [string]$KeyPass,
         [string]$CertificatePathRoot,
-        [string]$MyHost,
         [string]$CertificatePathRootCertificatePath,
         [string]$Fqdn
     )
