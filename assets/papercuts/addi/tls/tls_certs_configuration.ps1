@@ -15,6 +15,13 @@ function Main {
     $CertificatePathRootCertificatePath = $env:certificatePath
     $CertificatePathRoot = $env:certificatePathRoot
 
+    Write-Host "DNSName $DnsName"
+    Write-Host "KeyPass $KeyPass"
+    Write-Host "KeyStorePath $KeyStorePath"
+    Write-Host "MyHost $MyHost"
+    Write-Host "CertificatePathRootCertificatePath $CertificatePathRootCertificatePath"
+    Write-Host "CertificatePathRoot $CertificatePathRoot"
+
     if (-not (Test-Path $CertificatePathRootCertificatePath -PathType Container)) {
         Write-Host "Directory $CertificatePathRootCertificatePath does not exist... creating one now"
         New-Item -ItemType Directory -Path $CertificatePathRootCertificatePath
