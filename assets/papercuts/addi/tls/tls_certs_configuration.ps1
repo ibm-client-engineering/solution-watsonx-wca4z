@@ -1,20 +1,27 @@
 # import the common functions script
-. "./assets/papercuts/addi/SQL_Server/shared/common_functions.ps1"
-. "./assets/papercuts/addi/SQL_Server/shared/common_functions.ps1"
-. "./assets/papercuts/addi/SQL_Server/shared/get_set_env_vars.ps1"
+. ".\shared\common_functions_tls.ps1"
+. ".\shared\get_set_env_vars.ps1"
 
 function Main {
     Writing-Host "Configure TLS Certs and Keystores"
     $envFilePath = ".\.env"
     Set-EnvVariables -FilePath $envFilePath
     Confirm-EnvVariables
- # env vars
+    # env vars
     $DnsName = $env:dnsName
     $KeyPass = $env:keyPass
     $KeyStorePath = $env:keyStorePath
     $MyHost = $env:host
     $CertificatePathRootCertificatePath = $env:certificatePath
     $CertificatePathRoot = $env:certificatePathRoot
+
+    if (-not (Test-Path $CertificatePathRootCertificatePath -PathType Container)) {
+        Write-Host "Directory $CertificatePathRootCertificatePath does not exist... creating one now"
+        New-Item -ItemType Directory -Path $CertificatePathRootCertificatePath
+    } else {
+        Write-Host "Directory $CertificatePathRootCertificatePath already exists, skipping."
+    }
+
 
     # Generate key pair, export and import cert to keystore
     GenerateKeyPair -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath -StorePass $KeyPass -MyHost $MyHost
