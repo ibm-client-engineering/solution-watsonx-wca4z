@@ -29,6 +29,7 @@ function Main {
     } else {
         Write-Host "Directory $directoryPath already exists, skipping."
     }
+    $hostName = [System.Net.Dns]::GetHostName()
 
     $fqdn = [System.Net.Dns]::GetHostEntry($hostName).HostName
     Write-Host "FQDN: $fqdn"
