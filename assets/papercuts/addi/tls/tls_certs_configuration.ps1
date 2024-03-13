@@ -1,6 +1,6 @@
 # import the common functions script
 . ".\shared\common_functions_tls.ps1"
-. "..\SQL_Server\shared\get_set_env_vars.ps1"
+. ".\shared\get_set_env_vars.ps1"
 
 function Main {
     Write-Host "Configure TLS Certs and Keystores"
