@@ -19,8 +19,10 @@ function Export-CertificateToPfx {
         [string]$KeyStorePath,
         [string]$CertificatePath
     )
-    $outputFileName = $CertificatePath "\exported_certificate.cer"
-    keytool -exportcert -alias $Fqdn -keystore $KeyStorePath -file $outputFileName -storepass $Password
+
+    $fileName = "exported_certificate.cer"
+    $fullFilePath = Join-Path $CertificatePath $fileName
+    keytool -exportcert -alias $Fqdn -keystore $KeyStorePath -file $fullFilePath -storepass $Password
 }
 
 # Function to import a certificate into a keystore
