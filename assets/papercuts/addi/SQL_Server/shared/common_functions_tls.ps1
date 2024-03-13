@@ -11,7 +11,7 @@ function New-SelfSignedCertificate {
     # Return the generated certificate
 }
 # Function to export a certificate to a PFX file
-function Export-CeritficateToPfx {
+function Export-CertificateToPfx {
     param (
         # [System.Security.CryptoGraphy.x509Certificates.X509Certificates2]$Certificate,
         [string]$DnsName,

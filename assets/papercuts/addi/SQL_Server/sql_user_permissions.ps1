@@ -16,9 +16,8 @@ function Main {
     Write-Host "4. Step 4. Checks if SQL user has all required privileges on $env:serverInstance" ## required
     Write-Host "5. Step 5. Configure SSL For ADD components"
     Write-Host "6. Step 6. Check and configure collation" ## required, this should be after step 2.
-    Write-Host "7. Step 7. Configure TLS Certs and Keystores" ## required
-    Write-Host "8. Step 8. Get existing usernames" ## required
-    Write-Host "9. Step 9. Get existing databases" ## required
+    Write-Host "7. Step 7. Get existing usernames" ## required
+    Write-Host "8. Step 8. Get existing databases" ## required
 
     $choice = Read-Host "Enter the step number"
 
@@ -31,7 +30,6 @@ function Main {
         6 { Step6 }
         7 { Step7 }
         8 { Step8 }
-        9 { Step9 }
         default { Write-Host "Invalid choise. Exiting." }
     }
 }
@@ -87,36 +85,12 @@ function Step6 {
     ConfirmAndExecute "Step 6"
     ConfigureSSLForAdComponents
 }
-#  Configure TLS Certs && KeyStores
+
 function Step7 {
-    # env vars
-    $DnsName = $env:dnsName
-    $KeyPass = $env:keyPass
-    $KeyStorePath = $env:keyStorePath
-    $MyHost = $env:host
-    $CertificatePathRootCertificatePath = $env:certificatePath
-    $CertificatePathRoot = $env:certificatePathRoot
-
-    # Generate key pair, export and import cert to keystore
-    GenerateKeyPair -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath -StorePass $KeyPass -MyHost $MyHost
-    Export-CeritficateToPfx -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath
-    Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath CertificatePath -Password $KeyPass
-
-    # Optional
-    Db2SSL -DB2SSLCert $KeyStorePath -CertificatePath $CertificatePath -KeyStorePath $KeyStorePath -Password $KeyPass
-
-    # Delete certs
-    DeleteServerCertificate -CertificatePath $CertificatePath
-
-    # Cofigure certs
-    ConfigureCertificates -KeyStorePath $KeyStorePath -KeyPass $KeyPass -CertificatePathRoot $CertificatePathRoot -MyHost $MyHost -CertificatePathRootCertificatePath $CertificatePathRootCertificatePath
-}
-
-function Step8 {
     $usernames = Get-SqlUsernames -ServerInstance $env:serverInstance -Database $env:sqlDatabase -SqlUser $env:sqlUser -SqlPassword $env:sqlPassword
     Write-Output "usernames:" $usernames
 }
-function Step9 {
+function Step8 {
     $databases = Get-SqlDatabases -ServerInstance $env:serverInstance -Database $env:sqlDatabase -SqlUser $env:sqlUser -SqlPassword $env:sqlPassword
     Write-Output "databases:" $databases
 }
