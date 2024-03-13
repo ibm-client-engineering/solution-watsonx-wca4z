@@ -16,9 +16,10 @@ function Export-CertificateToPfx {
         # [System.Security.CryptoGraphy.x509Certificates.X509Certificates2]$Certificate,
         [string]$DnsName,
         [string]$Password,
-        [string]$KeyStorePath
+        [string]$KeyStorePath,
+        [string]$CertificatePath
     )
-    keytool -exportcert -alias $DnsName -keystore $KeyStorePath -file "D:\certificates\server_certificate.crt" -storepass $Password
+    keytool -exportcert -alias $DnsName -keystore $KeyStorePath -file $CertificatePath -storepass $Password
 }
 
 # Function to import a certificate into a keystore

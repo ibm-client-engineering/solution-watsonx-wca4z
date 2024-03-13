@@ -35,7 +35,8 @@ function Main {
     Write-Host "FQDN: $fqdn"
     # Generate key pair, export and import cert to keystore
     GenerateKeyPair -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath -StorePass $KeyPass -MyHost $fqdn
-    # Export-CertificateToPfx -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath
+
+    Export-CertificateToPfx -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath
     # Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath CertificatePath -Password $KeyPass
 
     # Optional
