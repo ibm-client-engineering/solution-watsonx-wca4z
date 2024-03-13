@@ -32,7 +32,9 @@ function Import-CertificateToKeystore {
         [string]$CertificatePath,
         [string]$KeyPass
     )
-    keytool -keystore KeyStorePath -import -file $CertificatePath -alias "self-signed-root" -storepass $KeyPass
+    $fileName = "exported_certificate.cer"
+    $fullFilePath = Join-Path $CertificatePath $fileName
+    keytool -keystore KeyStorePath -import -file $fullFilePath -alias "self-signed-root" -storepass $KeyPass
 }
 
 # Function to peform additional steps like managing aliases, deleting uncessary files, etc.
