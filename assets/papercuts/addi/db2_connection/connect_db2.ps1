@@ -28,11 +28,13 @@ if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 
 Set-EnvVariables ".\.env"
 
-$url="https://ak-delivery04-mul.dhe.ibm.com/sdfdl/v2/sar/CM/IM/0bsy7/0/Xa.2/Xb.jusyLTSp44S04pS0QkREBImn48Su0JpUuOXTtzxIGDJJSASJo_ljgiYhMjc/Xc.CM/IM/0bsy7/0/v11.5.9_ntx64_dsdriver_EN.exe/Xd./Xf.LPR.D1vk/Xg.12732236/Xi.habanero/XY.habanero/XZ.8zV6KKRzqz-raqzsYwyXRYP-Y2VP7ouv/v11.5.9_ntx64_dsdriver_EN.exe"
-$downloadPath=".\v11.5.9_ntx64_dsdriver_EN.exe"
+$url="https://papercuts-wca4z.s3.us-south.cloud-object-storage.appdomain.cloud/v11.5.9_ntx64_dsdriver_EN.exe"
+$downloadPath="v11.5.9_ntx64_dsdriver_EN.exe"
 
 $ProgressPreference = 'SilentlyContinue'
 Invoke-WebRequest -Uri $url -OutFile $downloadPath
+
+
 
 Start-Process -FilePath $downloadPath
 
