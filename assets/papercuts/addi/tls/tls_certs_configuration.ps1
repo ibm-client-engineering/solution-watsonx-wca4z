@@ -12,20 +12,20 @@ function Main {
     $KeyPass = $env:keyPass
     $KeyStorePath = $env:keyStorePath
     $MyHost = $env:host
-    $CertificatePathRootCertificatePath = $env:certificatePath
+    $CertificatePath = $env:certificatePath
     $CertificatePathRoot = $env:certificatePathRoot
 
     Write-Host "DNSName $DnsName"
     Write-Host "KeyPass $KeyPass"
     Write-Host "KeyStorePath $KeyStorePath"
     Write-Host "MyHost $MyHost"
-    Write-Host "CertificatePathRootCertificatePath $CertificatePathRootCertificatePath"
+    Write-Host "CertificatePath $CertificatePath"
     Write-Host "env:certificatePath $env:certificatePath"
 
-    Write-Host "CertificatePathRootCertificatePath $CertificatePathRootCertificatePath"
-    if (-not (Test-Path $CertificatePathRootCertificatePath -PathType Container)) {
-        Write-Host "Directory $CertificatePathRootCertificatePath does not exist... creating one now"
-        New-Item -ItemType Directory -Path $CertificatePathRootCertificatePath
+    Write-Host "CertificatePath $CertificatePath"
+    if (-not (Test-Path $CertificatePath -PathType Container)) {
+        Write-Host "Directory $CertificatePath does not exist... creating one now"
+        New-Item -ItemType Directory -Path $CertificatePath
     } else {
         Write-Host "Directory $directoryPath already exists, skipping."
     }
