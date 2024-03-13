@@ -8,17 +8,13 @@ function Main {
     Set-EnvVariables -FilePath $envFilePath
     Confirm-EnvVariables
     # env vars
-    $DnsName = $env:dnsName
     $KeyPass = $env:keyPass
     $KeyStorePath = $env:keyStorePath
-    $MyHost = $env:host
     $CertificatePath = $env:certificatePath
     $CertificatePathRoot = $env:certificatePathRoot
 
-    Write-Host "DNSName $DnsName"
     Write-Host "KeyPass $KeyPass"
     Write-Host "KeyStorePath $KeyStorePath"
-    Write-Host "MyHost $MyHost"
     Write-Host "CertificatePath $CertificatePath"
     Write-Host "env:certificatePath $env:certificatePath"
 
