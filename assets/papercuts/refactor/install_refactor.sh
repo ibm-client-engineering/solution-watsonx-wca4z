@@ -57,7 +57,7 @@ dnf install openssl
 echo "Installation completed."
 
 echo "Downloading Refactor Assistant"
-wget https://ak-dsw-mul.dhe.ibm.com/sdfdl/v2/fulfill/M0H0FML/Xa.2/Xb.htcOMovxHCAgZGRqiJYFDYk9OTYxxEpP/Xc.M0H0FML/wCAZ_RA_z_OS_1.0.1_Linux_ML.zip/Xd./Xf.lPr.A6VR/Xg.12697645/Xi./XY.knac/XZ.uRX389FVoW81YoJ7r4UuTV0D1cvQicYR/wCAZ_RA_z_OS_1.0.1_Linux_ML.zip
+wget https://ak-dsw-mul.dhe.ibm.com/sdfdl/v2/fulfill/M0H0FML/Xa.2/Xb.htcOMovxHCAgZGRqiJYFDYk9OTYxxEpP/Xc.M0H0FML/wCAZ_RA_z_OS_1.0.1_Linux_ML.zip/Xd./Xf.lPr.A6VR/Xg.12697645/Xi./XY.knac/XZ.uRX389FVoW81YoJ7r4UuTV0D1cvQicYR/wCAZ_RA_z_OS_1.0.1_Linux_ML.zip -O wCAZ_RA_z_OS_1.0.1_Linux_ML.zip
 
 echo $(java --version)
 echo $(openssl version)
