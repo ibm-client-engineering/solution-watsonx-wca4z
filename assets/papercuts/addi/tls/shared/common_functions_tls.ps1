@@ -14,12 +14,12 @@ function New-SelfSignedCertificate {
 function Export-CertificateToPfx {
     param (
         # [System.Security.CryptoGraphy.x509Certificates.X509Certificates2]$Certificate,
-        [string]$DnsName,
+        [string]$Fqdn,
         [string]$Password,
         [string]$KeyStorePath,
         [string]$CertificatePath
     )
-    keytool -exportcert -alias $DnsName -keystore $KeyStorePath -file $CertificatePath -storepass $Password
+    keytool -exportcert -alias $Fqdn -keystore $KeyStorePath -file $CertificatePath -storepass $Password
 }
 
 # Function to import a certificate into a keystore
