@@ -32,18 +32,18 @@ function Main {
 
 
     # Generate key pair, export and import cert to keystore
-#     GenerateKeyPair -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath -StorePass $KeyPass -MyHost $MyHost
-#     Export-CertificateToPfx -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath
-#     Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath CertificatePath -Password $KeyPass
+    GenerateKeyPair -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath -StorePass $KeyPass -MyHost $MyHost
+    Export-CertificateToPfx -DnsName $DnsName -KeyPass $KeyPass -KeyStorePath $KeyStorePath
+    Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath CertificatePath -Password $KeyPass
 
     # Optional
     # Db2SSL -DB2SSLCert $KeyStorePath -CertificatePath $CertificatePath -KeyStorePath $KeyStorePath -Password $KeyPass
 
     # Delete certs
-#     DeleteServerCertificate -CertificatePath $CertificatePath
+    DeleteServerCertificate -CertificatePath $CertificatePath
 
     # Cofigure certs
-#     ConfigureCertificates -KeyStorePath $KeyStorePath -KeyPass $KeyPass -CertificatePathRoot $CertificatePathRoot -MyHost $MyHost -CertificatePathRootCertificatePath $CertificatePathRootCertificatePath
+    ConfigureCertificates -KeyStorePath $KeyStorePath -KeyPass $KeyPass -CertificatePathRoot $CertificatePathRoot -MyHost $MyHost -CertificatePathRootCertificatePath $CertificatePathRootCertificatePath
 }
 
 Main

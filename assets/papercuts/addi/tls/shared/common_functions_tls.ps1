@@ -67,7 +67,7 @@ function DeleteServerCertificate {
     param(
         [string]$CertificatePath
     )
-    rm -rf $CertificatePath
+    # Remove-Item -Recurse -Force -Path $CertificatePath
 }
 
 function GenerateServerKey {
