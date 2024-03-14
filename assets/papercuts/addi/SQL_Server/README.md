@@ -54,3 +54,16 @@ PS C:\Users\Administrator>
 
 ## Update .env file
 Update `sqlUser`, `serverInstance`, `sqlPassword`, `sqlDatabase`, `sqlCredential`
+
+
+## Troubleshoot Reset SQL Password
+If you are having issues with ADDI Server not connecting to the SQL Server you can do the following:
+
+Open powershell as an admin
+```powershell
+sqlcmd
+>> 1 ALTER LOGIN my_user WITH PASSWORD='me?*L=OchopRlx@9woc', CHECK_POLICY= OFF, CHECK_EXPIRATION = OFF;
+>> 2 GO
+```
+
+Try again and you should now be able to login 
