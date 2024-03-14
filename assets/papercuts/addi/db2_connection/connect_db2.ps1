@@ -3,8 +3,6 @@ function Set-EnvVariables {
         [string]$FilePath
     )
     $envFileContent = Get-Content -Path $FilePath -Raw
-    Write-Host "ALPHA"
-    Write-Host $envFileContent
     # Split content by new line using a \
     $envFileContent -split "\r?\n" | ForEach-Object {
         #split each line into key and value
@@ -24,7 +22,10 @@ if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
   Throw "You must run this script as administrator"
 }
 
-
+Write-Host $env:FQDN
+Write-Host $env:DB2PORT
+Write-Host $env:DB2USER
+Write-Host $env:DB2PASS
 
 Set-EnvVariables ".\.env"
 
@@ -35,11 +36,14 @@ $ProgressPreference = 'SilentlyContinue'
 Invoke-WebRequest -Uri $url -OutFile $downloadPath
 
 
-Start-Process -FilePath $downloadPath
+Start-Process -FilePath $downloadPath -Wait
 
-db2cli writecfg add -database bludb -host $FQDN -port $DB2PORT
-db2cli writecfg add -dsn dashdb -database bludb -host $FQDN -port $DB2PORT
-db2cli writecfg add -database bludb -host $FQDN -port $DB2PORT -parameter "SecurityTransportMode=SSL"
+#re source the path in order to get db2cli
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
+
+db2cli writecfg add -database bludb -host $env:FQDN -port $env:DB2PORT
+db2cli writecfg add -dsn dashdb -database bludb -host $env:FQDN -port $env:DB2PORT
+db2cli writecfg add -database bludb -host $env:FQDN -port $env:DB2PORT -parameter "SecurityTransportMode=SSL"
 
 
-.\db2configuration.bat dbName=BLUDB db2Host=$FQDN db2Port=$DB2PORT db2User=$DB2USER db2Password=$DB2PASS useTLS=true
+.\db2configuration.bat dbName=BLUDB db2Host=$env:FQDN db2Port=$env:DB2PORT db2User=$env:DB2USER db2Password=$env:DB2PASS useTLS=true
