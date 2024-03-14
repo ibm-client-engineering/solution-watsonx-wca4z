@@ -9,6 +9,7 @@ custom_edit_url: null
 <div style={{ borderBottom: '1px solid #000', marginTop: '20px', marginBottom: '20px' }}></div>
 
 This section will walkthrough the automation scripts for the ADDI install. This install will consist of four components:
+- Set User Permissions
 - Adoptium Java Runtime Environment
 - Eclipse
 - SQL server and its user permissions
@@ -20,6 +21,8 @@ This section will also walkthorugh the configurations for:
 
 ## Script Walkthrough
 <div style={{ borderBottom: '1px solid #000', marginTop: '20px', marginBottom: '20px' }}></div>
+
+### Set User Permissions
 
 ### Adoptium Java Runtime Environment
 Navigate to the appropriate directory:
@@ -52,6 +55,7 @@ Run the automation script
 ### SQL Server Install and User Permissions
 
 #### **SQL Server Install**
+
 Navigate to the appropriate directory:
 ```powershell
 cd assets/papercuts/addi/SQL_Server
@@ -72,6 +76,19 @@ cd assets/papercuts/addi/SQL_Server
 ```
 
 ### ADDI Install
+
+:::note
+ADDI installer executable is sitting in a personal COS bucket (User will have to store executable somewhere)
+:::
+
+First we are going to download the executable for ADDI
+
+Nagivate to this [link](https://w3east-limited-use.cpc.ibm.com/isc/esd/dswdown/home?ticket=Xa.2%2FXb.ddeX-Pn5_UKDYD1s3YpYVy-E9HPU6DcxxO4Gkg%2FXc.%2FXd.%2FXf.%2FXg.12728081%2FXi.%2FXY.knac%2FXZ.egtpZ_CjXOeNUEnHr5jNVMB0ZKkGNna0)
+1. Select "Part Number" below the "Search Options" label
+2. Search "M0H2CML"
+3. Select "HTTPs" as the download method
+4. Press "Search" and download the file
+
 
 
 
