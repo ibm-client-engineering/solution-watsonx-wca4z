@@ -38,7 +38,7 @@ Set-EnvVariables ".\.env"
 $password = Microsoft.PowerShell.Security\ConvertTo-SecureString -String 'CRfE1rkwoKXk4cb' -AsPlainText -Force
 $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList "sjLcoLoM", $password
 $url = "delivery04-bld.dhe.ibm.com"
-Invoke-WebRequest $url $credentials ".\"
+Invoke-WebRequest $url $credential ".\"
 
 exit
 
