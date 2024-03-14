@@ -29,6 +29,10 @@ Refactor Host
 
 ## Software to be installed
 
+:::info
+As of this writing, RA version 1.1.1 is available and can be downloaded from [IBM Software Downloads](https://w3south-limited-use.cpc.ibm.com/software/xl/download/ticket.wss)
+:::
+
 Refactoring Assistant
 - Podman
 - Refactor Containers
@@ -130,33 +134,30 @@ sudo systemctl enable podman
 
 ### Retrieve and install the Refactor Assistant
 
-Go to IBM's internal download [site](https://w3south-limited-use.cpc.ibm.com/software/xl/download/ticket.wss) and download `IBM watsonx Code Assistant for Z Refactoring Assistant 1.0.1 Linux Multilingual`.
+Go to IBM's internal download [site](https://w3south-limited-use.cpc.ibm.com/software/xl/download/ticket.wss) and download `IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.1 Linux Multilingual`.
 
-:::info
-As of this writing, we are working with Watson Code Assistant for z 1.0.1.
-:::
 
 We are extracting this package to the root directory. 
 
 ```tsx
-unzip wCAZ_RA_z_OS_1.0.1_Linux_ML.zip
-Archive:  wCAZ_RA_z_OS_1.0.1_Linux_ML.zip
-   creating: IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual/
- extracting: IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual/refactoring-assistant-1.1.0.zip
+unzip IwCAfZRA_1.1.1_L_ML.zip
+Archive:  ../IwCAfZRA_1.1.1_L_ML.zip
+   creating: IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.1 Linux Multilingual/
+ extracting: IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.1 Linux Multilingual/refactoring-assistant-1.1.1.zip
 
-cd IBM\ watsonx\ Code\ Assistant\ for\ Z\ Refactoring\ Assistant\ 1.1.0\ Linux\ Multilingual/
+cd IBM\ watsonx\ Code\ Assistant\ for\ Z\ Refactoring\ Assistant\ 1.1.1\ Linux\ Multilingual/
 
-unzip refactoring-assistant-1.1.0.zip
-Archive:  refactoring-assistant-1.1.0.zip
+unzip refactoring-assistant-1.1.1.zip
+Archive:  refactoring-assistant-1.1.1.zip
   inflating: PRD0013118key.pem.cer
   inflating: PRD0013118key.pem.chain
   inflating: PRD0013118key.pem.pub.key
-  inflating: refactoring-assistant-1.1.0.tgz
-  inflating: refactoring-assistant-1.1.0.tgz.sig
-  inflating: WCA4Z-Data-Generator-1.1.1.zip
-  inflating: WCA4Z-Data-Generator-1.1.1.zip.sig
+ extracting: WCA4Z-Data-Generator-1.1.2.zip
+  inflating: WCA4Z-Data-Generator-1.1.2.zip.sig
+  inflating: refactoring-assistant-1.1.1.tgz
+  inflating: refactoring-assistant-1.1.1.tgz.sig
 
-tar zxf refactoring-assistant-1.1.0.tgz
+tar zxf refactoring-assistant-1.1.1.tgz
 
 mv refactoring-assistant ~/
 ```
@@ -260,11 +261,11 @@ Set the orientdb pass to `inittest`
 Once things are happier, podman should show the following:
 ```tsx
 [root@wca4z-refactor refactoring-assistant]# podman ps -a
-CONTAINER ID  IMAGE                                            COMMAND               CREATED        STATUS        PORTS                   NAMES
-39ee821934ad  docker.io/library/orientdb:3.2.18                /orientdb/bin/ser...  6 minutes ago  Up 6 minutes                          orientdb
-2ea1ed0227ae  localhost/ibm/ra/ad-core-server:1.1.0                                  3 minutes ago  Up 3 minutes  0.0.0.0:4001->4001/tcp  ad-core-server
-5728a7c116d4  localhost/ibm/ra/refactoring-assistant:1.1.0                           3 minutes ago  Up 3 minutes  0.0.0.0:8081->8081/tcp  refactoring-assistant
-88c2177e3de6  localhost/ibm/ra/refactoring-assistant-ui:1.1.0  /bin/sh -c nginx ...  3 minutes ago  Up 3 minutes  0.0.0.0:9080->9080/tcp  refactoring-assistant-ui
+CONTAINER ID  IMAGE                                            COMMAND               CREATED             STATUS             PORTS                   NAMES
+2e6843cce881  docker.io/library/orientdb:3.2.18                /orientdb/bin/ser...  About a minute ago  Up About a minute                          orientdb
+bc5bbd4219b0  localhost/ibm/ra/ad-core-server:1.1.1                                  53 seconds ago      Up 52 seconds      0.0.0.0:4001->4001/tcp  ad-core-server
+b9973f5940c4  localhost/ibm/ra/refactoring-assistant:1.1.1                           52 seconds ago      Up 50 seconds      0.0.0.0:8081->8081/tcp  refactoring-assistant
+c9071da1e3b5  localhost/ibm/ra/refactoring-assistant-ui:1.1.1  /bin/sh -c nginx ...  50 seconds ago      Up 48 seconds      0.0.0.0:9443->9080/tcp  refactoring-assistant-ui
 ```
 
 Let's set refactor as a systemd service. The service script will ask you for the orientdb password, which we set to `inittest`.

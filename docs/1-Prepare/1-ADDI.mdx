@@ -45,6 +45,7 @@ ADDI Host
 - Adoptium Java SDK 11
 - SQL Server Management Studio
 - Git for Windows
+- WinSCP
 
 Refactoring Assistant
 - Podman
@@ -198,6 +199,12 @@ Download the installer from [here](https://github.com/git-for-windows/git/releas
 
 Run the installer with all default options.
 
+### Installing WinSCP
+
+This is a secure transfer application that will be needed to move files back and forth between the ADDI host and the Refactor Assistant host. The most recent version is 6.3.1 as of this writing.
+
+Download the installer from [here](https://winscp.net/download/WinSCP-6.3.1-Setup.exe)
+
 ### Installing Microsoft SQL Server
 
 As of this writing, the following versions of MS SQL Server are compatible with ADDI:
@@ -342,7 +349,11 @@ https://www.ibm.com/docs/en/watsonx-code-assistant-4z/1.0?topic=installing-compo
 
 Once we have downloaded the installation file, it should show up as a zip file in our `Downloads` folder called `ADDI_FOR_IBM_Z_612_WIN.zip`.
 
-Right click the zip file and extract it.
+Extract `C:\Users\Administrator\Downloads\cics-genapp-main.zip`.
+
+```powershell
+Expand-Archive -LiteralPath 'C:\Users\Administrator\Downloads\ADDI_FOR_IBM_Z_612_WIN.zip' -DestinationPath 'C:\Users\Administrator\Downloads'
+```
 
 In the File Explorer window, go to `C:\Users\Administrator.WCA4Z-ADDI\Downloads\ADDI_FOR_IBM_Z_612_WIN\IBM ADDI`
 
