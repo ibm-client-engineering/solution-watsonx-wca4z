@@ -106,6 +106,8 @@ $credentials = New-Object System.Net.NetworkCredential("sjLcoLoM", "CRfE1rkwoKXk
 $url = "delivery04-bld.dhe.ibm.com"
 DownloadFtpDirectory $url $credentials "."
 
+exit
+
 Start-Process -FilePath $downloadPath
 
 db2cli writecfg add -database bludb -host $FQDN -port $DB2PORT
