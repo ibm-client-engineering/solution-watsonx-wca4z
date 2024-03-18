@@ -22,12 +22,14 @@ if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
   Throw "You must run this script as administrator"
 }
 
+Set-EnvVariables ".\.env"
+
+
 Write-Host $env:FQDN
 Write-Host $env:DB2PORT
 Write-Host $env:DB2USER
 Write-Host $env:DB2PASS
 
-Set-EnvVariables ".\.env"
 
 $url="https://papercuts-wca4z.s3.us-south.cloud-object-storage.appdomain.cloud/v11.5.9_ntx64_dsdriver_EN.exe"
 $downloadPath="v11.5.9_ntx64_dsdriver_EN.exe"
