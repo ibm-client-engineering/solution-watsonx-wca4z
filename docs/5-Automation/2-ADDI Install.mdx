@@ -23,6 +23,14 @@ This section will also walkthorugh the configurations for:
 <div style={{ borderBottom: '1px solid #000', marginTop: '20px', marginBottom: '20px' }}></div>
 
 ### Set User Permissions
+Navigate to the appropriate directory:
+```powershell
+cd assets/papercuts/addi/access_management/
+```
+Run the automation script
+```powershell
+./set_user_permissions.ps1
+```
 
 ### Adoptium Java Runtime Environment
 Navigate to the appropriate directory:
@@ -88,6 +96,23 @@ Nagivate to this [link](https://w3east-limited-use.cpc.ibm.com/isc/esd/dswdown/h
 2. Search "M0H2CML"
 3. Select "HTTPs" as the download method
 4. Press "Search" and download the file
+
+Navigate to the appropriate file:
+```powershell
+cd assets/papercuts/addi/install_addi.ps1
+```
+
+On line 48 change the ```$addi_endpoint_install_binary``` value to the directory with the downloaded executable from above
+
+```powershell
+$addi_endpoint_install_binary="[executable file path]"
+```
+
+Run:
+```powershell
+cd assets/papercuts/addi/install_addi.ps1
+```
+
 
 
 
