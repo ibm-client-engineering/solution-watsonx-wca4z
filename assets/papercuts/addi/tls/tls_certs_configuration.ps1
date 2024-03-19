@@ -7,44 +7,32 @@ function Main {
     $envFilePath = ".\.env"
     Set-EnvVariables -FilePath $envFilePath
     Confirm-EnvVariables
-    # env vars
-    $KeyPass = $env:keyPass
-    $KeyStorePath = $env:keyStorePath
-    $CertificatePath = $env:certificatePath
-    $CertificatePathRoot = $env:certificatePathRoot
-
-    Write-Host "KeyPass $KeyPass"
-    Write-Host "KeyStorePath $KeyStorePath"
-    Write-Host "CertificatePath $CertificatePath"
-    Write-Host "env:certificatePath $env:certificatePath"
-
-    Write-Host "CertificatePath $CertificatePath"
-    if (-not (Test-Path $CertificatePath -PathType Container)) {
-        Write-Host "Directory $CertificatePath does not exist... creating one now"
-        New-Item -ItemType Directory -Path $CertificatePath
-    } else {
-        Write-Host "Directory $directoryPath already exists, skipping."
-    }
     $hostName = [System.Net.Dns]::GetHostName()
 
     $fqdn = [System.Net.Dns]::GetHostEntry($hostName).HostName
-    Write-Host "FQDN: $fqdn"
+    $KeyPass = $env:keyPass
+    $KeyStorePath = $env:keyStorePath
+    $CertificatePath = $env:certificatePath
+    $RefactorIP = $env:refactorIP
+
+    if (-not (Test-Path $env:certificatePath -PathType Container)) {
+        Write-Host "Directory $env:certificatePath does not exist... creating one now"
+        New-Item -ItemType Directory -Path $env:certificatePath
+    } else {
+        Write-Host "Directory $directoryPath already exists, skipping."
+    }
+    # You have to define your vars like this or it breaks...
+    $ServerCertificateFileName = "server_certificate.crt"
+    $ZookeeperFileName = "zookeeper.crt"
+
     # Generate key pair, export and import cert to keystore
     GenerateKeyPair -KeyPass $KeyPass -KeyStorePath $KeyStorePath -Fqdn $fqdn
+    Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ServerCertificateFileName
+    Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -KeyPass $KeyPass -Filename $ServerCertificateFileName
+    ConfigureCerts -RefactorIP $RefactorIP
 
-    Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath
-    Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -KeyPass $KeyPass
-
-    # Optional
-    # Db2SSL -DB2SSLCert $KeyStorePath -CertificatePath $CertificatePath -KeyStorePath $KeyStorePath -Password $KeyPass
-
-    # Delete certs
-    # TODO Uncomment this to test it works to delte certs,
-    # DeleteServerCertificate -CertificatePath $CertificatePath
-
-    # Cofigure certs
-    # TODO Configure Certs and uncomment to test this piece works.
-    # ConfigureCertificates -KeyStorePath $KeyStorePath -KeyPass $KeyPass -CertificatePathRoot $CertificatePathRoot -MyHost $MyHost -CertificatePathRootCertificatePath $CertificatePathRootCertificatePath -Fqdn $fqdn
+    ImportCertToJavaKeyStore -KeyStorePath $KeyStorePath -KeyPass $KeyPass
+    Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ZookeeperFileName
 }
 
 Main
