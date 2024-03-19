@@ -1,14 +1,3 @@
-
-# Function to generate a self-signed certificate
-function New-SelfSignedCertificate {
-    param(
-        [string]$CertStoreLocation = "Cert:\LocalMachine\My"
-    )
-    # Implementation using New-SelfSignedCertificate cmdlet
-    # ..
-
-    # Return the generated certificate
-}
 # Function to export a certificate to a PFX file
 function Export-CertificateToPfx {
     param (
@@ -16,11 +5,10 @@ function Export-CertificateToPfx {
         [string]$Fqdn,
         [string]$KeyPass,
         [string]$KeyStorePath,
-        [string]$CertificatePath
+        [string]$CertificatePath,
+        [string]$Filename
     )
-
-    $fileName = "exported_certificate.cer"
-    $fullFilePath = Join-Path $CertificatePath $fileName
+    $fullFilePath = Join-Path $CertificatePath $FileName
     keytool -exportcert -alias $Fqdn -keystore $KeyStorePath -file $fullFilePath -storepass $KeyPass
 }
 
@@ -29,33 +17,13 @@ function Import-CertificateToKeystore {
     param(
         [string]$KeyStorePath,
         [string]$CertificatePath,
-        [string]$KeyPass
+        [string]$KeyPass,
+        [string]$Filename
     )
-    $fileName = "exported_certificate.cer"
-    $fullFilePath = Join-Path $CertificatePath $fileName
+    $fullFilePath = Join-Path $CertificatePath $FileName
     keytool -keystore KeyStorePath -import -file $fullFilePath -alias "self-signed-root" -storepass $KeyPass
 }
 
-# Function to peform additional steps like managing aliases, deleting uncessary files, etc.
-function Additional-KeystoreConfiguration {
-    param(
-        [string]$KeystorePath
-    )
-
-    # Additional configuration steps
-    # ...
-}
-
-function Db2SSL {
-    param(
-        [string]$DB2SSLCert,
-        [string]$CertificatePath,
-        [string]$KeyStorePath,
-        [string]$Password
-    )
-    keytool -import -trustcacerts -alias $DB2SSLCert -file $CertificatePath -keystore $KeyStorePath -storepass $Password
-
-}
 function GenerateKeyPair {
     param(
         [string]$KeyPass,
@@ -73,40 +41,48 @@ function DeleteServerCertificate {
     #Remove-Item -Recurse -Force -Path $CertificatePath
 }
 
-function GenerateServerKey {
-    param(
-        [string]$KeyStorePath
-    )
-
-    openssl pkcs12 -in $KeyStorePath -nocerts -nodes -out "D:\certificates\server.key"
-}
-
-function ConfigureCertificates {
-    # TODO #2 Verify that server.key, server_certificate, server_keystore exist guardrail
-
+function ImportCertToJavaKeyStore {
     param(
         [string]$KeyStorePath,
-        [string]$KeyPass,
-        [string]$CertificatePathRoot,
-        [string]$CertificatePathRootCertificatePath,
-        [string]$Fqdn
+        [string]$KeyPass
     )
-    $fileName = "exported_certificate.cer"
-    $fullFilePath = Join-Path $CertificatePath $fileName
-    keytool -importcert -alias ad-core-server -keystore $KeyStorePath -storetype PKCS12 -storepass $KeyPass -file $fullFilePath -storepass $KeyPass -ext BasicConstraints:critical=ca:true -ext san=dns:$Fqdn
-
-    # TODO #3 If you run windows 2022 or higher you have to use UTF 16
-    $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
-    keytool -list -keystore $KeyStorePath -rfc > $CertificatePathRootCertificatePath
+    keytool -importkeystore -srckeystore $KeyStorePath -srcstorepass $KeyPass -destkeystore "%JAVA_HOME%\lib\security\cacerts" -deststorepass "changeit"
 
     Get-Service | Select-Object DisplayName, ServiceName
 
     Restart-Service -Name "IBM Application Discovery Configuration Service (IBMApplicationDiscoveryConfigurationService)"
-
-    Import-PfxCertificate -FilePath $CertificatePathRootCertificatePath -Password $KeyPass
 
     # lists the certificates in the path
     Get-ChildItem -Path $CertificatePathRootCertificatePath
 
 }
 
+function ConfigureCerts {
+    param(
+        [string]$RefactorIP
+    )
+    $serverKeyFileName = "server.key"
+    $serverKeyStoreFileName = "server_keystore.p12"
+    $rootCertFileName = "root.crt"
+    $serverCertificateFileName = "server_certificate.crt"
+
+    $fullServerKeyFilePath = Join-Path $CertificatePath $serverKeyFileName
+    $fullKeyStoreFilePath = Join-Path $CertificatePath $serverKeyStoreFileName
+    $fullRootCertFilePath = Join-Path $CertificatePath $rootCertFileName
+    $fullCertificateFilePath = Join-Path $CertificatePath $serverCertificateFileName
+
+    # keytool -importcert -alias ad-core-server -keystore "D:\certificates\server_keystore.p12" -storetype PKCS12 -storepass "p@ssw0rd" -file "D:\certificates\root.crt" -storepass p@ssw0rd -ext BasicConstraints:critical=ca:true -ext san=dns:wca4z2-winaddi.fyre.ibm.com
+    keytool -importcert -alias ad-core-server -keystore $fullKeyStoreFilePath -storetype PKCS12 -storepass $KeyPass -file $fullRootCertFilePath -storepass $KeyPass -ext BasicConstraints:critical=ca:true -ext san=dns:$Fqdn
+
+    $fullFilePath = Join-Path $CertificatePath $serverKeyFileName
+
+    ssh root@$RefactorIP 'cat /root/certs/root.crt' > C:\certificates\root.crt
+
+    # generates server.key file
+    openssl pkcs12 -in $KeyStorePath -nocerts -nodes -out $fullServerKeyFilePath
+
+    $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
+    keytool -list -keystore $KeyStorePath -rfc > $fullCertificateFilePath
+
+    # TODO Open that server_certificate.crt in notepad and reset the order of certs. We want the root cert to be at the to
+}
