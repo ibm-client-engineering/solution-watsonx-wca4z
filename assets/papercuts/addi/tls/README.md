@@ -1,17 +1,3 @@
-# TLS
-
-This README provides instructions for automating SCP (Secure Copy Protocol) file transfer between hosts using PowerShell with SSH key-based authentication.
-
-## Prerequisites
-
-Before proceeding, ensure the following prerequisites are met:
-
-- Windows or Linux machine with PowerShell installed.
-- SSH installed on both the source and destination hosts.
-- Permission to execute PowerShell scripts.
-- Access to both the source and destination hosts via SSH.
-- Basic understanding of PowerShell scripting.
-
 ## Install Dependencies
 To install OpenSSL 
 ```
