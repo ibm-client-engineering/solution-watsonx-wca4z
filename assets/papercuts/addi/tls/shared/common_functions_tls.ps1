@@ -1,7 +1,6 @@
 # Function to export a certificate to a PFX file
 function Export-CertificateToPfx {
     param (
-        # [System.Security.CryptoGraphy.x509Certificates.X509Certificates2]$Certificate,
         [string]$Fqdn,
         [string]$KeyPass,
         [string]$KeyStorePath,
@@ -71,7 +70,6 @@ function ConfigureCerts {
     $fullRootCertFilePath = Join-Path $CertificatePath $rootCertFileName
     $fullCertificateFilePath = Join-Path $CertificatePath $serverCertificateFileName
 
-    # keytool -importcert -alias ad-core-server -keystore "D:\certificates\server_keystore.p12" -storetype PKCS12 -storepass "p@ssw0rd" -file "D:\certificates\root.crt" -storepass p@ssw0rd -ext BasicConstraints:critical=ca:true -ext san=dns:wca4z2-winaddi.fyre.ibm.com
     keytool -importcert -alias ad-core-server -keystore $fullKeyStoreFilePath -storetype PKCS12 -storepass $KeyPass -file $fullRootCertFilePath -storepass $KeyPass -ext BasicConstraints:critical=ca:true -ext san=dns:$Fqdn
 
     $fullFilePath = Join-Path $CertificatePath $serverKeyFileName
