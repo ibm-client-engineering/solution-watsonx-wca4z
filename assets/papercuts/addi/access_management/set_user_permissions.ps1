@@ -1,9 +1,3 @@
-# Set-FolderPermission.ps1
-# Run script
-# cd ~/Desktop/Scripts
-# pwsh ./Set-FolderPermissions.ps1
-
-
 #Function to set folder permissions
 function Set-FolderPermission {
     param (
