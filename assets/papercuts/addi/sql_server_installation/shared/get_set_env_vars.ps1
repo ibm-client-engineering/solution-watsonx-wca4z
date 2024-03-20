@@ -6,7 +6,7 @@ function Set-EnvVariables {
     $envFileContent = Get-Content -Path $FilePath -Raw
     #Write-Host $envFileContent
     # Split content by new line using a \
-    $envFileContent -split "\n\r" | ForEach-Object {
+    $envFileContent -split "\r\n" | ForEach-Object {
         #split each line into key and value
         $key, $value = $_ -split '=', 2
         # set the environment variable
