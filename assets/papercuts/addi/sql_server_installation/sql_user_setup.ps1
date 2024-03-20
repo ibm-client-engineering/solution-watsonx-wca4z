@@ -10,9 +10,6 @@ function Main {
     Write-Host "Starting sql_user_setup.ps1 script"
     Confirm-EnvVariables
 
-    #Configure TCP with SQL (Step 2)
-    ConfigureSQLForTCP
-
     #Create user account (Step 3)
     SetUpSQLUserAccount
     Write-Host "SQL user set up successfully"
