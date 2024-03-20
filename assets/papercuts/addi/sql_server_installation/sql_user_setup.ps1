@@ -1,6 +1,5 @@
 # import the common functions script
 . ".\shared\common_functions.ps1"
-. ".\shared\common_functions_tls.ps1"
 . ".\shared\get_set_env_vars.ps1"
 
 
