@@ -120,6 +120,24 @@ Once ADDI has been installed, the next step is to install refactor on the refact
 
 ### Configuring the certs on the ADDI host
 
+First ensure OpenSSL is installed. An install script exists in the tls folder
+```powershell
+.\dependencies\install_open_ssl.ps1
+```
 
+Next, update the `tls/.env` file according to your environment
+```bash
+keyPass="p@ssw0rd"
+keyStorePath="C:\certificates\server_keystore.p12"
+certificatePath="C:\certificates\"
+certificatePathRoot="C:\certificates\root.crt"
+```
+
+Then you can run to set up the following certs `server.key`, `server_certificate`, `server_keystore`, `zookeeper`, `root.crt` in `C:\certificates\`
+```
+.\tls_certs_configuration.ps1
+```
+
+Once the script completes verify that those 5 files exist on your `C:\certificates` directory.
 
 
