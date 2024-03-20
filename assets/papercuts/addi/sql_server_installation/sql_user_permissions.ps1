@@ -14,8 +14,8 @@ function Main {
     Write-Host "2. Step 2. Configure SQL For TCP" # recommended
     Write-Host "3. Step 3. Set up SQL User Account" ## required default user is dbo
     Write-Host "4. Step 4. Checks if SQL user has all required privileges on $env:serverInstance" ## required
-    Write-Host "5. Step 5. Configure SSL For ADD components"
-    Write-Host "6. Step 6. Check and configure collation" ## required, this should be after step 2.
+    Write-Host "5. Step 5. Configure TLS for Java" 
+    Write-Host "6. Step 6. Check and configure collation" ## IGNORE
     Write-Host "7. Step 7. Get existing usernames" ## required
     Write-Host "8. Step 8. Get existing databases" ## required
 
