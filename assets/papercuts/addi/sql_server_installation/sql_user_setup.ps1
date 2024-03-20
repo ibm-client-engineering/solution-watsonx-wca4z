@@ -31,9 +31,6 @@ function Main {
         }
     }
 
-    #Configure TLS Java (Step 5)
-    ConfigureTLSJava -eclipseIniPath $env:eclipseIniPath
-
 
     #Check usernames
     $usernames = Get-SqlUsernames -ServerInstance $env:serverInstance -Database $env:sqlDatabase -SqlUser $env:sqlUser -SqlPassword $env:sqlPassword
