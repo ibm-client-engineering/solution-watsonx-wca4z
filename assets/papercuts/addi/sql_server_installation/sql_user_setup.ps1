@@ -11,15 +11,6 @@ function Main {
     Write-Host "Starting sql_user_setup.ps1 script"
     Confirm-EnvVariables
 
-    # Checks if SSL (Step 1)
-    if ($IsSSLEncryptionEnabled) {
-        Write-Host "SSL Encryption is enabled for SQL Server ($env:serverInstance)"
-    } else {
-        Write-Host "SSL Encryption is not enabled for SQL Server ($env:serverInstance)"
-        # Step 1
-        EnableSSLEncryption
-    }
-
     #Configure TCP with SQL (Step 2)
     ConfigureSQLForTCP
 
