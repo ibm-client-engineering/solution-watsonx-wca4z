@@ -62,3 +62,23 @@ separate VSCode instances using the two different API keys.
 Some customers may have policies against installing databases on the same system as other applications.
 If this is the case you will need an extra Windows server in your architecture to house the SQL Server.
 
+### Multiple users on ADDI server
+
+When installing ADDI on IBM Cloud, the license that comes with the Windows server by default allows 
+two users maximum for the server. If pilot requires more than 2 user accounts then additional 
+licenses will be required.
+
+In addition, when ADDI is installed, ensure that it is installed "For all users" and not just for
+one user.
+
+### Ports open between VMs
+
+If there are firewalls deployed (local to the machine and otherwise), ensure that all needed ports
+can be opened between the ADDI and RA server.
+
+### RDP access to Windows servers
+
+If deploying ADDI in IBM Cloud, Remote Desktop Protocol (RDP) cannot be available via public IP address.
+A workaround is to use an SSL tunnel to the private address, but this might not meet security requirements
+for pilot customers. In which case, the usage of a VPN to the IBM Cloud account will need to be 
+deployed and used.
