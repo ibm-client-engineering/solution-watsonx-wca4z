@@ -42,3 +42,23 @@ However, the WCAz component is completely transient and does not hold any data a
 The metadata from the refactored code is held in the DB2 on Cloud instance and that 
 will be protected by IP restrictions.
 
+### Multiple COBOL Programs in Pilot
+
+As of March 2024, a WCAz space/deployment has a single connection to DB2 on Cloud and that
+DB2 on Cloud can only contain one project build. If a customer wants to do transformation
+on more than one project there are two options.
+
+1. Serial - Do the first application end to end, then do the second application. This is the simplest
+way to do it and it is recommended to pursue this path.
+
+2. At the same time - In order to handle two application projects at the same time, you will need
+to duplicate a lot of things. You will need to duplicate DB2, Cloud Object Storage, have a second
+WCAz space/deployment hooked up to those duplicate services. You will have to configure the ADDI
+and RA environment to use the 2 different cloud service groups. And lastly, you will need two 
+separate VSCode instances using the two different API keys.
+
+### Installing SQL Server on same system as ADDI
+
+Some customers may have policies against installing databases on the same system as other applications.
+If this is the case you will need an extra Windows server in your architecture to house the SQL Server.
+
