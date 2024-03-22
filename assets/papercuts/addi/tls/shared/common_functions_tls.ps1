@@ -8,6 +8,7 @@ function Export-CertificateToPfx {
         [string]$Filename
     )
     $fullFilePath = Join-Path $CertificatePath $Filename
+    Write-Host "Export-CertificateToPfx KeyStorePath: $KeyStorePath , CertificatePath: $CertificatePath, KeyPass: $KeyPass , Filename: $Filename , fullFilePath: $fullFilePath"
     keytool -exportcert -alias $Fqdn -keystore $KeyStorePath -file $fullFilePath -storepass $KeyPass
     Set-Content -Path $fullFilePath -Encoding utf8 -Value ""
 }
@@ -21,6 +22,7 @@ function Import-CertificateToKeystore {
         [string]$Filename
     )
     $fullFilePath = Join-Path $CertificatePath $Filename
+    Write-Host "Import-CertificateToKeystore  KeyStorePath: $KeyStorePath , CertificatePath: $CertificatePath, KeyPass: $KeyPass , Filename: $Filename , fullFilePath: $fullFilePath"
     keytool -keystore $KeyStorePath -import -file $fullFilePath -alias "self-signed-root" -storepass $KeyPass -noprompt
 }
 
@@ -30,6 +32,7 @@ function GenerateKeyPair {
         [string]$KeyStorePath,
         [string]$Fqdn
     )
+    Write-Host "GenerateKeyPair KeyStorePath: $KeyStorePath , KeyPass: $KeyPass , FQDN: $Fqdn"
     keytool -genkeypair -alias $Fqdn -keyalg RSA -keysize 2048 -dname "cn=$Fqdn" -keypass $KeyPass -keystore $KeyStorePath -storepass $KeyPass -storetype PKCS12 -ext BasicConstraints:critical=ca:true -ext san=dns:$Fqdn
 }
 
@@ -46,8 +49,9 @@ function ImportCertToJavaKeyStore {
         [string]$KeyStorePath,
         [string]$KeyPass
     )
+    Write-Host "ImportCertToJavaKeyStore KeyStorePath: $KeyStorePath , KeyPass: $KeyPass"
     keytool -importkeystore -srckeystore $KeyStorePath -srcstorepass $KeyPass -destkeystore "C:\Program Files\Eclipse Adoptium\jre-11.0.22.7-hotspot\lib\security\cacerts" -deststorepass "changeit"
-    keytool -list -keystore "C:\Program Files\Eclipse Adoptium\jre-11.0.22.7-hotspot\lib\security\cacerts" -storepass "changeit"
+    # keytool -list -keystore "C:\Program Files\Eclipse Adoptium\jre-11.0.22.7-hotspot\lib\security\cacerts" -storepass "changeit"
     # Get-Service | Select-Object DisplayName, ServiceName
 
     Restart-Service -Name "IBM Application Discovery Configuration Service (IBMApplicationDiscoveryConfigurationService)"
@@ -62,6 +66,8 @@ function ConfigureCerts {
         [string]$RefactorIP,
         [string]$CertificatePath
     )
+    Write-Host "ConfigureCerts RefactorIP: $RefactorIP , CertificatePath: $CertificatePath"
+
     $serverKeyFileName = "server.key"
     $serverKeyStoreFileName = "server_keystore.p12"
     $rootCertFileName = "root.crt"
@@ -92,6 +98,7 @@ function Add-RootCertificateToTrustedRoot {
         [string]$CertificatePath
     )
     try {
+        Write-Host "Add-RootCertificateToTrustedRoot CertificatePath $CertificatePath"
         # Import the root certificate to the Trusted Root Certification Authorities store
         $rootCert = Get-Content -Path $CertificatePath -Raw -Encoding UTF8
         $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
