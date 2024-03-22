@@ -35,7 +35,7 @@ function Import-CertificateToKeystore {
         return
     }
     #keytool -keystore $KeyStorePath -import -file $fullFilePath -alias "self-signed-root" -storepass $KeyPass -noprompt
-    keytool -keystore "C:\certificates\server_keystore.p12" -import -file "C:\certificates\server_certificate.crt" -alias "self-signed-root" -storepass $KeyPass -noprompt
+    keytool -keystore "C:\certificates\server_keystore.p12" -import -file "C:\certificates\server_certificate.crt" -alias "self-signed-root" -storepass 'p@ssw0rd' -noprompt
 }
 
 function GenerateKeyPair {
@@ -45,9 +45,21 @@ function GenerateKeyPair {
         [string]$Fqdn
     )
     Write-Host "GenerateKeyPair KeyStorePath: $KeyStorePath , KeyPass: $KeyPass , FQDN: $Fqdn"
-    keytool -genkeypair -alias $Fqdn -keyalg RSA -keysize 2048 -dname "cn=$Fqdn" -keypass $KeyPass -keystore $KeyStorePath -storepass $KeyPass -storetype PKCS12 -ext BasicConstraints:critical=ca:true -ext san=dns:$Fqdn
+    $keytoolOutput = keytool -genkeypair `
+        -alias $Fqdn `
+        -keyalg RSA `
+        -keysize 2048 `
+        -storetype PKCS12 `
+        -keystore $KeyStorePath `
+        -storepass $KeyPass `
+        -dname "CN=$Fqdn" `
+        -ext "san=dns:$Fqdn" `
+        -keypass $KeyPass `
+        -validity 365
+    if ($keytoolOutput -match "keytool error") {
+        Write-Host "Error generating key pair: $keytoolOutput"
+    }
 }
-
 
 function DeleteServerCertificate {
     param(
