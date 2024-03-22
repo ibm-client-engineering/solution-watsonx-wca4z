@@ -1,14 +1,15 @@
-
 function GenerateKeyPair {
     param(
         [string]$KeyPass,
         [string]$KeyStorePath,
         [string]$Fqdn
     )
-    if(-not (Test-Path $KeyStorePath -PathType Container)) {
+
+    if (-not (Test-Path $KeyStorePath -PathType Container)) {
         Write-Host "Directory $KeyStorePath does not exist... creating one now"
-        New-Item -ItemType Directory -Path $KeyStorePath
+        New-Item -ItemType Directory -Path $KeyStorePath | Out-Null
     }
+
     Write-Host "GenerateKeyPair KeyStorePath: $KeyStorePath , KeyPass: $KeyPass , FQDN: $Fqdn"
     $keytoolOutput = keytool -genkeypair `
         -alias $Fqdn `
@@ -21,12 +22,12 @@ function GenerateKeyPair {
         -ext "san=dns:$Fqdn" `
         -keypass $KeyPass `
         -validity 365
+
     if ($keytoolOutput -match "keytool error") {
         Write-Host "Error generating key pair: $keytoolOutput"
     }
 }
 
-# Function to export a certificate to a PFX file
 function Export-CertificateToPfx {
     param (
         [string]$Fqdn,
@@ -35,13 +36,13 @@ function Export-CertificateToPfx {
         [string]$CertificatePath,
         [string]$Filename
     )
+
     $fullFilePath = Join-Path $CertificatePath $Filename
     Write-Host "Export-CertificateToPfx KeyStorePath: $KeyStorePath , CertificatePath: $CertificatePath, KeyPass: $KeyPass , Filename: $Filename , fullFilePath: $fullFilePath"
     keytool -exportcert -alias $Fqdn -keystore $KeyStorePath -file $fullFilePath -storepass $KeyPass
     Set-Content -Path $fullFilePath -Encoding utf8 -Value ""
 }
 
-# Function to import a certificate into a keystore
 function Import-CertificateToKeystore {
     param(
         [string]$KeyStorePath,
@@ -50,19 +51,22 @@ function Import-CertificateToKeystore {
         [string]$Filename,
         [string]$Fqdn
     )
+
     $fullFilePath = Join-Path $CertificatePath $Filename
     Write-Host "Import-CertificateToKeystore  KeyStorePath: $KeyStorePath , CertificatePath: $CertificatePath, KeyPass: $KeyPass , Filename: $Filename , fullFilePath: $fullFilePath"
 
-    if(-not (Test-Path $fullFilePath -PathType Container)) {
+    if (-not (Test-Path $fullFilePath -PathType Container)) {
         Write-Host "Certificate file not found: $fullFilePath"
         return
     }
+
     $certificateContent = Get-Content -Path $fullFilePath -Raw
-    if([string]::IsNullOrEmpty($certificateContent)) {
+
+    if ([string]::IsNullOrEmpty($certificateContent)) {
         Write-Host "Certificate file is empty or null: $fullFilePath"
         return
     }
-    #keytool -keystore $KeyStorePath -import -file $fullFilePath -alias "self-signed-root" -storepass $KeyPass -noprompt
+
     keytool -importcert -keystore $KeyStorePath -file $fullFilePath -alias $Fqdn -noprompt
 }
 
@@ -73,6 +77,7 @@ function Import-CertificateToKeystoreWithAlias {
         [string]$Alias,
         [string]$StorePass
     )
+
     Write-Host "Importing certificate to keystore with alias: $Alias"
 
     if (-not (Test-Path $CertificatePath -PathType Leaf)) {
@@ -90,6 +95,7 @@ function ConfigureCerts {
         [string]$KeyPass,
         [string]$Fqdn
     )
+
     Write-Host "ConfigureCerts RefactorIP: $RefactorIP , CertificatePath: $CertificatePath"
 
     $serverKeyFileName = "server.key"
@@ -109,17 +115,13 @@ function ConfigureCerts {
     keytool -importcert -alias ad-core-server -keystore $fullKeyStoreFilePath -storetype PKCS12 -storepass $KeyPass -file $fullRootCertFilePath -storepass $KeyPass -ext "BasicConstraints:critical=ca:true" -ext "san=dns:$Fqdn"
     keytool -importcert -alias self-signed-root -keystore $fullKeyStoreFilePath -storetype PKCS12 -storepass $KeyPass -file $fullRootCertFilePath -storepass $KeyPass -ext "BasicConstraints:critical=ca:true" -ext "san=dns:$Fqdn"
 
-
-    # Generate server.key file
     openssl pkcs12 -in $KeyStorePath -nocerts -nodes -out $fullServerKeyFilePath
 
-    # Export all ceertificates to server_certificate.crt
     $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
     keytool -list -keystore $fullKeyStoreFilePath -rfc > $fullCertificateFilePath
 
     Write-Host "Certificates configured successfully."
 
-    # Reorder certificates with root certificate at the top
     $certs = Get-Content $fullCertificateFilePath
     $rootCert = Get-Content $fullRootCertFilePath
     $certs = $rootCert + $certs | Select-Object -Unique
@@ -132,6 +134,7 @@ function DeleteServerCertificate {
     param(
         [string]$CertificatePath
     )
+
     #Remove-Item -Recurse -Force -Path $CertificatePath
 }
 
@@ -140,16 +143,12 @@ function ImportCertToJavaKeyStore {
         [string]$KeyStorePath,
         [string]$KeyPass
     )
+
     Write-Host "ImportCertToJavaKeyStore KeyStorePath: $KeyStorePath , KeyPass: $KeyPass"
     keytool -importkeystore -srckeystore $KeyStorePath -srcstorepass $KeyPass -destkeystore "C:\Program Files\Eclipse Adoptium\jre-11.0.22.7-hotspot\lib\security\cacerts" -deststorepass "changeit" -deststoretype pkcs12 -noprompt
-    # keytool -list -keystore "C:\Program Files\Eclipse Adoptium\jre-11.0.22.7-hotspot\lib\security\cacerts" -storepass "changeit" -deststoretype pkcs12 -noprompt
-    # Get-Service | Select-Object DisplayName, ServiceName
 
     Restart-Service -Name "IBM Application Discovery Configuration Service (IBMApplicationDiscoveryConfigurationService)"
     Write-Host "ImportCertToJavaKeyStore completed successfully"
-    # lists the certificates in the path
-    # Get-ChildItem -Path $CertificatePathRootCertificatePath
-
 }
 
 function Add-RootCertificateToTrustedRoot {
