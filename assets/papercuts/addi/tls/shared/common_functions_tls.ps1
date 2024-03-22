@@ -109,8 +109,8 @@ function ImportCertToJavaKeyStore {
         [string]$KeyPass
     )
     Write-Host "ImportCertToJavaKeyStore KeyStorePath: $KeyStorePath , KeyPass: $KeyPass"
-    keytool -importkeystore -srckeystore $KeyStorePath -srcstorepass $KeyPass -destkeystore "C:\Program Files\Eclipse Adoptium\jre-11.0.22.7-hotspot\lib\security\cacerts" -deststorepass "changeit" -destoretype pkcs12 -noprompt
-    # keytool -list -keystore "C:\Program Files\Eclipse Adoptium\jre-11.0.22.7-hotspot\lib\security\cacerts" -storepass "changeit" -destoretype pkcs12 -noprompt
+    keytool -importkeystore -srckeystore $KeyStorePath -srcstorepass $KeyPass -destkeystore "C:\Program Files\Eclipse Adoptium\jre-11.0.22.7-hotspot\lib\security\cacerts" -deststorepass "changeit" -deststoretype pkcs12 -noprompt
+    # keytool -list -keystore "C:\Program Files\Eclipse Adoptium\jre-11.0.22.7-hotspot\lib\security\cacerts" -storepass "changeit" -deststoretype pkcs12 -noprompt
     # Get-Service | Select-Object DisplayName, ServiceName
 
     Restart-Service -Name "IBM Application Discovery Configuration Service (IBMApplicationDiscoveryConfigurationService)"
