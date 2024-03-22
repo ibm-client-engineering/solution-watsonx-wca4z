@@ -62,6 +62,23 @@ function Import-CertificateToKeystore {
     keytool -importcert -keystore $KeyStorePath -file $fullFilePath -alias $Fqdn -noprompt
 }
 
+function Import-CertificateToKeystoreWithAlias {
+    param(
+        [string]$KeyStorePath,
+        [string]$CertificatePath,
+        [string]$Alias,
+        [string]$StorePass
+    )
+    Write-Host "Importing certificate to keystore with alias: $Alias"
+
+    if (-not (Test-Path $CertificatePath -PathType Leaf)) {
+        Write-Host "Certificate file not found: $CertificatePath"
+        return
+    }
+
+    keytool -importcert -file $CertificatePath -alias $Alias -keystore $KeyStorePath -storepass $StorePass -noprompt
+}
+
 function ConfigureCerts {
     param(
         [string]$RefactorIP,
@@ -83,8 +100,9 @@ function ConfigureCerts {
 
     ssh root@$RefactorIP 'cat /root/certs/root.crt' | Out-File -Encoding utf8 'C:\certificates\root.crt'
 
+    keytool -importcert -alias ad-core-server -keystore $fullKeyStoreFilePath -storetype PKCS12 -storepass $KeyPass -file $fullRootCertFilePath -storepass $KeyPass -ext "BasicConstraints:critical=ca:true" -ext "san=dns:$Fqdn"
     keytool -importcert -alias self-signed-root -keystore $fullKeyStoreFilePath -storetype PKCS12 -storepass $KeyPass -file $fullRootCertFilePath -storepass $KeyPass -ext "BasicConstraints:critical=ca:true" -ext "san=dns:$Fqdn"
-    keytool -importcert -alias ad-core-server -keystore $fullKeyStoreFilePath -storetype PKCS12 -storepass $KeyPass -file $fullAdCoreCertFilePath -storepass $KeyPass -ext "BasicConstraints:critical=ca:true" -ext "san=dns:$Fqdn"
+
 
     # Generate server.key file
     openssl pkcs12 -in $KeyStorePath -nocerts -nodes -out $fullServerKeyFilePath
