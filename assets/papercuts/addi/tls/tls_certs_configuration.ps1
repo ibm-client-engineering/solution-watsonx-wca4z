@@ -29,10 +29,10 @@ function Main {
     GenerateKeyPair -KeyPass $KeyPass -KeyStorePath $KeyStorePath -Fqdn $fqdn
     Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ServerCertificateFileName
     Import-CertificateToKeystoreWithAlias -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Alias "self-signed-root" -StorePass "p@ssw0rd"
-    Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -KeyPass $KeyPass -Filename $ServerCertificateFileName
+    Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -KeyPass $KeyPass -Filename $ServerCertificateFileName -Fqdn $fqdn
 
 
-    ConfigureCerts -RefactorIP $RefactorIP -CertificatePath $CertificatePath
+    ConfigureCerts -RefactorIP $RefactorIP -CertificatePath $CertificatePath -KeyPass $KeyPass -Fqdn $fqdn
 
     ImportCertToJavaKeyStore -KeyStorePath $KeyStorePath -KeyPass $KeyPass
     Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ZookeeperFileName

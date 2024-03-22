@@ -5,6 +5,10 @@ function GenerateKeyPair {
         [string]$KeyStorePath,
         [string]$Fqdn
     )
+    if(-not (Test-Path $KeyStorePath -PathType Container)) {
+        Write-Host "Directory $KeyStorePath does not exist... creating one now"
+        New-Item -ItemType Directory -Path $KeyStorePath
+    }
     Write-Host "GenerateKeyPair KeyStorePath: $KeyStorePath , KeyPass: $KeyPass , FQDN: $Fqdn"
     $keytoolOutput = keytool -genkeypair `
         -alias $Fqdn `
@@ -43,13 +47,13 @@ function Import-CertificateToKeystore {
         [string]$KeyStorePath,
         [string]$CertificatePath,
         [string]$KeyPass,
-        [string]$Filename
+        [string]$Filename,
+        [string]$Fqdn
     )
     $fullFilePath = Join-Path $CertificatePath $Filename
-
     Write-Host "Import-CertificateToKeystore  KeyStorePath: $KeyStorePath , CertificatePath: $CertificatePath, KeyPass: $KeyPass , Filename: $Filename , fullFilePath: $fullFilePath"
 
-    if(-not (Test-Path $fullFilePath -PathType Leaf)) {
+    if(-not (Test-Path $fullFilePath -PathType Container)) {
         Write-Host "Certificate file not found: $fullFilePath"
         return
     }
@@ -82,7 +86,9 @@ function Import-CertificateToKeystoreWithAlias {
 function ConfigureCerts {
     param(
         [string]$RefactorIP,
-        [string]$CertificatePath
+        [string]$CertificatePath,
+        [string]$KeyPass,
+        [string]$Fqdn
     )
     Write-Host "ConfigureCerts RefactorIP: $RefactorIP , CertificatePath: $CertificatePath"
 
