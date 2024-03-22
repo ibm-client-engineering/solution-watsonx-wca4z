@@ -37,7 +37,9 @@ function Main {
     Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ZookeeperFileName
 
     # Import the root certificate to the trusted root certification authorities store
-    RootCertificateToTrusted-Root $rootFilePath
+    $storeLocation = "C:\certificates\root.crt"
+    $certificateFilePath = "C:\certificates\server_certificate.crt"
+    RootCertificateToTrusted-Root -CertificatePath $certificateFilePath -StoreLocation $storeLocation
 }
 
 Main

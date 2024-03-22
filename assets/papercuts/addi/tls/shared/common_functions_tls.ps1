@@ -86,11 +86,9 @@ function ConfigureCerts {
 }
 
 function RootCertificateToTrusted-Root {
-    $rootCertFileName = "root.crt"
-    $serverCertificateFileName = "server_certificate.crt"
-
-    $fullCertificateFilePath = Join-Path $CertificatePath $serverCertificateFileName
-    $fullRootCertFilePath = Join-Path $CertificatePath $rootCertFileName
-
-    Import-Certificate -FilePath $fullCertificateFilePath -CertStoreLocation $fullRootCertFilePath
+    param (
+        [string]$CertificatePath,
+        [string]$StoreLocation
+    )
+    Import-Certificate -FilePath $CertificatePath -CertStoreLocation $StoreLocation
 }
