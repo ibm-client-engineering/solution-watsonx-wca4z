@@ -1,3 +1,27 @@
+
+function GenerateKeyPair {
+    param(
+        [string]$KeyPass,
+        [string]$KeyStorePath,
+        [string]$Fqdn
+    )
+    Write-Host "GenerateKeyPair KeyStorePath: $KeyStorePath , KeyPass: $KeyPass , FQDN: $Fqdn"
+    $keytoolOutput = keytool -genkeypair `
+        -alias $Fqdn `
+        -keyalg RSA `
+        -keysize 2048 `
+        -storetype PKCS12 `
+        -keystore $KeyStorePath `
+        -storepass $KeyPass `
+        -dname "CN=$Fqdn" `
+        -ext "san=dns:$Fqdn" `
+        -keypass $KeyPass `
+        -validity 365
+    if ($keytoolOutput -match "keytool error") {
+        Write-Host "Error generating key pair: $keytoolOutput"
+    }
+}
+
 # Function to export a certificate to a PFX file
 function Export-CertificateToPfx {
     param (
@@ -38,27 +62,36 @@ function Import-CertificateToKeystore {
     keytool -keystore "C:\certificates\server_keystore.p12" -import -file "C:\certificates\server_certificate.crt" -alias "self-signed-root" -storepass 'p@ssw0rd' -noprompt
 }
 
-function GenerateKeyPair {
+function ConfigureCerts {
     param(
-        [string]$KeyPass,
-        [string]$KeyStorePath,
-        [string]$Fqdn
+        [string]$RefactorIP,
+        [string]$CertificatePath
     )
-    Write-Host "GenerateKeyPair KeyStorePath: $KeyStorePath , KeyPass: $KeyPass , FQDN: $Fqdn"
-    $keytoolOutput = keytool -genkeypair `
-        -alias $Fqdn `
-        -keyalg RSA `
-        -keysize 2048 `
-        -storetype PKCS12 `
-        -keystore $KeyStorePath `
-        -storepass $KeyPass `
-        -dname "CN=$Fqdn" `
-        -ext "san=dns:$Fqdn" `
-        -keypass $KeyPass `
-        -validity 365
-    if ($keytoolOutput -match "keytool error") {
-        Write-Host "Error generating key pair: $keytoolOutput"
-    }
+    Write-Host "ConfigureCerts RefactorIP: $RefactorIP , CertificatePath: $CertificatePath"
+
+    $serverKeyFileName = "server.key"
+    $serverKeyStoreFileName = "server_keystore.p12"
+    $rootCertFileName = "root.crt"
+    $serverCertificateFileName = "server_certificate.crt"
+
+    $fullServerKeyFilePath = Join-Path $CertificatePath $serverKeyFileName
+    $fullKeyStoreFilePath = Join-Path $CertificatePath $serverKeyStoreFileName
+    $fullRootCertFilePath = Join-Path $CertificatePath $rootCertFileName
+    $fullCertificateFilePath = Join-Path $CertificatePath $serverCertificateFileName
+
+    $fullFilePath = Join-Path $CertificatePath $serverKeyFileName
+
+    ssh root@$RefactorIP 'cat /root/certs/root.crt' | Out-File -Encoding utf8 'C:\certificates\root.crt'
+
+    keytool -importcert -alias self-signed-root -keystore $fullKeyStoreFilePath -storetype PKCS12 -storepass $KeyPass -file $fullRootCertFilePath -storepass $KeyPass -ext "BasicConstraints:critical=ca:true" -ext "san=dns:$Fqdn"
+
+    # generates server.key file
+    openssl pkcs12 -in $KeyStorePath -nocerts -nodes -out $fullServerKeyFilePath
+
+    $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
+    keytool -list -keystore $KeyStorePath -rfc > $fullCertificateFilePath
+
+    # TODO Open that server_certificate.crt in notepad and reset the order of certs. We want the root cert to be at the to
 }
 
 function DeleteServerCertificate {
@@ -83,39 +116,6 @@ function ImportCertToJavaKeyStore {
     # lists the certificates in the path
     # Get-ChildItem -Path $CertificatePathRootCertificatePath
 
-}
-
-function ConfigureCerts {
-    param(
-        [string]$RefactorIP,
-        [string]$CertificatePath
-    )
-    Write-Host "ConfigureCerts RefactorIP: $RefactorIP , CertificatePath: $CertificatePath"
-
-    $serverKeyFileName = "server.key"
-    $serverKeyStoreFileName = "server_keystore.p12"
-    $rootCertFileName = "root.crt"
-    $serverCertificateFileName = "server_certificate.crt"
-
-    $fullServerKeyFilePath = Join-Path $CertificatePath $serverKeyFileName
-    $fullKeyStoreFilePath = Join-Path $CertificatePath $serverKeyStoreFileName
-    $fullRootCertFilePath = Join-Path $CertificatePath $rootCertFileName
-    $fullCertificateFilePath = Join-Path $CertificatePath $serverCertificateFileName
-
-
-    $fullFilePath = Join-Path $CertificatePath $serverKeyFileName
-
-    ssh root@$RefactorIP 'cat /root/certs/root.crt' | Out-File -Encoding utf8 'C:\certificates\root.crt'
-
-    keytool -importcert -alias ad-core-server -keystore $fullKeyStoreFilePath -storetype PKCS12 -storepass $KeyPass -file $fullRootCertFilePath -storepass $KeyPass -ext "BasicConstraints:critical=ca:true" -ext "san=dns:$Fqdn"
-
-    # generates server.key file
-    openssl pkcs12 -in $KeyStorePath -nocerts -nodes -out $fullServerKeyFilePath
-
-    $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
-    keytool -list -keystore $KeyStorePath -rfc > $fullCertificateFilePath
-
-    # TODO Open that server_certificate.crt in notepad and reset the order of certs. We want the root cert to be at the to
 }
 
 function Add-RootCertificateToTrustedRoot {
