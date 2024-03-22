@@ -78,11 +78,12 @@ function ConfigureCerts {
     $fullRootCertFilePath = Join-Path $CertificatePath $rootCertFileName
     $fullCertificateFilePath = Join-Path $CertificatePath $serverCertificateFileName
 
-    keytool -importcert -alias ad-core-server -keystore $fullKeyStoreFilePath -storetype PKCS12 -storepass $KeyPass -file $fullRootCertFilePath -storepass $KeyPass -ext BasicConstraints:critical=ca:true -ext san=dns:$Fqdn
 
     $fullFilePath = Join-Path $CertificatePath $serverKeyFileName
 
     ssh root@$RefactorIP 'cat /root/certs/root.crt' | Out-File -Encoding utf8 'C:\certificates\root.crt'
+
+    keytool -importcert -alias ad-core-server -keystore $fullKeyStoreFilePath -storetype PKCS12 -storepass $KeyPass -file $fullRootCertFilePath -storepass $KeyPass -ext BasicConstraints:critical=ca:true -ext san=dns:$Fqdn
 
     # generates server.key file
     openssl pkcs12 -in $KeyStorePath -nocerts -nodes -out $fullServerKeyFilePath
