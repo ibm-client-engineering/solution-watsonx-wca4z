@@ -74,7 +74,7 @@ function ConfigureCerts {
 
     $fullFilePath = Join-Path $CertificatePath $serverKeyFileName
 
-    ssh root@$RefactorIP 'cat /root/certs/root.crt' > C:\certificates\root.crt
+    ssh root@$RefactorIP 'cat /root/certs/root.crt' | Out-File -Encoding utf8 'C:\certificates\root.crt'
 
     # generates server.key file
     openssl pkcs12 -in $KeyStorePath -nocerts -nodes -out $fullServerKeyFilePath
