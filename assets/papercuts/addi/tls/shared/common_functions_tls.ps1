@@ -4,12 +4,6 @@ function GenerateKeyPair {
         [string]$KeyStorePath,
         [string]$Fqdn
     )
-
-    if (-not (Test-Path $KeyStorePath -PathType Container)) {
-        Write-Host "Directory $KeyStorePath does not exist... creating one now"
-        New-Item -ItemType Directory -Path $KeyStorePath | Out-Null
-    }
-
     Write-Host "GenerateKeyPair KeyStorePath: $KeyStorePath , KeyPass: $KeyPass , FQDN: $Fqdn"
     $keytoolOutput = keytool -genkeypair `
         -alias $Fqdn `
