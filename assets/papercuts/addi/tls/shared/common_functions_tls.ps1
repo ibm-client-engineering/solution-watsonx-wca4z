@@ -59,7 +59,8 @@ function ImportCertToJavaKeyStore {
 
 function ConfigureCerts {
     param(
-        [string]$RefactorIP
+        [string]$RefactorIP,
+        [string]$CertificatePath
     )
     $serverKeyFileName = "server.key"
     $serverKeyStoreFileName = "server_keystore.p12"
