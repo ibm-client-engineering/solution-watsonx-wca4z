@@ -22,7 +22,18 @@ function Import-CertificateToKeystore {
         [string]$Filename
     )
     $fullFilePath = Join-Path $CertificatePath $Filename
+
     Write-Host "Import-CertificateToKeystore  KeyStorePath: $KeyStorePath , CertificatePath: $CertificatePath, KeyPass: $KeyPass , Filename: $Filename , fullFilePath: $fullFilePath"
+
+    if(-not (Test-Path $fullFilePath -PathType Leaf)) {
+        Write-Host "Certificate file not found: $fullFilePath"
+        return
+    }
+    $validationResult = openssl x509 -in $fullFilePath -text -noout
+    if($LASTEXITCODE -ne 0) {
+        Write-Host "Invalid certificate file format or content: $fullFilePath"
+        return
+    }
     keytool -keystore $KeyStorePath -import -file $fullFilePath -alias "self-signed-root" -storepass $KeyPass -noprompt
 }
 
