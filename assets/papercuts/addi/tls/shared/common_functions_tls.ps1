@@ -85,12 +85,14 @@ function ConfigureCerts {
 
     keytool -importcert -alias self-signed-root -keystore $fullKeyStoreFilePath -storetype PKCS12 -storepass $KeyPass -file $fullRootCertFilePath -storepass $KeyPass -ext "BasicConstraints:critical=ca:true" -ext "san=dns:$Fqdn"
 
-    # generates server.key file
+    # Generate server.key file
     openssl pkcs12 -in $KeyStorePath -nocerts -nodes -out $fullServerKeyFilePath
 
+    # Export all ceertificates to server_certificate.crt
     $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
-    keytool -list -keystore $KeyStorePath -rfc > $fullCertificateFilePath
+    keytool -list -keystore $fullKeyStoreFilePath -rfc > $fullCertificateFilePath
 
+    Write-Host "Certificates configured successfully."
     # TODO Open that server_certificate.crt in notepad and reset the order of certs. We want the root cert to be at the to
 }
 
@@ -107,12 +109,12 @@ function ImportCertToJavaKeyStore {
         [string]$KeyPass
     )
     Write-Host "ImportCertToJavaKeyStore KeyStorePath: $KeyStorePath , KeyPass: $KeyPass"
-    keytool -importkeystore -srckeystore $KeyStorePath -srcstorepass $KeyPass -destkeystore "C:\Program Files\Eclipse Adoptium\jre-11.0.22.7-hotspot\lib\security\cacerts" -deststorepass "changeit"
-    # keytool -list -keystore "C:\Program Files\Eclipse Adoptium\jre-11.0.22.7-hotspot\lib\security\cacerts" -storepass "changeit"
+    keytool -importkeystore -srckeystore $KeyStorePath -srcstorepass $KeyPass -destkeystore "C:\Program Files\Eclipse Adoptium\jre-11.0.22.7-hotspot\lib\security\cacerts" -deststorepass "changeit" -destoretype pkcs12 -noprompt
+    # keytool -list -keystore "C:\Program Files\Eclipse Adoptium\jre-11.0.22.7-hotspot\lib\security\cacerts" -storepass "changeit" -destoretype pkcs12 -noprompt
     # Get-Service | Select-Object DisplayName, ServiceName
 
     Restart-Service -Name "IBM Application Discovery Configuration Service (IBMApplicationDiscoveryConfigurationService)"
-
+    Write-Host "ImportCertToJavaKeyStore completed successfully"
     # lists the certificates in the path
     # Get-ChildItem -Path $CertificatePathRootCertificatePath
 
