@@ -47,7 +47,7 @@ function ImportCertToJavaKeyStore {
     )
     keytool -importkeystore -srckeystore $KeyStorePath -srcstorepass $KeyPass -destkeystore "%JAVA_HOME%\lib\security\cacerts" -deststorepass "changeit"
 
-    Get-Service | Select-Object DisplayName, ServiceName
+    # Get-Service | Select-Object DisplayName, ServiceName
 
     Restart-Service -Name "IBM Application Discovery Configuration Service (IBMApplicationDiscoveryConfigurationService)"
 
