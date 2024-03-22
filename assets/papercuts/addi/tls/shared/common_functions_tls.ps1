@@ -29,9 +29,9 @@ function Import-CertificateToKeystore {
         Write-Host "Certificate file not found: $fullFilePath"
         return
     }
-    $validationResult = openssl x509 -in $fullFilePath -text -noout
-    if($LASTEXITCODE -ne 0) {
-        Write-Host "Invalid certificate file format or content: $fullFilePath"
+    $certificateContent = Get-Content -Path $fullFilePath -Raw
+    if([string]::IsNullOrEmpty($certificateContent)) {
+        Write-Host "Certificate file is empty or null: $fullFilePath"
         return
     }
     #keytool -keystore $KeyStorePath -import -file $fullFilePath -alias "self-signed-root" -storepass $KeyPass -noprompt
