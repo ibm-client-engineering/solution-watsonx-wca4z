@@ -34,7 +34,8 @@ function Import-CertificateToKeystore {
         Write-Host "Invalid certificate file format or content: $fullFilePath"
         return
     }
-    keytool -keystore $KeyStorePath -import -file $fullFilePath -alias "self-signed-root" -storepass $KeyPass -noprompt
+    #keytool -keystore $KeyStorePath -import -file $fullFilePath -alias "self-signed-root" -storepass $KeyPass -noprompt
+    keytool -keystore "C:\certificates\server_keystore.p12" -import -file "C:\certificates\server_certificate.crt" -alias "self-signed-root" -storepass $KeyPass -noprompt
 }
 
 function GenerateKeyPair {
