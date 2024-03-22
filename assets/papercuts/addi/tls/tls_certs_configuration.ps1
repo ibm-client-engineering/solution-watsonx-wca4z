@@ -29,6 +29,8 @@ function Main {
     GenerateKeyPair -KeyPass $KeyPass -KeyStorePath $KeyStorePath -Fqdn $fqdn
     Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ServerCertificateFileName
     Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -KeyPass $KeyPass -Filename $ServerCertificateFileName
+
+
     ConfigureCerts -RefactorIP $RefactorIP
 
     ImportCertToJavaKeyStore -KeyStorePath $KeyStorePath -KeyPass $KeyPass
