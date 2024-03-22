@@ -89,14 +89,18 @@ function Add-RootCertificateToTrustedRoot {
     param (
         [string]$CertificatePath
     )
+    try {
+        # Import the root certificate to the Trusted Root Certification Authorities store
+        $rootCert = Get-Content -Path $CertificatePath -Raw
+        $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+        $cert.Import([System.Text.Encoding]::ASCII.GetBytes($rootCert))
 
-    # Import the root certificate to the Trusted Root Certification Authorities store
-    $rootCert = Get-Content -Path $CertificatePath -Raw
-    $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
-    $cert.Import([System.Text.Encoding]::ASCII.GetBytes($rootCert))
-
-    $store = New-Object System.Security.Cryptography.X509Certificates.X509Store -ArgumentList "Root", "LocalMachine"
-    $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
-    $store.Add($cert)
-    $store.Close()
+        $store = New-Object System.Security.Cryptography.X509Certificates.X509Store -ArgumentList "Root", "LocalMachine"
+        $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
+        $store.Add($cert)
+        $store.Close()
+        Write-Host "Root certificate successfully added to trusted root certification authorities store."
+    } catch {
+        Write-Host "Error adding root certificate to Trusted Root Certification Authorities store. $_"
+    }
 }
