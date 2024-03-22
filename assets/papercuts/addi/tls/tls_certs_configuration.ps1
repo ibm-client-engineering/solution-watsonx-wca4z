@@ -31,7 +31,7 @@ function Main {
     Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -KeyPass $KeyPass -Filename $ServerCertificateFileName
 
 
-    ConfigureCerts -RefactorIP $RefactorIP
+    ConfigureCerts -RefactorIP $RefactorIP -CertificatePath $CertificatePath
 
     ImportCertToJavaKeyStore -KeyStorePath $KeyStorePath -KeyPass $KeyPass
     Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ZookeeperFileName
