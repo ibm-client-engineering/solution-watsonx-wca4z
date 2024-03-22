@@ -85,10 +85,18 @@ function ConfigureCerts {
     # TODO Open that server_certificate.crt in notepad and reset the order of certs. We want the root cert to be at the to
 }
 
-function RootCertificateToTrusted-Root {
+function Add-RootCertificateToTrustedRoot {
     param (
-        [string]$CertificatePath,
-        [string]$StoreLocation
+        [string]$CertificatePath
     )
-    Import-Certificate -FilePath $CertificatePath -CertStoreLocation $StoreLocation
+
+    # Import the root certificate to the Trusted Root Certification Authorities store
+    $rootCert = Get-Content -Path $CertificatePath -Raw
+    $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+    $cert.Import([System.Text.Encoding]::ASCII.GetBytes($rootCert))
+
+    $store = New-Object System.Security.Cryptography.X509Certificates.X509Store -ArgumentList "Root", "LocalMachine"
+    $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
+    $store.Add($cert)
+    $store.Close()
 }

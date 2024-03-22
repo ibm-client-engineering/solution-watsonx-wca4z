@@ -38,8 +38,8 @@ function Main {
 
     # Import the root certificate to the trusted root certification authorities store
     $storeLocation = "C:\certificates\root.crt"
-    $certificateFilePath = "C:\certificates\server_certificate.crt"
-    RootCertificateToTrusted-Root -CertificatePath $certificateFilePath -StoreLocation $storeLocation
+    $certificateFilePath = "C:\certificates\root.crt"
+    Add-RootCertificateToTrustedRoot -CertificatePath $certificateFilePath
 }
 
 Main
