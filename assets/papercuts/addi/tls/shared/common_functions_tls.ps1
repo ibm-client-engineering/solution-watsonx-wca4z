@@ -59,7 +59,7 @@ function Import-CertificateToKeystore {
         return
     }
     #keytool -keystore $KeyStorePath -import -file $fullFilePath -alias "self-signed-root" -storepass $KeyPass -noprompt
-    keytool -importkeystore $KeyStorePath -srcstorepass $KeyPass -destkeystore $fullKeyStoreFilePath -deststorepass $KeyPass -desstoretype PKCS12 -alias $Fqdn -noprompt
+    keytool -importcert -keystore $KeyStorePath -file $fullFilePath -alias $Fqdn -storepass $KeyPass -noprompt
 }
 
 function ConfigureCerts {
