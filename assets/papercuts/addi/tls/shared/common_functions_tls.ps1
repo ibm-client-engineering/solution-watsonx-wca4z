@@ -112,7 +112,14 @@ function ConfigureCerts {
     keytool -list -keystore $fullKeyStoreFilePath -rfc > $fullCertificateFilePath
 
     Write-Host "Certificates configured successfully."
-    # TODO Open that server_certificate.crt in notepad and reset the order of certs. We want the root cert to be at the to
+
+    # Reorder certificates with root certificate at the top
+    $certs = Get-Content $fullCertificateFilePath
+    $rootCert = Get-Content $fullRootCertFilePath
+    $certs = $rootCert + $certs | Select-Object -Unique
+    $certs | Out-File $fullCertificateFilePath -Encoding utf8
+
+    Write-Host "Certificates configured successfully"
 }
 
 function DeleteServerCertificate {
