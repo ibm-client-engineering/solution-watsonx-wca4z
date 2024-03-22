@@ -3,44 +3,54 @@
 . ".\shared\get_set_env_vars.ps1"
 
 function Main {
-    Write-Host "Configure TLS Certs and Keystores"
+    Write-Host "Configuring TLS Certs and Keystores..."
+
+    # Load environment variables from .env file
     $envFilePath = ".\.env"
     Set-EnvVariables -FilePath $envFilePath
     Confirm-EnvVariables
-    $hostName = [System.Net.Dns]::GetHostName()
 
-    $fqdn = [System.Net.Dns]::GetHostEntry($hostName).HostName
+    # Get fully qualified domain name
+    $fqdn = [System.Net.Dns]::GetHostEntry([System.Net.Dns]::GetHostName()).HostName
+
+    # Extract required parameters from environment variables
     $KeyPass = $env:keyPass
     $KeyStorePath = $env:keyStorePath
     $CertificatePath = $env:certificatePath
     $RefactorIP = $env:refactorIP
 
-    if (-not (Test-Path $env:certificatePath -PathType Container)) {
-        Write-Host "Directory $env:certificatePath does not exist... creating one now"
-        New-Item -ItemType Directory -Path $env:certificatePath
+    # Create certificate directory if it doesn't exist
+    if (-not (Test-Path $CertificatePath -PathType Container)) {
+        Write-Host "Creating directory: $CertificatePath"
+        New-Item -ItemType Directory -Path $CertificatePath | Out-Null
     } else {
-        Write-Host "Directory $directoryPath already exists, skipping."
+        Write-Host "Certificate directory already exists: $CertificatePath"
     }
-    # You have to define your vars like this or it breaks...
+
+    # Define certificate file names
     $ServerCertificateFileName = "server_certificate.crt"
     $ZookeeperFileName = "zookeeper.crt"
 
-    # Generate key pair, export and import cert to keystore
+    # Generate key pair and export/import certificate to keystore
     GenerateKeyPair -KeyPass $KeyPass -KeyStorePath $KeyStorePath -Fqdn $fqdn
     Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ServerCertificateFileName
     Import-CertificateToKeystoreWithAlias -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Alias "self-signed-root" -StorePass "p@ssw0rd"
     Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -KeyPass $KeyPass -Filename $ServerCertificateFileName -Fqdn $fqdn
 
-
+    # Configure certificates
     ConfigureCerts -RefactorIP $RefactorIP -CertificatePath $CertificatePath -KeyPass $KeyPass -Fqdn $fqdn
 
+    # Import certificate to Java keystore
     ImportCertToJavaKeyStore -KeyStorePath $KeyStorePath -KeyPass $KeyPass
+
+    # Export certificate to PFX
     Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ZookeeperFileName
 
-    # Import the root certificate to the trusted root certification authorities store
-    $storeLocation = "C:\certificates\root.crt"
+    # Add root certificate to trusted root certification authorities store
     $certificateFilePath = "C:\certificates\root.crt"
     Add-RootCertificateToTrustedRoot -CertificatePath $certificateFilePath
+
+    Write-Host "TLS configuration completed successfully."
 }
 
 Main
