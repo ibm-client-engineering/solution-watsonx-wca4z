@@ -46,7 +46,7 @@ function ImportCertToJavaKeyStore {
         [string]$KeyStorePath,
         [string]$KeyPass
     )
-    keytool -importkeystore -srckeystore $KeyStorePath -srcstorepass $KeyPass -destkeystore "%JAVA_HOME%\lib\security\cacerts" -deststorepass "changeit"
+    keytool -importkeystore -srckeystore $KeyStorePath -srcstorepass $KeyPass -destkeystore "C:\Program Files\Eclipse Adoptium\jre-11.0.22.7-hotspot\lib\security\cacerts" -deststorepass "changeit"
 
     # Get-Service | Select-Object DisplayName, ServiceName
 
