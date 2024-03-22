@@ -19,8 +19,8 @@ function Import-CertificateToKeystore {
         [string]$KeyPass,
         [string]$Filename
     )
-    $fullFilePath = Join-Path $CertificatePath $FileName
-    keytool -keystore KeyStorePath -import -file $fullFilePath -alias "self-signed-root" -storepass $KeyPass
+    $fullFilePath = Join-Path $CertificatePath $Filename
+    keytool -keystore $KeyStorePath -import -file $fullFilePath -alias "self-signed-root" -storepass $KeyPass
 }
 
 function GenerateKeyPair {
