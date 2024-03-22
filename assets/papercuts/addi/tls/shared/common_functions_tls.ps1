@@ -59,7 +59,7 @@ function Import-CertificateToKeystore {
         return
     }
     #keytool -keystore $KeyStorePath -import -file $fullFilePath -alias "self-signed-root" -storepass $KeyPass -noprompt
-    keytool -keystore "C:\certificates\server_keystore.p12" -import -file "C:\certificates\server_certificate.crt" -alias "self-signed-root" -storepass 'p@ssw0rd' -noprompt
+    keytool -importkeystore $KeyStorePath -srcstorepass $KeyPass -destkeystore $fullKeyStoreFilePath -deststorepass $KeyPass -desstoretype PKCS12 -alias $Fqdn -noprompt
 }
 
 function ConfigureCerts {
@@ -84,6 +84,7 @@ function ConfigureCerts {
     ssh root@$RefactorIP 'cat /root/certs/root.crt' | Out-File -Encoding utf8 'C:\certificates\root.crt'
 
     keytool -importcert -alias self-signed-root -keystore $fullKeyStoreFilePath -storetype PKCS12 -storepass $KeyPass -file $fullRootCertFilePath -storepass $KeyPass -ext "BasicConstraints:critical=ca:true" -ext "san=dns:$Fqdn"
+    keytool -importcert -alias ad-core-server -keystore $fullKeyStoreFilePath -storetype PKCS12 -storepass $KeyPass -file $fullAdCoreCertFilePath -storepass $KeyPass -ext "BasicConstraints:critical=ca:true" -ext "san=dns:$Fqdn"
 
     # Generate server.key file
     openssl pkcs12 -in $KeyStorePath -nocerts -nodes -out $fullServerKeyFilePath
