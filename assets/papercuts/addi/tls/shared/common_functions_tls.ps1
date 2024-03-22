@@ -7,8 +7,9 @@ function Export-CertificateToPfx {
         [string]$CertificatePath,
         [string]$Filename
     )
-    $fullFilePath = Join-Path $CertificatePath $FileName
+    $fullFilePath = Join-Path $CertificatePath $Filename
     keytool -exportcert -alias $Fqdn -keystore $KeyStorePath -file $fullFilePath -storepass $KeyPass
+    Set-Content -Path $fullFilePath -Encoding utf8
 }
 
 # Function to import a certificate into a keystore
@@ -52,7 +53,7 @@ function ImportCertToJavaKeyStore {
     Restart-Service -Name "IBM Application Discovery Configuration Service (IBMApplicationDiscoveryConfigurationService)"
 
     # lists the certificates in the path
-    Get-ChildItem -Path $CertificatePathRootCertificatePath
+    # Get-ChildItem -Path $CertificatePathRootCertificatePath
 
 }
 
