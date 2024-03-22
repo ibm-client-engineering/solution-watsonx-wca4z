@@ -9,7 +9,7 @@ function Export-CertificateToPfx {
     )
     $fullFilePath = Join-Path $CertificatePath $Filename
     keytool -exportcert -alias $Fqdn -keystore $KeyStorePath -file $fullFilePath -storepass $KeyPass
-    Set-Content -Path $fullFilePath -Encoding utf8
+    Set-Content -Path $fullFilePath -Encoding utf8 -Value ""
 }
 
 # Function to import a certificate into a keystore
@@ -21,7 +21,7 @@ function Import-CertificateToKeystore {
         [string]$Filename
     )
     $fullFilePath = Join-Path $CertificatePath $Filename
-    keytool -keystore $KeyStorePath -import -file $fullFilePath -alias "self-signed-root" -storepass $KeyPass
+    keytool -keystore $KeyStorePath -import -file $fullFilePath -alias "self-signed-root" -storepass $KeyPass -noprompt
 }
 
 function GenerateKeyPair {
