@@ -91,7 +91,7 @@ function Add-RootCertificateToTrustedRoot {
     )
     try {
         # Import the root certificate to the Trusted Root Certification Authorities store
-        $rootCert = Get-Content -Path $CertificatePath -Raw
+        $rootCert = Get-Content -Path $CertificatePath -Raw -Encoding UTF8
         $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
         $cert.Import([System.Text.Encoding]::ASCII.GetBytes($rootCert))
 
