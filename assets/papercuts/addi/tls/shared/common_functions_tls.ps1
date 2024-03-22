@@ -84,3 +84,13 @@ function ConfigureCerts {
 
     # TODO Open that server_certificate.crt in notepad and reset the order of certs. We want the root cert to be at the to
 }
+
+function RootCertificateToTrusted-Root {
+    $rootCertFileName = "root.crt"
+    $serverCertificateFileName = "server_certificate.crt"
+
+    $fullCertificateFilePath = Join-Path $CertificatePath $serverCertificateFileName
+    $fullRootCertFilePath = Join-Path $CertificatePath $rootCertFileName
+
+    Import-Certificate -FilePath $fullCertificateFilePath -CertStoreLocation $fullRootCertFilePath
+}
