@@ -108,16 +108,16 @@ function ConfigureCerts {
 
     openssl pkcs12 -in $fullKeyStoreFilePath -nocerts -nodes -out $fullServerKeyFilePath
 
-    scp root@$RefactorIP:/root/certs/root.crt C:\certificates\root.crt
+    scp root@${RefactorIP}:/root/certs/root.crt $fullRootCertFilePath
 
     # creates combined.cer and combined.crt
-    (Get-Content server_certificate.crt -Raw) + (Get-Content root.crt -Raw) | Set-Content -Encoding ASCII -NoNewline combined.cer
-    (Get-Content server_certificate.crt -Raw) + (Get-Content root.crt -Raw) | Set-Content -Encoding ASCII -NoNewline combined.crt
+    (Get-Content $fullCertificateFilePath -Raw) + (Get-Content $fullRootCertFilePath -Raw) | Set-Content -Encoding ASCII -NoNewline $fullCombinedFilePath
+    (Get-Content $fullCertificateFilePath -Raw) + (Get-Content $fullRootCertFilePath -Raw) | Set-Content -Encoding ASCII -NoNewline $fullCombinedFilePath
 
     # add the root certificate to the keystore
     keytool -importcert -keystore $fullKeyStoreFilePath -file $fullRootCertFilePath -alias "root" -storepass $KeyPass -noprompt
 
-    # import the combined .cert file into your keystore
+    # import the combined .cert file into the keystore
     keytool -importcert -keystore $fullKeyStoreFilePath -file $fullCombinedFilePath -alias "combined" -storepass $KeyPass -noprompt
 
     Write-Host "Certificates configured successfully"
