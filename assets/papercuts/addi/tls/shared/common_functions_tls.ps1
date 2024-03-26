@@ -6,20 +6,7 @@ function GenerateKeyPair {
         [string]$AddiIP
     )
     Write-Host "GenerateKeyPair KeyStorePath: $KeyStorePath , KeyPass: $KeyPass , FQDN: $Fqdn"
-    $keytoolOutput = keytool -genkeypair `
-        -alias $Fqdn `
-        -keyalg RSA `
-        -keysize 2048 `
-        -dname "cn=$AddiIP" `
-        -ext "BasicConstraints:critical=ca:true" `
-        -keypass $KeyPass `
-        -keystore $KeyStorePath
-        -storepass $KeyPass `
-        -storetype PKCS12
-
-    if ($keytoolOutput -match "keytool error") {
-        Write-Host "Error generating key pair: $keytoolOutput"
-    }
+    keytool -genkeypair -alias "$Fqdn" -keyalg RSA -keysize 2048 -dname "cn=$AddiIP" -ext "BasicConstraints:critical=ca:true" -keypass "$KeyPass" -keystore "$KeyStorePath" -storepass "$KeyPass" -storetype PKCS12
 }
 
 function Export-CertificateToPfx {
@@ -33,7 +20,7 @@ function Export-CertificateToPfx {
 
     $fullFilePath = Join-Path $CertificatePath $Filename
     Write-Host "Export-CertificateToPfx KeyStorePath: $KeyStorePath , CertificatePath: $CertificatePath, KeyPass: $KeyPass , Filename: $Filename , fullFilePath: $fullFilePath"
-    keytool -exportcert -alias $Fqdn -keystore $KeyStorePath -file $fullFilePath -storepass $KeyPass -rfc
+    keytool -exportcert -alias "$Fqdn" -keystore "$KeyStorePath" -file $fullFilePath -storepass "$KeyPass" -rfc
     # Set-Content -Path $fullFilePath -Encoding utf8 -Value ""
 }
 
@@ -61,7 +48,7 @@ function Import-CertificateToKeystore {
         return
     }
 
-    keytool -importcert -keystore $KeyStorePath -file $fullFilePath -alias $Fqdn -noprompt
+    keytool -importcert -keystore "$KeyStorePath" -file $fullFilePath -alias "$Fqdn" -noprompt
 }
 
 function Import-CertificateToKeystoreWithAlias {
@@ -79,7 +66,7 @@ function Import-CertificateToKeystoreWithAlias {
         return
     }
 
-    keytool -importcert  -keystore $KeyStorePath -file $CertificatePath -alias $Alias -storepass $StorePass -noprompt
+    keytool -importcert -keystore "$KeyStorePath" -file "$CertificatePath" -alias "$Alias" -storepass "$StorePass" -noprompt
 }
 
 function ConfigureCerts {
@@ -115,10 +102,11 @@ function ConfigureCerts {
     (Get-Content $fullCertificateFilePath -Raw) + (Get-Content $fullRootCertFilePath -Raw) | Set-Content -Encoding ASCII -NoNewline $fullCombinedFilePath
 
     # add the root certificate to the keystore
-    keytool -importcert -keystore $fullKeyStoreFilePath -file $fullRootCertFilePath -alias "root" -storepass $KeyPass -noprompt
+    keytool -importcert -keystore $fullKeyStoreFilePath -file $fullRootCertFilePath -alias "root" -storepass "$KeyPass" -noprompt
 
     # import the combined .cert file into the keystore
-    keytool -importcert -keystore $fullKeyStoreFilePath -file $fullCombinedFilePath -alias "combined" -storepass $KeyPass -noprompt
+    keytool -importcert -keystore $fullKeyStoreFilePath -file $fullCombinedFilePath -alias "combined" -storepass "$KeyPass" -noprompt
+
 
     Write-Host "Certificates configured successfully"
 }
