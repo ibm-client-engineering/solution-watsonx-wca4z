@@ -14,6 +14,7 @@ function Main {
       $KeyStorePath = $env:KeyStorePath
       $CertificatePath = $env:CertificatePath
       $RefactorIP = $env:RefactorIP
+      $AddiIP = $env:AddiIP
 
       if (-not (Test-Path $CertificatePath -PathType Container)) {
           Write-Host "Directory $CertificatePath does not exist... creating one now"
@@ -26,15 +27,14 @@ function Main {
       $ZookeeperFileName = "zookeeper.crt"
 
       # Generate key pair, export and import cert to keystore
-      GenerateKeyPair -KeyPass $KeyPass -KeyStorePath $KeyStorePath -Fqdn $fqdn
+      GenerateKeyPair -KeyPass $KeyPass -KeyStorePath $KeyStorePath -Fqdn $fqdn -AddiIP $AddiIP
       Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ServerCertificateFileName
-      Import-CertificateToKeystoreWithAlias -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Alias "self-signed-root" -StorePass $KeyPass
-      Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -KeyPass $KeyPass -Filename $ServerCertificateFileName -Fqdn $fqdn
+      Import-CertificateToKeystoreWithAlias -KeyStorePath $KeyStorePath -CertificatePath $ServerCertificateFileName -Alias "self-signed-root" -StorePass $KeyPass
+      # Import-CertificateToKeystore -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -KeyPass $KeyPass -Filename $ServerCertificateFileName -Fqdn $fqdn
 
       ConfigureCerts -RefactorIP $RefactorIP -CertificatePath $CertificatePath -KeyPass $KeyPass -Fqdn $fqdn
 
       ImportCertToJavaKeyStore -KeyStorePath $KeyStorePath -KeyPass $KeyPass
-      Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ZookeeperFileName
 
       # Import the root certificate to the trusted root certification authorities store
       $certificateFilePath = $env:certificatePathRoot
