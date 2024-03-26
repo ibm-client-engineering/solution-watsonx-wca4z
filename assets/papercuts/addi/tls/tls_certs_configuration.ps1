@@ -38,6 +38,8 @@ function Main {
       # Import the root certificate to the trusted root certification authorities store
       $certificateFilePath = $env:certificatePathRoot
       Add-RootCertificateToTrustedRoot -CertificatePath $certificateFilePath
+      Add-RootCertificateToTrustedRoot -CertificatePath "C:\certificates\combined.crt"
+
       Write-Host "TLS configuration completed successfully."
 }
 
