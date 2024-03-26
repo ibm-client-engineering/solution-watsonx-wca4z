@@ -84,12 +84,14 @@ function ConfigureCerts {
     $rootCertFileName = "root.crt"
     $serverCertificateFileName = "server_certificate.crt"
     $serverCertCombinedFileName = "combined.cer"
+    $serverCertCombinedCrtFileName = "combined.crt"
 
     $fullServerKeyFilePath = Join-Path $CertificatePath $serverKeyFileName
     $fullKeyStoreFilePath = Join-Path $CertificatePath $serverKeyStoreFileName
     $fullRootCertFilePath = Join-Path $CertificatePath $rootCertFileName
     $fullCertificateFilePath = Join-Path $CertificatePath $serverCertificateFileName
     $fullCombinedFilePath = Join-path $CertificatePath $serverCertCombinedFileName
+    $fullCombinedCertFileName = Join-path $CertificatePath $serverCertCombinedCrtFileName
 
     $fullFilePath = Join-Path $CertificatePath $serverKeyFileName
 
@@ -99,7 +101,7 @@ function ConfigureCerts {
 
     # creates combined.cer and combined.crt
     (Get-Content $fullCertificateFilePath -Raw) + (Get-Content $fullRootCertFilePath -Raw) | Set-Content -Encoding ASCII -NoNewline $fullCombinedFilePath
-    (Get-Content $fullCertificateFilePath -Raw) + (Get-Content $fullRootCertFilePath -Raw) | Set-Content -Encoding ASCII -NoNewline $fullCombinedFilePath
+    (Get-Content $fullCertificateFilePath -Raw) + (Get-Content $fullRootCertFilePath -Raw) | Set-Content -Encoding ASCII -NoNewline $fullCombinedCertFileName
 
     # add the root certificate to the keystore
     keytool -importcert -keystore $fullKeyStoreFilePath -file $fullRootCertFilePath -alias "root" -storepass "$KeyPass" -noprompt
