@@ -1,0 +1,117 @@
+---
+sidebar_position: 1
+title: 'Troubleshooting'
+custom_edit_url: null
+---
+## VSCode Z Open Editor (WCAz) debugging
+
+The following are some troubleshooting tips for Z Open Editor extension running
+in VSCode.
+
+### Enable TRACE logging
+
+In the extension settings for Z Open Editor, under 
+`Watsonx > Watsonx Code Assistant For Z: Log Level` select `TRACE` to enable the TRACE
+level logging.
+
+To view trace level logs, in the output console select `IBM watsonx Code Assistant for Z`.
+
+### Expanding 'Parameters used in API call' output
+
+When the extension attempts to connect to the WCAz service using the API key
+there is output in the log that looks like this by default (once TRACE logging is enabled):
+
+```
+2024-03-27T15:26:26.891-05:00 TRACE: 2024-03-27T20:26:26.891Z: Parameters used in API call: {
+  "url": "/v1/wca/codegen/c2j/projects",
+  "method": "GET"
+}
+```
+
+In order to see the full set of parameters used in the API call, you can edit `extension.js` 
+directly.
+
+:::warning
+This can be quite dangerous to operation of the extension and may invalidate the 
+licensing of the extension.
+:::
+
+First, close VSCode. Then navigate to the `.vscode-server` directory. From there navigate to
+`extensions/ibm.zopeneditor-4.0.0/dist` (assuming version is 4.0.0).
+
+Make a backup copy of the `extension.js` file.
+
+```tsx
+cp extension.js extension.bak
+```
+
+This file is ugly because everything is on one line, so it can be difficult to edit. However,
+if you can find the section of the file that has `Parameters used in API call` you will see
+this short snippet of code:
+
+```tsx
+a.WatsonxLogger.trace(`Parameters used in API call: ${JSON.stringify(null==e?void 0:e.options,null,2)}`)
+```
+
+Remove the `.options` from `e.options`, so that this snippet looks like this:
+
+```tsx
+a.WatsonxLogger.trace(`Parameters used in API call: ${JSON.stringify(null==e?void 0:e,null,2)}`)
+```
+
+Start VSCode again. When you add the API key to the extension, in the `IBM watsonx Code Assistant for Z`
+output console you will now see something that looks like this:
+
+```log
+2024-03-27T16:05:06.551-05:00 TRACE: 2024-03-27T21:05:06.551Z: Parameters used in API call: {
+  "options": {
+    "url": "/v1/wca/codegen/c2j/projects",
+    "method": "GET"
+  },
+  "defaultOptions": {
+    "qs": {},
+    "serviceUrl": "https://api.dataplatform.cloud.ibm.com",
+    "headers": {
+      "user-agent": "ibm.zopeneditor/4.0.0",
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    },
+    "authenticator": {
+      "disableSslVerification": false,
+      "url": "https://iam.cloud.ibm.com/identity/token",
+      "headers": {},
+      "tokenManager": {
+        "url": "https://iam.cloud.ibm.com",
+        "disableSslVerification": false,
+        "headers": {},
+        "requestWrapperInstance": {
+          "compressRequestData": false
+        },
+        "pendingRequests": [],
+        "tokenName": "access_token",
+        "tokenInfo": {},
+        "formData": {
+          "apikey": "XXXXXXXXXXXX-XXX-XXXXXXXXX-XXXXXXXXXXXX",
+          "grant_type": "urn:ibm:params:oauth:grant-type:apikey",
+          "response_type": "cloud_iam"
+        },
+        "requiredOptions": [
+          "apikey"
+        ],
+        "apikey": "XXXXXXXXXXXX-XXX-XXXXXXXXX-XXXXXXXXXXXX"
+      },
+      "requiredOptions": [
+        "apikey"
+      ],
+      "apikey": "XXXXXXXXXXXX-XXX-XXXXXXXXX-XXXXXXXXXXXX"
+    },
+    "jar": true,
+    "timeout": 120000,
+    "disableSslVerification": false
+  }
+}
+```
+
+:::note
+This will be overwritten when the extension is updated.
+:::
