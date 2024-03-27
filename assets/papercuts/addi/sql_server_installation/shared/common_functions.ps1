@@ -88,7 +88,7 @@ function CheckSQLUserPrivileges {
                   HAS_PERMS_BY_NAME('MSSQL', 'SERVER', 'CREATE ANY DATABASE') AS CanCreateDatabase,
                   HAS_PERMS_BY_NAME('MSSQL', 'SERVER', 'VIEW ANY DATABASE') AS CanViewDatabase;"
 
-    $privileges = Invoke-Sqlcmd -ServerInstance "." -Username "my_user" -Password $env:sqlPassword -Query $query
+    $privileges = Invoke-Sqlcmd -ServerInstance "." -Username $env:sqlUser -Password $env:sqlPassword -Query $query
 
     # Display result
     Write-Host "SQL User Privileges for $sqlUser on $serverInstance"

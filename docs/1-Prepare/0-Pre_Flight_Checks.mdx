@@ -1,0 +1,84 @@
+---
+id: pre-flight-checks
+sidebar_position: 1
+title: 'Pre-Flight Checks'
+custom_edit_url: null
+---
+### Firewall Rules
+
+If you plan to install ADDI and RA inside a firewall and connect to DB2 on
+IBM Cloud then you need to ensure that there is an available network path
+upfront. Even if the system running ADDI has internet access, the firewall
+may still block traffic on the DB2 port.
+
+If necessary, open a network security request on the deployment side to 
+create a firewall rule to allow this traffic through.
+
+For more technical details, see 
+[Connecting to DB2 on Cloud from inside a firewall](Prepare/cloud_databases#connecting-to-db2-on-cloud-from-inside-firewall)
+
+### IP-based Restrictions
+
+Determine if restrictions need to be placed on the services in IBM Cloud
+so that only customer IP addresses or ranges can access the services. ensure
+that you gather the IP addresses or ranges from the customer up front and 
+have that ready after deploying the IBM Cloud components.
+
+The mechanisms to do this with-in a TechZone managed IBM Cloud account (Velocity) 
+are available in varying degrees or not at all, so it's easiest if this
+is not required. If it is required, the following are some relevant notes
+on the different services.
+
+1. Cloud Object Storage (COS) – We are able to [leverage context-based 
+restrictions](https://cloud.ibm.com/docs/account?topic=account-context-restrictions-tutorial)
+to secure the COS service. Once we have the IP ranges 
+to use it’s a matter of plugging those in and creating a rule to access that service
+2. DB2 on Cloud – We are able to use [allowlists](https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-allowlisting&interface=ui#ip-allowlist)
+to limit IP connections to the deployment.
+3. WatsonX Code Assistant for Z – WCAz uses a multitenant SaaS service 
+where connections are made through a single global endpoint. Because the SaaS service 
+uses a single global endpoint, it isn’t possible to restrict IP access to the WCAz service. 
+However, the WCAz component is completely transient and does not hold any data at rest. 
+The metadata from the refactored code is held in the DB2 on Cloud instance and that 
+will be protected by IP restrictions.
+
+### Multiple COBOL Programs in Pilot
+
+As of March 2024, a WCAz space/deployment has a single connection to DB2 on Cloud and that
+DB2 on Cloud can only contain one project build. If a customer wants to do transformation
+on more than one project there are two options.
+
+1. Serial - Do the first application end to end, then do the second application. This is the simplest
+way to do it and it is recommended to pursue this path.
+
+2. At the same time - In order to handle two application projects at the same time, you will need
+to duplicate a lot of things. You will need to duplicate DB2, Cloud Object Storage, have a second
+WCAz space/deployment hooked up to those duplicate services. You will have to configure the ADDI
+and RA environment to use the 2 different cloud service groups. And lastly, you will need two 
+separate VSCode instances using the two different API keys.
+
+### Installing SQL Server on same system as ADDI
+
+Some customers may have policies against installing databases on the same system as other applications.
+If this is the case you will need an extra Windows server in your architecture to house the SQL Server.
+
+### Multiple users on ADDI server
+
+When installing ADDI on IBM Cloud, the license that comes with the Windows server by default allows 
+two users maximum for the server. If pilot requires more than 2 user accounts then additional 
+licenses will be required.
+
+In addition, when ADDI is installed, ensure that it is installed "For all users" and not just for
+one user.
+
+### Ports open between VMs
+
+If there are firewalls deployed (local to the machine and otherwise), ensure that all needed ports
+can be opened between the ADDI and RA server.
+
+### RDP access to Windows servers
+
+If deploying ADDI in IBM Cloud, Remote Desktop Protocol (RDP) cannot be available via public IP address.
+A workaround is to use an SSL tunnel to the private address, but this might not meet security requirements
+for pilot customers. In which case, the usage of a VPN to the IBM Cloud account will need to be 
+deployed and used.
