@@ -1,9 +1,64 @@
 ---
 id: cloud_databases
-sidebar_position: 4
+sidebar_position: 5
 title: Cloud Database
 custom_edit_url: null
 ---
+
+## Connecting to DB2 on Cloud from inside firewall
+
+For on-prem installations of ADDI and RA servers, if there is a firewall blocking
+access to DB2 on Cloud then a network security ticket will need to be opened.
+Ideally, the network security team will open up the firewall directly to the DB2 on Cloud
+host. In which case, you can proceed as normal.
+
+In some cases, the network security team will create a "plug proxy" instead of opening the
+firewall directly. They will then give you a proxy host and IP address to use that will 
+then create a tunnel to connect to the DB2 host on the otherside of the firewall. This 
+complicates the configuration.
+
+Another important detail to keep in mind is that the DB2 host given by IBM Cloud is a 
+load balancer. There are other actual IP addresses behind that load balancer IP. You will
+need all hosts and IP addresses from DB2 on Cloud to configure connection through a plug
+proxy.
+
+For example, the nslookup command below shows all hosts and IP addresses for a DB2 on Cloud
+load balancer host/ip combination.
+
+```
+➜  ~ nslookup bb54fad1-34c8-4d62-b5ea-3a11d91f3f3f.c3n41cmd0nqnrk39u98g.databases.appdomain.cloud
+Server:         172.26.32.1
+Address:        172.26.32.1#53
+
+Non-authoritative answer:
+bb54fad1-34c8-4d62-b5ea-3a11d91f3f3f.c3n41cmd0nqnrk39u98g.databases.appdomain.cloud     canonical name = db2-icd-prod-us-s-590130-4f0f9a5666e20005abfaee753b7e644d-0000.us-south.containers.appdomain.cloud.
+db2-icd-prod-us-s-590130-4f0f9a5666e20005abfaee753b7e644d-0000.us-south.containers.appdomain.cloud      canonical name = db2-icd-prod-us-s-590130-4f0f9a5666e20005abfaee753b7e644d-0000.c3n41cmd0nqnrk39u98g.akadns.net.
+Name:   db2-icd-prod-us-s-590130-4f0f9a5666e20005abfaee753b7e644d-0000.c3n41cmd0nqnrk39u98g.akadns.net
+Address: 52.117.249.178
+Name:   db2-icd-prod-us-s-590130-4f0f9a5666e20005abfaee753b7e644d-0000.c3n41cmd0nqnrk39u98g.akadns.net
+Address: 169.48.136.34
+Name:   db2-icd-prod-us-s-590130-4f0f9a5666e20005abfaee753b7e644d-0000.c3n41cmd0nqnrk39u98g.akadns.net
+Address: 52.116.221.102
+```
+
+You will need to note not only the load balancer hostname but the actual hostname.
+
+**Load balancer:** `bb54fad1-34c8-4d62-b5ea-3a11d91f3f3f.c3n41cmd0nqnrk39u98g.databases.appdomain.cloud`
+
+**Actual:** `db2-icd-prod-us-s-590130-4f0f9a5666e20005abfaee753b7e644d-0000.c3n41cmd0nqnrk39u98g.akadns.net`
+
+Let's now assume the plug proxy given is `plugproxy-xyz.customer.lab` and the 
+IP is `10.1.70.150` and the DB2 hostnames above are to be used. The Windows `hosts` file 
+needs to be configured as follows.
+
+```
+10.1.70.150 plugproxy-xyz.customer.lab
+10.1.70.150 bb54fad1-34c8-4d62-b5ea-3a11d91f3f3f.c3n41cmd0nqnrk39u98g.databases.appdomain.cloud
+10.1.70.150 db2-icd-prod-us-s-590130-4f0f9a5666e20005abfaee753b7e644d-0000.c3n41cmd0nqnrk39u98g.akadns.net
+```
+
+After configuring the `hosts` file (Found under `C:\Windows\System32\drivers\etc`), you will then
+proceed to configure the connection to DB2 using `plugproxy-xyz.customer.lab` as the hostname.
 
 ## Installing/Configuring DB2 Client 
 
