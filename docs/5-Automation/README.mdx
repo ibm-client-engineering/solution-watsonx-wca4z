@@ -1,27 +1,39 @@
 ---
-sidebar_position: 6
+sidebar_position: 6 
 slug: /automation
 title: 'Automation'
 custom_edit_url: null
 ---
 ## Overview
-<div style={{ borderBottom: '1px solid #000', marginTop: '20px', marginBottom: '20px' }}></div>
+---
 
-The purpose of this guide is to provide an overivew of the different automation scripts to download the differnt components required for a an end-to-end wca4z install.
+### Purpose
+The purpose of this guide is to ultimately reduce the time it takes to carry out a Watson Code Assistant install by leveraging a series of different automation scripts. These scripts are developed in a decoupled manner allowing the end user to leverage any script that may be relevant to their needs.
 
-![Example banner](./diagrams/arch.png)
+:::note
+Different components are dependent on other components for the install.
+:::
+
+### Install Components and Scripts
+This install will require a windows and RHEL host respectively for the ADDI install components and the Refactor Assistant components. For each host there are scripts to check for the required hardware and check / install the necessary software:
+
+![Example banner](./diagrams/host_components.png)
+
+### Suggested Script Execution
+![Example banner](./diagrams/exec_flow.png)
 
 **We will cover:**
-- System Pre-Flight checks: The hardware and software requirements needed to carry out the install
-- Refactor Installation
-    - pre-flight system check to ensure all the required OS system and hardware requirements are met
-    - Tool installation
+- [System Pre-Flight checks](Automation/Pre-flight-System-Check): The hardware and software requirements needed to carry out the install
+- [Refactor Installation](Automation/Refactor-Install):
+    - Tools installation
        - Podman
        - Refactor Containers
-- ADDI Installation: A walkthrough of the different prerequisite installs along with the ADDI install itself
+    - Certificate Configuration
+- [ADDI Install](Automation/ADDI-Install): A walkthrough of the different prerequisite installs along with the ADDI install itself
     - Set necessary User permissions
     - Java Runtime Environment install
+    - Eclipse Install
     - SQL server install and permissions
     - ADDI Installation
         - TLS and Certifcate configurations
-        - DB2 Cloud Database Config
+        - DB2 Cloud Database Configuration
