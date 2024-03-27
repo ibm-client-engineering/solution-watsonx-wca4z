@@ -124,11 +124,12 @@ function DeleteServerCertificate {
 function ImportCertToJavaKeyStore {
     param(
         [string]$KeyStorePath,
-        [string]$KeyPass
+        [string]$KeyPass,
+        [string]$JreCaCertsPath
     )
 
     Write-Host "ImportCertToJavaKeyStore KeyStorePath: $KeyStorePath , KeyPass: $KeyPass"
-    keytool -importkeystore -srckeystore $KeyStorePath -srcstorepass $KeyPass -destkeystore "C:\Program Files\Eclipse Adoptium\jre-11.0.22.7-hotspot\lib\security\cacerts" -deststorepass "changeit"
+    keytool -importkeystore -srckeystore $KeyStorePath -srcstorepass $KeyPass -destkeystore "$JreCaCertsPath" -deststorepass "changeit"
 
     Restart-Service -Name "IBM Application Discovery Configuration Service (IBMApplicationDiscoveryConfigurationService)"
     Write-Host "ImportCertToJavaKeyStore completed successfully"

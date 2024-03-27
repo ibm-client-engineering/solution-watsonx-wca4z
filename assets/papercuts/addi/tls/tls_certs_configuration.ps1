@@ -15,6 +15,7 @@ function Main {
       $CertificatePath = $env:CertificatePath
       $RefactorIP = $env:RefactorIP
       $AddiIP = $env:AddiIP
+      $JreCaCertsPath = $env:JreCaCertsPath
 
       if (-not (Test-Path $CertificatePath -PathType Container)) {
           Write-Host "Directory $CertificatePath does not exist... creating one now"
@@ -33,7 +34,7 @@ function Main {
 
       ConfigureCerts -RefactorIP $RefactorIP -CertificatePath $CertificatePath -KeyPass $KeyPass -Fqdn $fqdn
 
-      ImportCertToJavaKeyStore -KeyStorePath $KeyStorePath -KeyPass $KeyPass
+      ImportCertToJavaKeyStore -KeyStorePath $KeyStorePath -KeyPass $KeyPass -JreCaCertsPath $JreCaCertsPath
 
       # Import the root certificate to the trusted root certification authorities store
       $certificateFilePath = $env:certificatePathRoot
