@@ -63,10 +63,10 @@ Run the automation script
 ### SQL Server Install and User Permissions
 
 #### **SQL Server Install**
-
+This script will install Microsoft SQL server
 Navigate to the appropriate directory:
 ```powershell
-cd assets/papercuts/addi/SQL_Server
+cd assets/papercuts/addi/sql_server_install
 ```
 
 ```powershell
@@ -74,13 +74,14 @@ cd assets/papercuts/addi/SQL_Server
 ```
 
 #### **SQL Server User Permissions**
+This script will create an addi user on the SQL server and give them the appropriate permissions. Be sure to fill out the .env file with the appropriate values before runing these scripts.
 Navigate to the appropriate directory:
 ```powershell
-cd assets/papercuts/addi/SQL_Server
+cd assets/papercuts/addi/sql_server_install
 ```
 
 ```powershell
-.\sql_user_permissions.ps1
+.\sql_user_setup.ps1
 ```
 
 ### ADDI Install
@@ -112,8 +113,31 @@ Run:
 ```powershell
 cd assets/papercuts/addi/install_addi.ps1
 ```
+Be sure to complete the install by configuring ADDI through a web browser. If the page does not open automatically while the install script is running, navigate to this URL: https://localhost:9443/ad/admin/setup.
 
 
+Once ADDI has been installed, the next step is to install refactor on the refactor host, using the environmnent ID and host port from this ADDI host.
 
+### Configuring the certs on the ADDI host
+
+First ensure OpenSSL is installed. An install script exists in the tls folder
+```powershell
+.\dependencies\install_open_ssl.ps1
+```
+
+Next, update the `tls/.env` file according to your environment
+```bash
+keyPass="p@ssw0rd"
+keyStorePath="C:\certificates\server_keystore.p12"
+certificatePath="C:\certificates\"
+certificatePathRoot="C:\certificates\root.crt"
+```
+
+Then you can run to set up the following certs `server.key`, `server_certificate`, `server_keystore`, `zookeeper`, `root.crt` in `C:\certificates\`
+```
+.\tls_certs_configuration.ps1
+```
+
+Once the script completes verify that those 5 files exist on your `C:\certificates` directory.
 
 
