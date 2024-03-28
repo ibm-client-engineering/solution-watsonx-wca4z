@@ -4,15 +4,20 @@ To install OpenSSL
 .\dependencies\install_open_ssl.ps1
 ```
 
-To set up TLS on your environment update `tls/.env` file 
+Next, update the `tls/.env` file where it mentions `change this`. you can use the default values or change them if you'd like
 ```bash
-keyPass="p@ssw0rd"
-keyStorePath="C:\certificates\server_keystore.p12"
-certificatePath="C:\certificates\"
-certificatePathRoot="C:\certificates\root.crt"
+KeyPass="password" # default
+KeyStorePath="C:\certificates\server_keystore.p12" # default
+CertificatePath="C:\certificates\" # default
+CertificatePathRoot="C:\certificates\root.crt" # default
+RootFilePath="C:\root\certs\root.crt" # default
+Username="Administrator" # change this
+AddiIP=9.46.246.102 # change this
+RefactorIP=9.46.246.104 # change this
+JreCaCertsPath="C:\Program Files\Eclipse Adoptium\jre-11.0.22.7-hotspot\lib\security\cacerts" # change this
 ```
 
-Then you can run to set up the following certs. `server.key`, `server_certificate`, `server_keystore`, `zookeeper`, `root.crt` on `C:\certificates\`
+Then you can run the helper script to generate you the certs. 
 ```
 .\tls_certs_configuration.ps1
 ```
