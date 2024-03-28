@@ -155,3 +155,28 @@ function Add-RootCertificateToTrustedRoot {
         Write-Host "Error adding root certificate to Trusted Root Certification Authorities store. $_"
     }
 }
+
+function ExportFileToRemoteHost {
+    param (
+        [string]$AddiIP,
+        [string]$RefactorIP
+    )
+
+    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@{$RefactorIP}:/path/to/zookeper.crt "/etc/pki/ca-trust/source/anchors"
+
+    if ($LastExitCode -eq 0) {
+        Write-Host "File copied successfully to refactor host"
+
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@{$RefactorIP} "sudo update-ca-trust extract"
+        if ($LastExitCode -eq 0) {
+            Write-Host "CA trust store updated successfully on refactor host."
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@{$RefactorIP} "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/ad.crt"
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@{$RefactorIP} "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/dex.crt"
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@{$RefactorIP} "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/zookeeper.crt"
+        } else {
+            Write-Host "Failed to update CA trust store on Refactor host." -ForegroundColor Red
+        }
+    } else {
+        Write-Host "Failed to copy file to refactor host" -ForegroundColor Red
+    }
+}
