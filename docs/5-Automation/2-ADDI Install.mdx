@@ -294,3 +294,30 @@ You can update these fields to `UTF-8` and the `IP` of the `Addi` host and the p
 
 Validate everything is good. Configuration service should be online. Sometimes you have to restart the service.
 ![Dashboard banner](./diagrams/dashboard.png)
+
+### DB2 Configuration
+
+:::note
+- Make sure ADDI is install and configured
+- Make sure there is a non-lite version of DB2
+:::
+
+Navigate to the appropriate file:
+```powershell
+cd assets/papercuts/addi/db2_connection
+```
+
+Update the .env file within the directory 
+- FQDN="FQDN"
+- DB2PORT="DB2PORT"
+- DB2USER="DB2USER"
+- DB2PASS="DB2PASS"
+
+Refer to [Cloud Database Section](../prepare/cloud_databases) to locate the necessary values.
+
+Run:
+```powershell
+cd assets/papercuts/addi/connect_db2.ps1
+```
+
+
