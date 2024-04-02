@@ -15,21 +15,7 @@ function IsSSLEncryptionEnabled {
         return $true
     } else { return $false }
 }
-function EnableSSLEncryption {
-    Write-Host "Enabling SSL encryption for SQL Server"
-    # import the certificate
-    $certificate = Import-PfxCertificate -FilePath $env:certificatePath -CertStoreLocation Cert:\LocalMachine\My -Password (ConvertTo-SecureString) -String $env:certificatePassword -AsPlainText -Force
 
-    # Set SQL Server to force encryption
-    Invoke-Sqlcmd -Query "Exec sp_configure 'show advanced options', 1; RECONFIGURE; EXEC sp_configure 'force protocol encryption', 1; RECONFIGURE;" -ServerInstance $env:serverInstance
-
-    # Configure SQL Server to use the certificate
-    Invoke-Sqlcmd -Query "USE master; CREATE ENDPOINT MySSLEndpoint STATE = STARTED AS TCP (LISTENER_PORT = 1433, LISTENER_IP = ALL) FOR TSQL(ENCRYPTION = REQUIRED, PROVIDER = RSA_AES, CERTIFICATE = ServerCert);" -ServerInstance $env:serverInstance
-
-    # Restart SQL Server service to apply changes
-    Write-Host "Restart SQL Server service to apply changes"
-    Restart-Services -Name "MYSQLSERVER"  -Force
-}
 function ConfigureSQLForTCP {
     Write-Host "Configuring SQL Server to accept connections over TCP/IP"
 
@@ -44,33 +30,6 @@ function ConfigureSQLForTCP {
         Write-Host "TCP protocol is already enabled for SQL Server"
     }
 }
-
-function ConfigureSQLServerPermissions {
-    Write-Host "Configuring SQL Server permissions"
-}
-
-function ConfigureTLSJava {
-    param (
-        [string]$eclipseIniPath
-    )
-    if (NeedsTLSSetup -eclipseIniPath $eclipseIniPath) {
-        Write-Host "Configuring TLS...."
-        # Add TLS configuration to the eclipse.ini file
-        Add-Content -Path $eclipseIniPath -Value "-Dcom.ibm.jsse2.overrideDefaultTLS=true" -Force
-        Write-Host "TLS configuration added to $eclipseIniPath."
-    } else {
-        Write-Host "TLS configuration not needed."
-    }
-}
-
-function ConfigureSSLForAdComponents {
-    Write-Host "Configuring SSL/TLS for AD components"
-}
-
-function CheckAndConfigureCollation {
-    Write-Host "Checking and configuring SQL Server collation"
-}
-
 # function to check SQL user privileges
 function CheckSQLUserPrivileges {
     param (
