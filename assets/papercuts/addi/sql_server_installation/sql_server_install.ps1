@@ -1,4 +1,5 @@
 . ".\shared\get_set_env_vars.ps1"
+. ".\shared\common_functions.ps1"
 
 function Main {
     #Requires -RunAsAdministrator
@@ -60,6 +61,7 @@ function Main {
 
     $envFilePath = ".\.env"
     Set-EnvVariables -FilePath $envFilePath
+    InstallODBCDriver
 
     $ErrorActionPreference = 'STOP'
     $scriptName = (Split-Path -Leaf $PSCommandPath).Replace('.ps1', '')
