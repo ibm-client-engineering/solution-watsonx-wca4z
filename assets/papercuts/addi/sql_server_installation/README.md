@@ -9,12 +9,6 @@ cd assets/papercuts/addi/SQL_Server
 .\sql_server_install.ps1
 ```
 
-## Configure SQL User Permissions
-```
-cd assets/papercuts/addi/SQL_Server
-.\sql_user_permissions.ps1
-```
-
 ## Output
 ```
 

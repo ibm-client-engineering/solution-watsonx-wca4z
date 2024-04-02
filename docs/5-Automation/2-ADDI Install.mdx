@@ -9,11 +9,11 @@ custom_edit_url: null
 <div style={{ borderBottom: '1px solid #000', marginTop: '20px', marginBottom: '20px' }}></div>
 
 This section will walkthrough the automation scripts for the ADDI install. This install will consist of four components:
-- Set User Permissions
 - Adoptium Java Runtime Environment
 - Eclipse
 - SQL server and its user permissions
 - ADDI
+- Set User Permissions
 
 This section will also walkthorugh the configurations for:
 - TLS Connections
@@ -21,16 +21,6 @@ This section will also walkthorugh the configurations for:
 
 ## Script Walkthrough
 <div style={{ borderBottom: '1px solid #000', marginTop: '20px', marginBottom: '20px' }}></div>
-
-### Set User Permissions
-Navigate to the appropriate directory:
-```powershell
-cd assets/papercuts/addi/access_management/
-```
-Run the automation script
-```powershell
-./set_user_permissions.ps1
-```
 
 ### Adoptium Java Runtime Environment
 Navigate to the appropriate directory:
@@ -182,6 +172,16 @@ Be sure to complete the install by configuring ADDI through a web browser. If th
 
 
 Once ADDI has been installed, the next step is to install refactor on the refactor host, using the environmnent ID and host port from this ADDI host.
+
+### Set User Permissions
+Navigate to the appropriate directory:
+```powershell
+cd assets/papercuts/addi/access_management/
+```
+Run the automation script
+```powershell
+./set_user_permissions.ps1
+```
 
 ### Configuring the certs on the ADDI host
 
