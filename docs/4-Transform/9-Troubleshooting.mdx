@@ -18,6 +18,11 @@ To view trace level logs, in the output console select `IBM watsonx Code Assista
 
 ### Expanding 'Parameters used in API call' output
 
+:::warning
+This can be quite dangerous to operation of the extension and will invalidate the 
+licensing of the extension. Do not do this.
+:::
+
 When the extension attempts to connect to the WCAz service using the API key
 there is output in the log that looks like this by default (once TRACE logging is enabled):
 
@@ -30,11 +35,6 @@ there is output in the log that looks like this by default (once TRACE logging i
 
 In order to see the full set of parameters used in the API call, you can edit `extension.js` 
 directly.
-
-:::warning
-This can be quite dangerous to operation of the extension and may invalidate the 
-licensing of the extension.
-:::
 
 First, close VSCode. Then navigate to the `.vscode-server` directory. From there navigate to
 `extensions/ibm.zopeneditor-4.0.0/dist` (assuming version is 4.0.0).
