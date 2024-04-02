@@ -130,26 +130,22 @@ function Main {
         '/TCPENABLED=1'
         "/INSTANCEDIR=""$env:sqlInstallDir"""
         "/INSTALLSQLDATADIR=""$env:sqlDataDir"""
-
         "/FEATURES=" + ($Features -join ',')
 
-    #Security
+        #Security
         "/SQLSYSADMINACCOUNTS=""$SystemAdminAccounts"""
         '/SECURITYMODE=SQL'                 # Specifies the security mode for SQL Server. By default, Windows-only authentication mode is supported.
-        "/SAPWD=""$env:sqlPassword"""            # Sa user password
-
+        "/SAPWD="$env:sqlPassword""            # Sa user password
         "/INSTANCENAME=$env:serverInstance"       # Server instance name
-
         "/SQLSVCACCOUNT=""$ServiceAccountName"""
         "/SQLSVCPASSWORD=""$ServiceAccountPassword"""
-
-    # Service startup types
+        # Service startup types
         "/SQLSVCSTARTUPTYPE=Automatic"
         "/AGTSVCSTARTUPTYPE=Automatic"
-    #"/ASSVCSTARTUPTYPE=manual"
+        #"/ASSVCSTARTUPTYPE=manual"
         "/BROWSERSVCSTARTUPTYPE=Automatic"
         '/NPENABLED=1'
-    #'/PRODUCTCOVEREDBYSA=0'
+        #'/PRODUCTCOVEREDBYSA=0'
         "/PID=$ProductKey"
     )
 
