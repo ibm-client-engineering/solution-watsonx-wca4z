@@ -154,6 +154,8 @@ Nagivate to this [link](https://w3east-limited-use.cpc.ibm.com/isc/esd/dswdown/h
 3. Select "HTTPs" as the download method
 4. Press "Search" and download the file
 
+Next, update the ```.env``` and ```auto-install.xml``` files by adding the ADDI host's external IP address (or FQDN if possible) as the value to the CCS_IP. Update the CCS_PORT value if the default is already used.
+
 Navigate to the appropriate file:
 ```powershell
 cd assets/papercuts/addi/install_addi.ps1
