@@ -28,7 +28,7 @@
     <entry key="OpenWizard" value="on" />
   </com.izforge.izpack.panels.userinput.UserInputPanel>
   <com.izforge.izpack.panels.userinput.UserInputPanel id="userInput">
-    <entry key="CCS_IP" value="localhost" />
+    <entry key="CCS_IP" value="EXTERNAL_IP" />
     <entry key="CCS_PORT" value="2181" />
   </com.izforge.izpack.panels.userinput.UserInputPanel>
   <com.izforge.izpack.panels.install.InstallPanel id="InstallPanel_7" />
