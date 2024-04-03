@@ -12,9 +12,6 @@ function Set-EnvVariables {
         # set the environment variable
         [System.Environment]::SetEnvironmentVariable($key, $value, [System.EnvironmentVariableTarget]::Process)
     }
-
-    #Get-ChildItem Env:
-
 }
 
 function Get-AllEnvVariables {
