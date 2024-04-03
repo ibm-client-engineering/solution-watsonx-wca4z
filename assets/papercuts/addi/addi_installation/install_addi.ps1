@@ -52,7 +52,7 @@ function Main {
     ls
     java -jar '.\unzipped_binary\IBM ADDI\IBM_Application_Discovery_and_Delivery_Intelligence_Installer-6.1.2-ifix2.exe' -f $xmlFilePath
 
-    Start-Process firefox.exe '--new-window https://localhost:9443/ad/admin/setup?step=1'
+    start microsoft-edge:https://localhost:9443/ad/admin/setup?step=1
 }
 
 Main
