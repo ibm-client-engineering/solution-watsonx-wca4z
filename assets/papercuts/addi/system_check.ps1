@@ -6,7 +6,7 @@ $OS = Get-WmiObject -Class Win32_OperatingSystem
 $Disk = Get-WmiObject -Class Win32_LogicalDisk -Filter "DeviceID='C:'"
 
 if ($CPU.Name -notmatch 'Intel\(R\) Core\(TM\) i5|Intel\(R\) Core\(TM\) i7|Intel\(R\) Core\(TM\) i9|Intel Xeon') {
-    Write-Warning "CPU is not Intel Core i5 or equivalent (CPU is $CPU.Name)"
+    Write-Warning "CPU is not Intel Core i5 or equivalent (CPU is $($CPU.Name))"
 }
 
 if ($RAM.Sum -lt 32GB) {
