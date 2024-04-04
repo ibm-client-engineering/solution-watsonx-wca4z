@@ -15,7 +15,7 @@ function DownloadBinary {
 # Function is responsible given the values on .env it updates the CCS_IP and CCS_PORT on the auto-install.xml
 function UpdateXmlValues {
     $envFilePath = "./.env"
-    $xmlFilePath = "./auto-install.xml"
+    $xmlFilePath= "./auto-install.xml"
 
     # Read the .env file and set the env vars
     Get-Content $envFilePath | ForEach-Object {
