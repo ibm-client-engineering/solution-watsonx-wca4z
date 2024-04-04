@@ -14,16 +14,11 @@ function DownloadBinary {
     Remove-Item "addi_endpoint_install_binary.zip" -Force
 }
 # Function is responsible given the values on .env it updates the CCS_IP and CCS_PORT on the auto-install.xml
+
 function UpdateXmlValues {
     $envFilePath = "./.env"
     $xmlFilePath = "./auto-install.xml"
-    $file = "./auto-install.xml"
-    if ($file.isReadOnly) {
-        $file.isReadOnly = $false
-        Write-Host "File attributes updated to allow writing."
-    } else {
-        Write-Host "File is not read-only. Proceeding with the Update"
-    }
+
     # Read the .env file and set the env vars
     Get-Content $envFilePath | ForEach-Object {
         $envVar = $_ -split '=', 2
@@ -31,26 +26,24 @@ function UpdateXmlValues {
         $envVarValue = $envVar[1].Trim()
         [System.Environment]::SetEnvironmentVariable($envVarName, $envVarValue, [System.EnvironmentVariableTarget]::Process)
     }
+
     Write-Host "CCS_IP from .env: $($env:CCS_IP)"
     Write-Host "CCS_PORT from .env: $($env:CCS_PORT)"
 
-    echo "Starting process to install ADDI_FOR_IBM_Z_612_WIN.zip"
+    # Load XML file
+    [xml]$xml = Get-Content $xmlFilePath
 
-    $xml = [xml](Get-Content -Path $xmlFilePath)
-
-    # find the specific userinput panel with id="userInput" and update the CCS_IP key
-    $userInputPanel = $xml.SelectSingleNode("//com.izforge.izpack.panels.userinput.UserInputPanel[@id='userinput']")
-
-    if ($userInputPanel -ne $null) {
-        $ccsIPNode = $userInputPanel.SelectSingleNode("//entry[@key='CCS_IP']")
-        if ($ccsIPNode -ne $null) {
-            $ccsIPNode.SetAttribute('value', "huh")
+    # Update CCS_IP and CCS_PORT values
+    $xml.SelectNodes("//entry") | ForEach-Object {
+        if ($_.GetAttribute("key") -eq "CCS_IP") {
+            $_.SetAttribute("value", $env:CCS_IP)
         }
-        $ccsPortNode = $userInputPanel.SelectSingleNode("//entry[@key='CCS_PORT']")
-        if ($ccsPortNode -ne $null) {
-            $ccsPortNode.SetAttribute('value', "huh")
+        elseif ($_.GetAttribute("key") -eq "CCS_PORT") {
+            $_.SetAttribute("value", $env:CCS_PORT)
         }
     }
+
+    # Save XML file
     $xml.Save($xmlFilePath)
 }
 
