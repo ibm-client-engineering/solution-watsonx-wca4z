@@ -44,9 +44,7 @@ function UpdateXmlValues {
     Write-Host $xmlString
 
     try {
-        $file = Get-Item $xmlFilePath
-        $file.Attributes = $file.Attributes -band (-bnot [System.IO.FileAttributes]::ReadOnly)
-        $xml.Save($xmlFilePath)
+        $xmlString | Set-Content -Path $xmlFilePath
     } catch {
         Write-Host "Error saving xml file:"
     }
