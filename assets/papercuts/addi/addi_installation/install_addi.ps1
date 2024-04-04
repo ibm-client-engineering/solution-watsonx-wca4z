@@ -15,7 +15,9 @@ function DownloadBinary {
 # Function is responsible given the values on .env it updates the CCS_IP and CCS_PORT on the auto-install.xml
 function UpdateXmlValues {
     $envFilePath = ".\.env"
-    $xmlFilePath = ".\auto-install.xml"
+    $scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
+    $xmlFilePath = Join-Path -Path $scriptDirectory -ChildPath "auto-install.xml"
+    $file = Get-Item $xmlFilePath
 
     # Read the .env file and set the env vars
     Get-Content $envFilePath | ForEach-Object {
@@ -27,11 +29,10 @@ function UpdateXmlValues {
 
     echo "Starting process to install ADDI_FOR_IBM_Z_612_WIN.zip"
 
-    $xmlContent = [xml](Get-Content -Path $xmlFilePath)
-    $xmlDoc = [xml]$xmlContent
+    $xml = [xml](Get-Content -Path $xmlFilePath)
 
     # find the specific userinput panel with id="userInput" and update the CCS_IP key
-    $userInputPanel = $xmlDoc.AutomatedInstallation.'com.izforge.izpack.panels.userinput.UserInputPanel' | Where-Object { $_.id -eq "userInput"}
+    $userInputPanel = $xml.AutomatedInstallation.'com.izforge.izpack.panels.userinput.UserInputPanel' | Where-Object { $_.id -eq "userInput"}
 
     if ($userInputPanel -ne $null) {
         $userInputPanel.entry | Where-Object { $_.key -eq "CCS_IP" } | ForEach-Object { $_.value = $($env:ccsIP) }
@@ -40,13 +41,13 @@ function UpdateXmlValues {
         $userInputPanel.entry | Where-Object { $_.key -eq "CCS_PORT" } | ForEach-Object { $_.value = $($env:ccsPort) }
     }
     ls
-    $xmlString = $xmlDoc.OuterXml
+    $xmlString = $xml.OuterXml
     Write-Host "XML Before saving:"
     Write-Host $xmlString
 
     try {
         # $xmlString | Set-Content -Path $xmlFile
-        $xmlDoc.Save($xmlFilePath)
+        $xml.Save($xmlFilePath)
 
     } catch {
         Write-Host "Error saving xml file:"
