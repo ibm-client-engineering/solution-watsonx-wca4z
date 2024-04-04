@@ -14,7 +14,8 @@ function DownloadBinary {
 }
 # Function is responsible given the values on .env it updates the CCS_IP and CCS_PORT on the auto-install.xml
 function UpdateXmlValues {
-
+    $envFilePath = ".\.env"
+    $xmlFilePath = ".\auto-install.xml"
 
     # Read the .env file and set the env vars
     Get-Content $envFilePath | ForEach-Object {
@@ -53,8 +54,6 @@ function UpdateXmlValues {
 }
 
 function Main {
-    $envFilePath = "./.env"
-    $xmlFilePath = "./auto-install.xml"
     UpdateXmlValues
     #$addi_endpoint_install_binary="https://papercuts-wca4z.s3.us-south.cloud-object-storage.appdomain.cloud/ADDI_FOR_IBM_Z_612_WIN.zip"
     #DownloadBinary -url $addi_endpoint_install_binary
