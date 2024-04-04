@@ -13,7 +13,6 @@ function DownloadBinary {
     # Cleanup remove the downloaded zip file
     Remove-Item "addi_endpoint_install_binary.zip" -Force
 }
-# Function is responsible given the values on .env it updates the CCS_IP and CCS_PORT on the auto-install.xml
 function UpdateXmlValues {
     $envFilePath = "./.env"
     $xmlFilePath = "./auto-install.xml"
@@ -36,20 +35,33 @@ function UpdateXmlValues {
     # Update CCS_IP and CCS_PORT values
     $userInputPanel = $xml.SelectSingleNode("//com.izforge.izpack.panels.userinput.UserInputPanel[@id='userInput']")
     if ($userInputPanel -ne $null) {
+        Write-Host "Found userInput panel"
         $ccsIPNode = $userInputPanel.SelectSingleNode("//entry[@key='CCS_IP']")
         if ($ccsIPNode -ne $null) {
+            Write-Host "Found CCS_IP node"
             $ccsIPNode.SetAttribute('value', $env:CCS_IP)
+        }
+        else {
+            Write-Host "CCS_IP node not found"
         }
 
         $ccsPortNode = $userInputPanel.SelectSingleNode("//entry[@key='CCS_PORT']")
         if ($ccsPortNode -ne $null) {
+            Write-Host "Found CCS_PORT node"
             $ccsPortNode.SetAttribute('value', $env:CCS_PORT)
         }
+        else {
+            Write-Host "CCS_PORT node not found"
+        }
+    }
+    else {
+        Write-Host "userInput panel not found"
     }
 
     # Save XML file
     $xml.Save($xmlFilePath)
 }
+
 function Main {
     UpdateXmlValues
     $xmlFilePath = "./auto-install.xml"
