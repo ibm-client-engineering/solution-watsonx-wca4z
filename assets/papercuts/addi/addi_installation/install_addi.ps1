@@ -27,10 +27,11 @@ function UpdateXmlValues {
 
     echo "Starting process to install ADDI_FOR_IBM_Z_612_WIN.zip"
 
-    $xml = [xml](Get-Content -Path $xmlFilePath)
+    $xmlContent = [xml](Get-Content -Path $xmlFilePath)
+    $xmlDoc = [xml]$xmlContent
 
     # find the specific userinput panel with id="userInput" and update the CCS_IP key
-    $userInputPanel = $xml.AutomatedInstallation.'com.izforge.izpack.panels.userinput.UserInputPanel' | Where-Object { $_.id -eq "userInput"}
+    $userInputPanel = $xmlDoc.AutomatedInstallation.'com.izforge.izpack.panels.userinput.UserInputPanel' | Where-Object { $_.id -eq "userInput"}
 
     if ($userInputPanel -ne $null) {
         $userInputPanel.entry | Where-Object { $_.key -eq "CCS_IP" } | ForEach-Object { $_.value = $($env:ccsIP) }
@@ -39,13 +40,13 @@ function UpdateXmlValues {
         $userInputPanel.entry | Where-Object { $_.key -eq "CCS_PORT" } | ForEach-Object { $_.value = $($env:ccsPort) }
     }
     ls
-    $xmlString = $xml.OuterXml
+    $xmlString = $xmlDoc.OuterXml
     Write-Host "XML Before saving:"
     Write-Host $xmlString
 
     try {
         # $xmlString | Set-Content -Path $xmlFile
-        $xml.Save($xmlFilePath)
+        $xmlDoc.Save($xmlFilePath)
 
     } catch {
         Write-Host "Error saving xml file:"
