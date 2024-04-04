@@ -40,11 +40,13 @@ function UpdateXmlValues {
     }
     ls
     $xmlString = $xml.OuterXml
+    $xmlStringIndented = $xmlString | ConvertTo-Xml -NoTypeInformation -Indent
     Write-Host "XML Before saving:"
     Write-Host $xmlString
 
     try {
-        $xmlString | Set-Content -Path $xmlFilePath
+        $xmlStringIndented | Set-Content -Path $xmlFilePath
+        Write-Host "Success saving xml file:"
     } catch {
         Write-Host "Error saving xml file:"
     }
