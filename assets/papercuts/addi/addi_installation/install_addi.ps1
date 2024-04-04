@@ -15,8 +15,10 @@ function DownloadBinary {
 }
 # Function is responsible given the values on .env it updates the CCS_IP and CCS_PORT on the auto-install.xml
 function UpdateXmlValues {
-    $envFilePath = "./.env"
-    $xmlFilePath = "./auto-install.xml"
+    $envFilePath = ".\.env"
+    $scriptDirectory = $PSScriptRoot
+    $xmlFilePath = Join-Path -Path $scriptDirectory -ChildPath "auto-install.xml"
+    $file = Get-Item $xmlFilePath
 
     # Read the .env file and set the env vars
     Get-Content $envFilePath | ForEach-Object {
@@ -39,19 +41,27 @@ function UpdateXmlValues {
     if ($userInputPanel -ne $null) {
         $userInputPanel.entry | Where-Object { $_.key -eq "CCS_PORT" } | ForEach-Object { $_.value = $($env:ccsPort) }
     }
-    $xml.Save($xmlFilePath)
+    ls
+    $xmlString = $xml.OuterXml
+    Write-Host "XML Before saving:"
+    Write-Host $xmlString
+
+    try {
+        $xml.Save($xmlFilePath)
+
+    } catch {
+        Write-Host "Error saving xml file:"
+    }
 }
 
 function Main {
     UpdateXmlValues
-    $xmlFilePath = "./auto-install.xml"
     $addi_endpoint_install_binary="https://papercuts-wca4z.s3.us-south.cloud-object-storage.appdomain.cloud/ADDI_FOR_IBM_Z_612_WIN.zip"
     if (!(Test-Path "unzipped_binary")) {
         DownloadBinary -url $addi_endpoint_install_binary
     }
     ls
     java -jar '.\unzipped_binary\IBM ADDI\IBM_Application_Discovery_and_Delivery_Intelligence_Installer-6.1.2-ifix2.exe' -f $xmlFilePath
-
     start microsoft-edge:https://localhost:9443/ad/admin/setup?step=1
 }
 
