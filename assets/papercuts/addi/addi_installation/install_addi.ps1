@@ -38,6 +38,10 @@ function UpdateXmlValues {
     if ($userInputPanel -ne $null) {
         $userInputPanel.entry | Where-Object { $_.key -eq "CCS_PORT" } | ForEach-Object { $_.value = "blah" }
     }
+    $xmlString = $xml.OuterXml
+    Write-Host "XML Before saving:"
+    Write-Host $xmlString
+
     $xml.Save($xmlFilePath)
 }
 
