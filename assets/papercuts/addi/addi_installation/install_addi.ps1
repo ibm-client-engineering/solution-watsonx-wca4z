@@ -39,13 +39,17 @@ function UpdateXmlValues {
     $xml = [xml](Get-Content -Path $xmlFilePath)
 
     # find the specific userinput panel with id="userInput" and update the CCS_IP key
-    $userInputPanel = $xml.AutomatedInstallation.'com.izforge.izpack.panels.userinput.UserInputPanel' | Where-Object { $_.id -eq "userInput"}
+    $userInputPanel = $xml.SelectSingleNode("//com.izforge.izpack.panels.userinput.UserInputPanel[@id='userinput']")
 
     if ($userInputPanel -ne $null) {
-        $userInputPanel.entry | Where-Object { $_.key -eq "CCS_IP" } | ForEach-Object { $_.value = $($env:CCS_IP) }
-    }
-    if ($userInputPanel -ne $null) {
-        $userInputPanel.entry | Where-Object { $_.key -eq "CCS_PORT" } | ForEach-Object { $_.value = $($env:CCS_PORT) }
+        $ccsIPNode = $userInputPanel.SelectSingleNode("//entry[@key='CCS_IP']")
+        if ($ccsIPNode -ne $null) {
+            $ccsIPNode.SetAttribute('value', $env:CCS_IP)
+        }
+        $ccsPortNode = $userInputPanel.SelectSingleNode("//entry[@key='CCS_PORT']")
+        if ($ccsPortNode -ne $null) {
+            $ccsPortNode.SetAttribute('value', $env:CCS_PORT)
+        }
     }
     $xml.Save($xmlFilePath)
 }
