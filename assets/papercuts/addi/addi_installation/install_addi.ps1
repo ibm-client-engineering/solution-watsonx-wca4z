@@ -23,8 +23,8 @@ function UpdateXmlValues {
         $envVar = $_ -split '=', 2
         [System.Environment]::SetEnvironmentVariable($envVar[0], $envVar[1], [System.EnvironmentVariableTarget]::Process)
     }
-    Write-Host "CCS_IP from .env: $($env:ccsIP)"
-    Write-Host "CCS_PORT from .env: $($env:ccsPort)"
+    Write-Host "CCS_IP from .env: $($env:CCS_IP)"
+    Write-Host "CCS_PORT from .env: $($env:CCS_PORT)"
 
     echo "Starting process to install ADDI_FOR_IBM_Z_612_WIN.zip"
 
@@ -34,10 +34,10 @@ function UpdateXmlValues {
     $userInputPanel = $xml.AutomatedInstallation.'com.izforge.izpack.panels.userinput.UserInputPanel' | Where-Object { $_.id -eq "userInput"}
 
     if ($userInputPanel -ne $null) {
-        $userInputPanel.entry | Where-Object { $_.key -eq "CCS_IP" } | ForEach-Object { $_.value = $($env:ccsIP) }
+        $userInputPanel.entry | Where-Object { $_.key -eq "CCS_IP" } | ForEach-Object { $_.value = $($env:CCS_IP) }
     }
     if ($userInputPanel -ne $null) {
-        $userInputPanel.entry | Where-Object { $_.key -eq "CCS_PORT" } | ForEach-Object { $_.value = $($env:ccsPort) }
+        $userInputPanel.entry | Where-Object { $_.key -eq "CCS_PORT" } | ForEach-Object { $_.value = $($env:CCS_PORT) }
     }
     $xml.Save($xmlFilePath)
 }
