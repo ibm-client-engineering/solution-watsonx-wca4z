@@ -40,13 +40,13 @@ function UpdateXmlValues {
     }
     ls
     $xmlString = $xml.OuterXml
-    $xmlStringIndented = $xmlString -replace '(?<=\>)', "`r`n"
     Write-Host "XML Before saving:"
     Write-Host $xmlString
 
     try {
-        $xmlStringIndented | Set-Content -Path $xmlFilePath -Encoding UTF8
-        Write-Host "Success saving xml file:"
+        # $xmlString | Set-Content -Path $xmlFile
+        $xml.Save($xmlFilePath)
+
     } catch {
         Write-Host "Error saving xml file:"
     }
