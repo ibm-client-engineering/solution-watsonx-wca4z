@@ -21,7 +21,9 @@ function UpdateXmlValues {
     # Read the .env file and set the env vars
     Get-Content $envFilePath | ForEach-Object {
         $envVar = $_ -split '=', 2
-        [System.Environment]::SetEnvironmentVariable($envVar[0], $envVar[1], [System.EnvironmentVariableTarget]::Process)
+        $envVarName = $envVar[0].Trim()
+        $envVarValue = $envVar[1].Trim()
+        [System.Environment]::SetEnvironmentVariable($envVarName, $envVarValue, [System.EnvironmentVariableTarget]::Process)
     }
     Write-Host "CCS_IP from .env: $($env:CCS_IP)"
     Write-Host "CCS_PORT from .env: $($env:CCS_PORT)"
