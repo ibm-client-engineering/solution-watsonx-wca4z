@@ -39,7 +39,7 @@ function UpdateXmlValues {
         $ccsIPNode = $userInputPanel.SelectSingleNode("//entry[@key='CCS_IP']")
         if ($ccsIPNode -ne $null) {
             Write-Host "Found CCS_IP node"
-            $ccsIPNode.SetAttribute('value', $env:CCS_IP)
+            $ccsIPNode.SetAttribute('value', "omg")
         }
         else {
             Write-Host "CCS_IP node not found"
@@ -48,7 +48,7 @@ function UpdateXmlValues {
         $ccsPortNode = $userInputPanel.SelectSingleNode("//entry[@key='CCS_PORT']")
         if ($ccsPortNode -ne $null) {
             Write-Host "Found CCS_PORT node"
-            $ccsPortNode.SetAttribute('value', $env:CCS_PORT)
+            $ccsPortNode.SetAttribute('value', "omg")
         }
         else {
             Write-Host "CCS_PORT node not found"
