@@ -36,7 +36,7 @@ function UpdateXmlValues {
     $userInputPanel = $xml.SelectSingleNode("//com.izforge.izpack.panels.userinput.UserInputPanel[@id='userInput']")
     if ($userInputPanel -ne $null) {
         Write-Host "Found userInput panel"
-        $ccsIPNode = $userInputPanel.SelectSingleNode("//entry[@key='CCS_IP']")
+        $ccsIPNode = $userInputPanel.SelectSingleNode("entry[@key='CCS_IP']")
         if ($ccsIPNode -ne $null) {
             Write-Host "Found CCS_IP node"
             $ccsIPNode.SetAttribute('value', "omg")
@@ -45,7 +45,7 @@ function UpdateXmlValues {
             Write-Host "CCS_IP node not found"
         }
 
-        $ccsPortNode = $userInputPanel.SelectSingleNode("//entry[@key='CCS_PORT']")
+        $ccsPortNode = $userInputPanel.SelectSingleNode("entry[@key='CCS_PORT']")
         if ($ccsPortNode -ne $null) {
             Write-Host "Found CCS_PORT node"
             $ccsPortNode.SetAttribute('value', "omg")
