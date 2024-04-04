@@ -1,37 +1,37 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <AutomatedInstallation langpack="eng">
-  <com.izforge.izpack.panels.hello.HelloPanel id="HelloPanel_0"/>
-  <com.izforge.izpack.panels.licence.LicencePanel id="LicencePanel_1"/>
+  <com.izforge.izpack.panels.hello.HelloPanel id="HelloPanel_0" />
+  <com.izforge.izpack.panels.licence.LicencePanel id="LicencePanel_1" />
   <com.izforge.izpack.panels.target.TargetPanel id="TargetPanel_2">
     <installpath>C:\Program Files\IBM Application Discovery and Delivery Intelligence</installpath>
   </com.izforge.izpack.panels.target.TargetPanel>
   <com.izforge.izpack.panels.packs.PacksPanel id="PacksPanel_3">
-    <pack index="0" name="IBM Application Discovery Servers and Services" selected="true"/>
-    <pack index="1" name="IBM Application Discovery Build Client" selected="true"/>
-    <pack index="2" name="Authentication Server (DEX)" selected="true"/>
-    <pack index="3" name="Stop Running Services" selected="true"/>
-    <pack index="4" name="IBM Application Discovery Web Services" selected="true"/>
-    <pack index="5" name="@AN_SERVER_NAME@" selected="true"/>
-    <pack index="6" name="IBM Application Discovery Batch Server" selected="true"/>
-    <pack index="7" name="IBM Application Discovery Configuration Service" selected="true"/>
-    <pack index="8" name="IBM Application Discovery Cross Applications Service" selected="true"/>
-    <pack index="9" name="IBM Application Discovery Service Manager" selected="true"/>
-    <pack index="10" name="IBM Application Discovery File Service" selected="true"/>
-    <pack index="11" name="IBM Application Discovery Mainframe Projects Service" selected="true"/>
-    <pack index="12" name="IBM Application Discovery Manual Resolutions Service" selected="true"/>
-    <pack index="13" name="IBM Application Discovery Search Service" selected="true"/>
-    <pack index="14" name="Open Wizard" selected="true"/>
-    <pack index="15" name="Upgrade Wizard" selected="false"/>
-    <pack index="16" name="Installer files" selected="true"/>
+    <pack index="0" name="IBM Application Discovery Servers and Services" selected="true" />
+    <pack index="1" name="IBM Application Discovery Build Client" selected="true" />
+    <pack index="2" name="Authentication Server (DEX)" selected="true" />
+    <pack index="3" name="Stop Running Services" selected="true" />
+    <pack index="4" name="IBM Application Discovery Web Services" selected="true" />
+    <pack index="5" name="@AN_SERVER_NAME@" selected="true" />
+    <pack index="6" name="IBM Application Discovery Batch Server" selected="true" />
+    <pack index="7" name="IBM Application Discovery Configuration Service" selected="true" />
+    <pack index="8" name="IBM Application Discovery Cross Applications Service" selected="true" />
+    <pack index="9" name="IBM Application Discovery Service Manager" selected="true" />
+    <pack index="10" name="IBM Application Discovery File Service" selected="true" />
+    <pack index="11" name="IBM Application Discovery Mainframe Projects Service" selected="true" />
+    <pack index="12" name="IBM Application Discovery Manual Resolutions Service" selected="true" />
+    <pack index="13" name="IBM Application Discovery Search Service" selected="true" />
+    <pack index="14" name="Open Wizard" selected="true" />
+    <pack index="15" name="Upgrade Wizard" selected="false" />
+    <pack index="16" name="Installer files" selected="true" />
   </com.izforge.izpack.panels.packs.PacksPanel>
   <com.izforge.izpack.panels.userinput.UserInputPanel id="openConfigWizard">
-    <entry key="OpenWizard" value="on"/>
+    <entry key="OpenWizard" value="on" />
   </com.izforge.izpack.panels.userinput.UserInputPanel>
   <com.izforge.izpack.panels.userinput.UserInputPanel id="userInput">
-    <entry key="CCS_IP" value="HOST IP"/>
-    <entry key="CCS_PORT" value="2181"/>
+    <entry key="CCS_IP" value="google.com" />
+    <entry key="CCS_PORT" value="3000" />
   </com.izforge.izpack.panels.userinput.UserInputPanel>
-  <com.izforge.izpack.panels.install.InstallPanel id="InstallPanel_7"/>
+  <com.izforge.izpack.panels.install.InstallPanel id="InstallPanel_7" />
   <com.izforge.izpack.panels.shortcut.ShortcutPanel id="ShortcutPanel_8">
     <createMenuShortcuts>true</createMenuShortcuts>
     <programGroup>IBM Application Discovery and Delivery Intelligence</programGroup>
@@ -39,5 +39,5 @@
     <createStartupShortcuts>false</createStartupShortcuts>
     <shortcutType>all</shortcutType>
   </com.izforge.izpack.panels.shortcut.ShortcutPanel>
-  <com.izforge.izpack.panels.finish.FinishPanel id="FinishPanel_9"/>
+  <com.izforge.izpack.panels.finish.FinishPanel id="FinishPanel_9" />
 </AutomatedInstallation>
