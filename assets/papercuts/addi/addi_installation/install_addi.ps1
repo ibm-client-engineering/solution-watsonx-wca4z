@@ -33,16 +33,20 @@ function UpdateXmlValues {
     $userInputPanel = $xml.AutomatedInstallation.'com.izforge.izpack.panels.userinput.UserInputPanel' | Where-Object { $_.id -eq "userInput"}
 
     if ($userInputPanel -ne $null) {
-        $userInputPanel.entry | Where-Object { $_.key -eq "CCS_IP" } | ForEach-Object { $_.value = 'blahh' }
+        $userInputPanel.entry | Where-Object { $_.key -eq "CCS_IP" } | ForEach-Object { $_.value = $($env:ccsIP) }
     }
     if ($userInputPanel -ne $null) {
-        $userInputPanel.entry | Where-Object { $_.key -eq "CCS_PORT" } | ForEach-Object { $_.value = "blah" }
+        $userInputPanel.entry | Where-Object { $_.key -eq "CCS_PORT" } | ForEach-Object { $_.value = $($env:ccsPort) }
     }
     $xmlString = $xml.OuterXml
     Write-Host "XML Before saving:"
     Write-Host $xmlString
 
-    $xml.Save($xmlFilePath)
+    try {
+        $xml.Save($xmlFilePath)
+    } catch {
+        Write-Host "Error saving xml file:"
+    }
 }
 
 function Main {
