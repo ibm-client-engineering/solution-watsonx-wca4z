@@ -38,11 +38,14 @@ function UpdateXmlValues {
     if ($userInputPanel -ne $null) {
         $userInputPanel.entry | Where-Object { $_.key -eq "CCS_PORT" } | ForEach-Object { $_.value = $($env:ccsPort) }
     }
+    ls
     $xmlString = $xml.OuterXml
     Write-Host "XML Before saving:"
     Write-Host $xmlString
 
     try {
+        $file = Get-Item $xmlFilePath
+        $file.Attributes = $file.Attributes -band (-bnot [System.IO.FileAttributes]::ReadOnly)
         $xml.Save($xmlFilePath)
     } catch {
         Write-Host "Error saving xml file:"
