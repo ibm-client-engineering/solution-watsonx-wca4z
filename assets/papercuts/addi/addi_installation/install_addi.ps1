@@ -17,7 +17,13 @@ function DownloadBinary {
 function UpdateXmlValues {
     $envFilePath = "./.env"
     $xmlFilePath = "./auto-install.xml"
-
+    $file = "./auto-install.xml"
+    if ($file.isReadOnly) {
+        $file.isReadOnly = $false
+        Write-Host "File attributes updated to allow writing."
+    } else {
+        Write-Host "File is not read-only. Proceeding with the Update"
+    }
     # Read the .env file and set the env vars
     Get-Content $envFilePath | ForEach-Object {
         $envVar = $_ -split '=', 2
