@@ -44,11 +44,11 @@ function UpdateXmlValues {
     if ($userInputPanel -ne $null) {
         $ccsIPNode = $userInputPanel.SelectSingleNode("//entry[@key='CCS_IP']")
         if ($ccsIPNode -ne $null) {
-            $ccsIPNode.SetAttribute('value', $env:CCS_IP)
+            $ccsIPNode.SetAttribute('value', "huh")
         }
         $ccsPortNode = $userInputPanel.SelectSingleNode("//entry[@key='CCS_PORT']")
         if ($ccsPortNode -ne $null) {
-            $ccsPortNode.SetAttribute('value', $env:CCS_PORT)
+            $ccsPortNode.SetAttribute('value', "huh")
         }
     }
     $xml.Save($xmlFilePath)
