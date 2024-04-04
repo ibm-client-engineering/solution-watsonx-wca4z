@@ -15,7 +15,7 @@ function DownloadBinary {
 # Function is responsible given the values on .env it updates the CCS_IP and CCS_PORT on the auto-install.xml
 function UpdateXmlValues {
     $envFilePath = ".\.env"
-    $scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
+    $scriptDirectory = $PSScriptRoot
     $xmlFilePath = Join-Path -Path $scriptDirectory -ChildPath "auto-install.xml"
     $file = Get-Item $xmlFilePath
 
