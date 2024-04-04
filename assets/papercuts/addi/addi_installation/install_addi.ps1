@@ -4,6 +4,7 @@ function DownloadBinary {
     )
 
     # Download binary
+    $ProgressPreference = 'SilentlyContinue'
     Invoke-WebRequest -Uri $url -OutFile "addi_endpoint_install_binary.zip"
 
     # Unzip the binary
@@ -46,7 +47,6 @@ function UpdateXmlValues {
     Write-Host $xmlString
 
     try {
-        # $xmlString | Set-Content -Path $xmlFile
         $xml.Save($xmlFilePath)
 
     } catch {
