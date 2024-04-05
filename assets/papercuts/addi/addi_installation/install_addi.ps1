@@ -60,9 +60,8 @@ function Main {
     if (!(Test-Path "unzipped_binary")) {
         DownloadBinary -url $addi_endpoint_install_binary
     }
-    $absolouteXmlFilePath = Join-Path -Path $scriptDirectory -ChildPath "auto-install.xml"
     ls
-    java -jar '.\unzipped_binary\IBM ADDI\IBM_Application_Discovery_and_Delivery_Intelligence_Installer-6.1.2-ifix2.exe' -f $absolouteXmlFilePath
+    java -jar '.\unzipped_binary\IBM ADDI\IBM_Application_Discovery_and_Delivery_Intelligence_Installer-6.1.2-ifix2.exe' -f "./auto-install.xml"
     start microsoft-edge:https://localhost:9443/ad/admin/setup?step=1
 }
 
