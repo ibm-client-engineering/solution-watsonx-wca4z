@@ -64,6 +64,7 @@ function Main {
     }
     ls
     java -jar '.\unzipped_binary\IBM ADDI\IBM_Application_Discovery_and_Delivery_Intelligence_Installer-6.1.2-ifix2.exe' -f $xmlFilePath
+
     start microsoft-edge:https://localhost:9443/ad/admin/setup?step=1
 }
 
