@@ -4,7 +4,7 @@ $url = 'https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.
 
 # Path to where you want to save the downloaded zip file
 $downloadPath = 'C:\Program Files\OpenJDK11U-jre_x64_windows_hotspot_11.0.22_7.zip'
-$installerDir = "C:\Program Files\Java\jdk-11.0.22+7-jre\bin"
+$installerDir = "C:\Program Files\Java\jdk-11.0.22+7-jre\"
 # Path to where you want to extract the contents
 $extractPath = 'C:\Program Files\Java'
 
