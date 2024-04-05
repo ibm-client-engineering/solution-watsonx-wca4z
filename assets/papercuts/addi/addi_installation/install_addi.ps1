@@ -56,12 +56,15 @@ function UpdateXmlValues {
 
 function Main {
     UpdateXmlValues
+    $scriptDirectory = $PSScriptRoot
+    $xmlFilePath = Join-Path -Path $scriptDirectory -ChildPath "auto-install.xml"
     $addi_endpoint_install_binary="https://papercuts-wca4z.s3.us-south.cloud-object-storage.appdomain.cloud/ADDI_FOR_IBM_Z_612_WIN.zip"
     if (!(Test-Path "unzipped_binary")) {
         DownloadBinary -url $addi_endpoint_install_binary
     }
     ls
     java -jar '.\unzipped_binary\IBM ADDI\IBM_Application_Discovery_and_Delivery_Intelligence_Installer-6.1.2-ifix2.exe' -f $xmlFilePath
+
     start microsoft-edge:https://localhost:9443/ad/admin/setup?step=1
 }
 
