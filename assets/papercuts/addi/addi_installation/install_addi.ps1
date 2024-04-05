@@ -56,6 +56,8 @@ function UpdateXmlValues {
 
 function Main {
     UpdateXmlValues
+    $xmlFilePath = Join-Path -Path $scriptDirectory -ChildPath "auto-install.xml"
+
     $addi_endpoint_install_binary="https://papercuts-wca4z.s3.us-south.cloud-object-storage.appdomain.cloud/ADDI_FOR_IBM_Z_612_WIN.zip"
     if (!(Test-Path "unzipped_binary")) {
         DownloadBinary -url $addi_endpoint_install_binary
