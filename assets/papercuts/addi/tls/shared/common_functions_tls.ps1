@@ -162,7 +162,7 @@ function ExportFileToRemoteHost {
         [string]$RefactorIP
     )
 
-    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP:/path/to/zookeper.crt "/etc/pki/ca-trust/source/anchors"
+    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "C:\certificates\zookeeper.crt" root@$RefactorIP:/etc/pki/ca-trust/source/anchors/zookeeper.crt
 
     if ($LastExitCode -eq 0) {
         Write-Host "File copied successfully to refactor host"
