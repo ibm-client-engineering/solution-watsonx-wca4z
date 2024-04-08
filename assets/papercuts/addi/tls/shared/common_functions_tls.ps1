@@ -158,11 +158,13 @@ function Add-RootCertificateToTrustedRoot {
 
 function ExportFileToRemoteHost {
     param (
+        [string]$CertificatePath,
         [string]$AddiIP,
         [string]$RefactorIP
     )
-
-    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "C:\certificates\zookeeper.crt" root@$RefactorIP:/etc/pki/ca-trust/source/anchors/zookeeper.crt
+    $zooKeeperFileName = "zookeeper.crt"
+    $fullZooKeeperFilePath = Join-Path $CertificatePath $zooKeeper
+    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $fullZooKeeperFilePath root@$RefactorIP:/etc/pki/ca-trust/source/anchors/zookeeper.crt
 
     if ($LastExitCode -eq 0) {
         Write-Host "File copied successfully to refactor host"
