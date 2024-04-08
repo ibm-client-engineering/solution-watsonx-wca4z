@@ -43,6 +43,7 @@ function Main {
       Add-RootCertificateToTrustedRoot -CertificatePath $certificateFilePath
       Add-RootCertificateToTrustedRoot -CertificatePath "C:\certificates\combined.crt"
 
+      ExportFileToRemoteHost
       Write-Host "TLS configuration completed successfully."
 }
 
