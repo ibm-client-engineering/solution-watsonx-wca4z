@@ -163,8 +163,8 @@ function ExportFileToRemoteHost {
         [string]$RefactorIP
     )
     $zooKeeperFileName = "zookeeper.crt"
-    $fullZooKeeperFilePath = Join-Path $CertificatePath $zooKeeper
-    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $fullZooKeeperFilePath root@$RefactorIP:/etc/pki/ca-trust/source/anchors/zookeeper.crt
+    $fullZooKeeperFilePath = Join-Path $CertificatePath $zooKeeperFileName
+    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $fullZooKeeperFilePath "root@$RefactorIP:/etc/pki/ca-trust/source/anchors/zookeeper.crt"
 
     if ($LastExitCode -eq 0) {
         Write-Host "File copied successfully to refactor host"
