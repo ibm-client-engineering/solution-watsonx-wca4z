@@ -162,17 +162,17 @@ function ExportFileToRemoteHost {
         [string]$RefactorIP
     )
 
-    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@{$RefactorIP}:/path/to/zookeper.crt "/etc/pki/ca-trust/source/anchors"
+    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP:/path/to/zookeper.crt "/etc/pki/ca-trust/source/anchors"
 
     if ($LastExitCode -eq 0) {
         Write-Host "File copied successfully to refactor host"
 
-        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@{$RefactorIP} "sudo update-ca-trust extract"
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "sudo update-ca-trust extract"
         if ($LastExitCode -eq 0) {
             Write-Host "CA trust store updated successfully on refactor host."
-            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@{$RefactorIP} "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/ad.crt"
-            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@{$RefactorIP} "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/dex.crt"
-            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@{$RefactorIP} "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/zookeeper.crt"
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/ad.crt"
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/dex.crt"
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/zookeeper.crt"
         } else {
             Write-Host "Failed to update CA trust store on Refactor host." -ForegroundColor Red
         }
