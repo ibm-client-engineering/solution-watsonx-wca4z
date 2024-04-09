@@ -181,7 +181,7 @@ function InstallODBCDriver {
     $outputPath = "./msodbcsql.msi"
 
     if (-not (Test-Path $outputPath)) {
-        Invoke-WebRequest -Uri $url -OutFile $outputPath
-        Start-Process -FilePath $outputPath -Wait
+	Invoke-WebRequest -Uri $url -OutFile $outputPath
+	Start-Process msiexec "/I $outputPath /qb IACCEPTMSODBCSQLLICENSETERMS=YES ALLUSERS=1"
     }
 }
