@@ -75,7 +75,7 @@ function SetUpSQLUserAccount {
                             FROM master.sys.server_principals
                             WHERE name = '$env:sqlUser')
                         BEGIN
-                            CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;'
+                            CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;
                         END"
 
     Invoke-SqlCmd -ServerInstance "." -Query $queryCreateLogin
