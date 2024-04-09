@@ -68,24 +68,40 @@ function CheckSQLUserPrivileges {
 
 # Functions sets up sql user account and nakes sure the sql user is NOT required to change his password on first login.
 function SetUpSQLUserAccount {
-    $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
+
+
+    $queryCreateLogin = "IF NOT EXISTS 
+                            (SELECT name  
+                            FROM master.sys.server_principals
+                            WHERE name = '$env:sqlUser')
+                        BEGIN
+                            CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;'
+                        END"
+
     Invoke-SqlCmd -ServerInstance "." -Query $queryCreateLogin
 
-    $queryGrantPermissions = @"
-    USE $env:sqlDatabase;
-    CREATE USER $env:sqlUser FOR LOGIN $env:sqlUser;
-    GRANT CONNECT SQL TO $env:sqlUser;
-    GRANT CREATE PROCEDURE TO $env:sqlUser;
-    GRANT CREATE ANY DATABASE TO $env:sqlUser;
-    GRANT CREATE TABLE TO $env:sqlUser;
-    GRANT CREATE FUNCTION TO $env:sqlUser;
-    GRANT CREATE VIEW TO $env:sqlUser;
-    GRANT ALTER ANY DATABASE TO $env:sqlUser;
-    GRANT ALTER ANY LOGIN TO $env:sqlUser;
+    $queryCheckUserExists = "USE $env:sqlDatabase; SELECT * FROM sys.database_principals WHERE name = '$env:sqlUser'"
+    $checkResult =  Invoke-SqlCmd -ServerInstance "." -Query $queryCheckUserExists
+
+    if (!$checkResult) 
+    {
+        $queryGrantPermissions = @"
+        USE $env:sqlDatabase;
+        CREATE USER $env:sqlUser FOR LOGIN $env:sqlUser;
+        GRANT CONNECT SQL TO $env:sqlUser;
+        GRANT CREATE PROCEDURE TO $env:sqlUser;
+        GRANT CREATE ANY DATABASE TO $env:sqlUser;
+        GRANT CREATE TABLE TO $env:sqlUser;
+        GRANT CREATE FUNCTION TO $env:sqlUser;
+        GRANT CREATE VIEW TO $env:sqlUser;
+        GRANT ALTER ANY DATABASE TO $env:sqlUser;
+        GRANT ALTER ANY LOGIN TO $env:sqlUser; 
 "@
 
-    # Execute the query
-    Invoke-Sqlcmd -ServerInstance "." -Query $queryGrantPermissions;
+        # Execute the query
+        Invoke-Sqlcmd -ServerInstance "." -Query $queryGrantPermissions;
+    }
+
 }
 
 ## Default users dbo, guest, information_schema, sys, MS_PolicyEventProcessingLogin
