@@ -182,3 +182,23 @@ function ExportFileToRemoteHost {
         Write-Host "Failed to copy file to refactor host" -ForegroundColor Red
     }
 }
+
+function UpdateYamlFile {
+   param (
+        [string]$MyHash,
+        [string]$AddiIP,
+        [string]$RefactorIP
+    )
+    $yamlFilePath = ".\zookeeper.yaml"
+    $yamlContent = Get-Content -Path $yamlFilePath -Raw
+
+    # replace vars in the yaml certificateContent
+    $yamlContent = $yamlContent -Replace '\$\{AddiIP}', $AddiIP
+    $yamlContent = $yamlContent -Replace '\$\{RefactorIP}', $RefactorIP
+    $yamlContent = $yamlContent -Replace '\$\{MyHash}', $MyHash
+
+    # write updated content back to the yaml file
+    $yamlContent | Set-Content -Path $yamlFilePath
+
+
+}
