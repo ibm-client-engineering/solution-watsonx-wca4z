@@ -12,17 +12,34 @@ This section will walkthrough the automation scripts for the Refactor install. T
 - Podman
 - Refactor Containers
 
-## Script Walkthrough (WIP Need to update certs)
+## Script Walkthrough
 <div style={{ borderBottom: '1px solid #000', marginTop: '20px', marginBottom: '20px' }}></div>
 
 Navigate to the appropriate directory:
 ```sh
 cd assets/papercuts/refactor
 ```
+
+### Install Refactor Assistant
 Run the automation script
 ```sh
 ./install_refactor.sh
 ```
+
+### Configure Certifcates
+
+:::note
+    - ensure ADDI is installed
+:::
+
+Update the .env file with the appropriate values for the HOST_PORT and ENVIRONMENT_ID from the ADDI Host / application:
+- CERTS_LOCATION=/root/certs
+- HOST_PORT=HOST_PORT
+- ENVIRONMENT_ID=ADDI_ENV_ID
+
+:::note
+    - HOST_PORT = full address of the ADDI application (ex. https://[ADDI host address]:[port number])
+:::
 
 Once Refactor Assistant has been installed successfully, configure the refactor host cert by running this script within the same directory:
 ```sh
