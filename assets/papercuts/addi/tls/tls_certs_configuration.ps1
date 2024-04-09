@@ -11,6 +11,7 @@ function Main {
 
       $fqdn = [System.Net.Dns]::GetHostEntry($hostName).HostName
       $KeyPass = $env:KeyPass
+      $MyHashPassword = $env:MyHashPassword
       $KeyStorePath = $env:KeyStorePath
       $CertificatePath = $env:CertificatePath
       $RefactorIP = $env:RefactorIP
