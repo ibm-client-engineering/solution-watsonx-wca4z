@@ -45,7 +45,7 @@ function Main {
       Add-RootCertificateToTrustedRoot -CertificatePath "C:\certificates\combined.crt"
 
 
-      $MyHash = GenerateSHA256Password -Password $KeyPass
+      $MyHash = GenerateSHA256Password -Password $MyHashPassword
       UpdateYamlFile -MyHash $MyHash -AddiIP $AddiIP -RefactorIP $RefactorIP
       # export zookeeper.crt to refactor host
       ExportFileToRemoteHost -CertificatePath $CertificatePath -AddiIP $AddiIP -RefactorIP $RefactorIP
