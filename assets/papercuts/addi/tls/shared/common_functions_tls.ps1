@@ -198,6 +198,7 @@ function UpdateYamlFile {
         [string]$AddiIP,
         [string]$RefactorIP
     )
+    Write-Host "Update Zookeeper Yaml File given .env values"
     $yamlFilePath = ".\zookeeper.yaml"
     $yamlContent = Get-Content -Path $yamlFilePath -Raw
 
@@ -206,8 +207,10 @@ function UpdateYamlFile {
     $yamlContent = $yamlContent -Replace '\$\{RefactorIP}', $RefactorIP
     $yamlContent = $yamlContent -Replace '\$\{MyHash}', $MyHash
 
+    $updatedYamlFilePath = "C:\certificates\zookeeper.yaml"
     # write updated content back to the yaml file
-    $yamlContent | Set-Content -Path $yamlFilePath
+    $yamlContent | Set-Content -Path $updatedYamlFilePath
 
+    Write-Host "Yaml file updated and saved to: $updatedYamlFilePath"
 
 }
