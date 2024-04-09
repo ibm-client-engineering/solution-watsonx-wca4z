@@ -162,11 +162,15 @@ function ExportFileToRemoteHost {
         [string]$AddiIP,
         [string]$RefactorIP
     )
+    Write-Host "Exporting file to remote host zookeeper.yaml && zookeper.crt"
     $zooKeeperYamlFileName = "zookeeper.yaml"
     $zooKeeperFileName = "zookeeper.crt"
 
     $fullZooKeeperFilePath = Join-Path $CertificatePath $zooKeeperFileName
     $fullZooKeeperYamlFilePath = Join-Path $CertificatePath $zooKeeperYamlFileName
+
+    cat $fullZooKeeperFilePath
+    cat $fullZooKeeperYamlFilePath
 
     scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$fullZooKeeperFilePath" ("root@" + $RefactorIP + ":/etc/pki/ca-trust/source/anchors/zookeeper.crt")
     scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$fullZooKeeperYamlFilePath" ("root@" + $RefactorIP + ":/etc/pki/ca-trust/source/anchors/zookeeper.yaml")
