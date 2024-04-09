@@ -173,7 +173,6 @@ function ExportFileToRemoteHost {
     cat $fullZooKeeperYamlFilePath
 
     scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$fullZooKeeperFilePath" ("root@" + $RefactorIP + ":/etc/pki/ca-trust/source/anchors/zookeeper.crt")
-    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$fullZooKeeperYamlFilePath" ("root@" + $RefactorIP + ":/etc/pki/ca-trust/source/anchors/zookeeper.yaml")
 
     if ($LastExitCode -eq 0) {
         Write-Host "File copied successfully to refactor host"
@@ -199,7 +198,7 @@ function UpdateYamlFile {
         [string]$RefactorIP
     )
     Write-Host "Update Zookeeper Yaml File given .env values"
-    $yamlFilePath = ".\zookeeper.yaml"
+    $yamlFilePath = ".\dex.yaml"
     $yamlContent = Get-Content -Path $yamlFilePath -Raw
 
     # replace vars in the yaml certificateContent
@@ -207,7 +206,7 @@ function UpdateYamlFile {
     $yamlContent = $yamlContent -Replace '\$\{RefactorIP}', $RefactorIP
     $yamlContent = $yamlContent -Replace '\$\{MyHash}', $MyHash
 
-    $updatedYamlFilePath = "C:\certificates\zookeeper.yaml"
+    $updatedYamlFilePath = "C:\Program Files\IBM Application Discovery and Delivery Intelligence\Authentication Server (DEX)\conf\dex.yaml"
     # write updated content back to the yaml file
     $yamlContent | Set-Content -Path $updatedYamlFilePath
 
