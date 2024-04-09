@@ -244,7 +244,10 @@ htpasswd -nbBC 10 addi_user p@ssw0rd
 addi_user:$2y$10$vAk2SLjHIU2x2dNuzwDxDuq6TwdnLK1XeO8OCzxNqXK3yv3ObYfIy
 ```
 
-Now open the `dex.yaml` file in that folder and edit it.
+On the ADDI host, open the `dex.yaml` file:
+```tsx
+C:\Program Files\IBM Application Discovery and Delivery Intelligence\Authentication Server (DEX)\conf\dex.yaml
+```
 
 The cert paths will be updated when the certs are imported into ADDI.
 
@@ -252,6 +255,7 @@ The cert paths will be updated when the certs are imported into ADDI.
 - The `redirectURIs:` should point to the ip of the Refactor server.
 - `staticPasswords.hash` should be the generated bcrypt password from above
 
+`dex.yaml`
 ```yaml
 issuer: https://wca4z2-winaddi.fyre.ibm.com:7600/dex
 storage:

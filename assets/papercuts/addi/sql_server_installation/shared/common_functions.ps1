@@ -15,21 +15,7 @@ function IsSSLEncryptionEnabled {
         return $true
     } else { return $false }
 }
-function EnableSSLEncryption {
-    Write-Host "Enabling SSL encryption for SQL Server"
-    # import the certificate
-    $certificate = Import-PfxCertificate -FilePath $env:certificatePath -CertStoreLocation Cert:\LocalMachine\My -Password (ConvertTo-SecureString) -String $env:certificatePassword -AsPlainText -Force
 
-    # Set SQL Server to force encryption
-    Invoke-Sqlcmd -Query "Exec sp_configure 'show advanced options', 1; RECONFIGURE; EXEC sp_configure 'force protocol encryption', 1; RECONFIGURE;" -ServerInstance $env:serverInstance
-
-    # Configure SQL Server to use the certificate
-    Invoke-Sqlcmd -Query "USE master; CREATE ENDPOINT MySSLEndpoint STATE = STARTED AS TCP (LISTENER_PORT = 1433, LISTENER_IP = ALL) FOR TSQL(ENCRYPTION = REQUIRED, PROVIDER = RSA_AES, CERTIFICATE = ServerCert);" -ServerInstance $env:serverInstance
-
-    # Restart SQL Server service to apply changes
-    Write-Host "Restart SQL Server service to apply changes"
-    Restart-Services -Name "MYSQLSERVER"  -Force
-}
 function ConfigureSQLForTCP {
     Write-Host "Configuring SQL Server to accept connections over TCP/IP"
 
@@ -44,33 +30,6 @@ function ConfigureSQLForTCP {
         Write-Host "TCP protocol is already enabled for SQL Server"
     }
 }
-
-function ConfigureSQLServerPermissions {
-    Write-Host "Configuring SQL Server permissions"
-}
-
-function ConfigureTLSJava {
-    param (
-        [string]$eclipseIniPath
-    )
-    if (NeedsTLSSetup -eclipseIniPath $eclipseIniPath) {
-        Write-Host "Configuring TLS...."
-        # Add TLS configuration to the eclipse.ini file
-        Add-Content -Path $eclipseIniPath -Value "-Dcom.ibm.jsse2.overrideDefaultTLS=true" -Force
-        Write-Host "TLS configuration added to $eclipseIniPath."
-    } else {
-        Write-Host "TLS configuration not needed."
-    }
-}
-
-function ConfigureSSLForAdComponents {
-    Write-Host "Configuring SSL/TLS for AD components"
-}
-
-function CheckAndConfigureCollation {
-    Write-Host "Checking and configuring SQL Server collation"
-}
-
 # function to check SQL user privileges
 function CheckSQLUserPrivileges {
     param (
@@ -88,45 +47,76 @@ function CheckSQLUserPrivileges {
                   HAS_PERMS_BY_NAME('MSSQL', 'SERVER', 'CREATE ANY DATABASE') AS CanCreateDatabase,
                   HAS_PERMS_BY_NAME('MSSQL', 'SERVER', 'VIEW ANY DATABASE') AS CanViewDatabase;"
 
-    $privileges = Invoke-Sqlcmd -ServerInstance "." -Username $env:sqlUser -Password $env:sqlPassword -Query $query
+    $queryCheckUserExists = "USE $env:sqlDatabase; SELECT * FROM sys.database_principals WHERE name = '$env:sqlUser'"
+    $checkResult =  Invoke-SqlCmd -ServerInstance "." -Query $queryCheckUserExists
 
-    # Display result
-    Write-Host "SQL User Privileges for $sqlUser on $serverInstance"
-    Write-Host "Can Create Table: $($privileges.CanCreateTable)"
-    Write-Host "Can Alter Login: $($privileges.CanAlterLogin)"
-    Write-Host "Can Alter Database: $($privileges.CanAlterDatabase)"
-    Write-Host "Can Create Database: $($privileges.CanCreateDatabase)"
-    Write-Host "Can View Database: $($privileges.CanViewDatabase)"
+    if ($checkResult) #only run if the user exists
+    {
+        $privileges = Invoke-Sqlcmd -ServerInstance "." -Username $env:sqlUser -Password $env:sqlPassword -Query $query
 
-    $hasAllPrivileges = $privileges.CanCreateTable -eq 1 -and
-            $privileges.CanAlterLogin -eq 1 -and
-            $privileges.CanAlterDatabase -eq 1 -and
-            $privileges.CanCreateDatabase -eq 1 -and
-            $privileges.CanViewDatabase -eq 1
+        # Display result
+        Write-Host "SQL User Privileges for $sqlUser on $serverInstance"
+        Write-Host "Can Create Table: $($privileges.CanCreateTable)"
+        Write-Host "Can Alter Login: $($privileges.CanAlterLogin)"
+        Write-Host "Can Alter Database: $($privileges.CanAlterDatabase)"
+        Write-Host "Can Create Database: $($privileges.CanCreateDatabase)"
+        Write-Host "Can View Database: $($privileges.CanViewDatabase)"
 
-    return $hasAllPrivileges
+        $hasAllPrivileges = $privileges.CanCreateTable -eq 1 -and
+                $privileges.CanAlterLogin -eq 1 -and
+                $privileges.CanAlterDatabase -eq 1 -and
+                $privileges.CanCreateDatabase -eq 1 -and
+                $privileges.CanViewDatabase -eq 1
+
+        return $hasAllPrivileges
+    }
+    else 
+    {
+        Write-Host "SQL User does not exist, so failed permissions check"
+        return 0
+    }
 }
 
 # Functions sets up sql user account and nakes sure the sql user is NOT required to change his password on first login.
 function SetUpSQLUserAccount {
-    $queryCreateLogin = "CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;"
+
+
+    $queryCreateLogin = "IF NOT EXISTS 
+                            (SELECT name  
+                            FROM master.sys.server_principals
+                            WHERE name = '$env:sqlUser')
+                        BEGIN
+                            CREATE LOGIN $env:sqlUser WITH PASSWORD = '$env:sqlPassword', CHECK_EXPIRATION = OFF;
+                        END"
+
     Invoke-SqlCmd -ServerInstance "." -Query $queryCreateLogin
 
-    $queryGrantPermissions = @"
-    USE $env:sqlDatabase;
-    CREATE USER $env:sqlUser FOR LOGIN $env:sqlUser;
-    GRANT CONNECT SQL TO $env:sqlUser;
-    GRANT CREATE PROCEDURE TO $env:sqlUser;
-    GRANT CREATE ANY DATABASE TO $env:sqlUser;
-    GRANT CREATE TABLE TO $env:sqlUser;
-    GRANT CREATE FUNCTION TO $env:sqlUser;
-    GRANT CREATE VIEW TO $env:sqlUser;
-    GRANT ALTER ANY DATABASE TO $env:sqlUser;
-    GRANT ALTER ANY LOGIN TO $env:sqlUser;
+    $queryCheckUserExists = "USE $env:sqlDatabase; SELECT * FROM sys.database_principals WHERE name = '$env:sqlUser'"
+    $checkResult =  Invoke-SqlCmd -ServerInstance "." -Query $queryCheckUserExists
+
+    if (!$checkResult) 
+    {
+        $queryGrantPermissions = @"
+        USE $env:sqlDatabase;
+        CREATE USER $env:sqlUser FOR LOGIN $env:sqlUser;
+        GRANT CONNECT SQL TO $env:sqlUser;
+        GRANT CREATE PROCEDURE TO $env:sqlUser;
+        GRANT CREATE ANY DATABASE TO $env:sqlUser;
+        GRANT CREATE TABLE TO $env:sqlUser;
+        GRANT CREATE FUNCTION TO $env:sqlUser;
+        GRANT CREATE VIEW TO $env:sqlUser;
+        GRANT ALTER ANY DATABASE TO $env:sqlUser;
+        GRANT ALTER ANY LOGIN TO $env:sqlUser; 
 "@
 
-    # Execute the query
-    Invoke-Sqlcmd -ServerInstance "." -Query $queryGrantPermissions;
+        # Execute the query
+        Invoke-Sqlcmd -ServerInstance "." -Query $queryGrantPermissions;
+    }
+    else
+    {
+        Write-Host "SQL User already exists"
+    }
+
 }
 
 ## Default users dbo, guest, information_schema, sys, MS_PolicyEventProcessingLogin
@@ -183,5 +173,15 @@ function ConfirmAndExecute {
         Write-Host "$stepName completed."
     }  else {
         Write-Host "$stepName skipped."
+    }
+}
+
+function InstallODBCDriver {
+    $url = "https://go.microsoft.com/fwlink/?linkid=2249004"
+    $outputPath = "./msodbcsql.msi"
+
+    if (-not (Test-Path $outputPath)) {
+	Invoke-WebRequest -Uri $url -OutFile $outputPath
+	Start-Process msiexec "/I $outputPath /qb IACCEPTMSODBCSQLLICENSETERMS=YES ALLUSERS=1"
     }
 }
