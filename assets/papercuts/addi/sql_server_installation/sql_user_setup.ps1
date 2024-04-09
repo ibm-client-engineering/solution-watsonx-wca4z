@@ -8,7 +8,6 @@ function Main {
     Set-EnvVariables -FilePath $envFilePath
 
     Write-Host "Starting sql_user_setup.ps1 script"
-    Confirm-EnvVariables
 
     #Create user account (Step 3)
     SetUpSQLUserAccount
