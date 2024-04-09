@@ -208,19 +208,3 @@ function UpdateYamlFile {
     Write-Host "Yaml file updated and saved to: $updatedYamlFilePath"
 
 }
-
-function GenerateSHA256Password {
-    param (
-        [string]$Password
-    )
-    $passwordBytes = [System.Text.Encoding]::UTF8.GetBytes($Password)
-
-    # compute sha 256 hash
-    $sha256= [System.Security.Cryptography.SHA256]::Create()
-    $hashedBytes = $sha256.ComputeHash($passwordBytes)
-
-    # convert hashed bytes to hex string
-    $hashedPassword = [System.BitConverter]::ToString($hashedBytes) -replace '-', ''
-
-    return $hashedPassword
-}
