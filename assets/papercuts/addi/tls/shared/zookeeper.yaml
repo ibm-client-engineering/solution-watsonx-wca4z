@@ -1,4 +1,4 @@
-issuer: https://${ADDI_IP}:7600/dex
+issuer: https://${AddiIP}:7600/dex
 storage:
   type: sqlite3
   config:
@@ -6,7 +6,7 @@ storage:
 frontend:
   theme: addi
 web:
-  TLSCert: conf/server_certificate.crt
+  TLSCert: conf/combined.crt
   TLSKey: conf/server.key
   https: 0.0.0.0:7600
 connectors: []
@@ -15,12 +15,12 @@ enablePasswordDB: true
 staticClients:
   - id: refactoring-assistant
     redirectURIs:
-      - https://${REFACTOR_IP}:9443
+      - https://${RefactorIP}:9443
     name: Refactoring Assistant
     secret: pkce
 staticPasswords:
   - email: addi_user@ibm.com
-    hash:
+    hash:  ${MyHash}
     username: addi_user
     userID: null
 
