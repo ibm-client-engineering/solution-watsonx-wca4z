@@ -46,7 +46,7 @@ function Main {
 
 
       $MyHash = GenerateSHA256Password -Password $MyHashPassword
-      UpdateYamlFile -MyHash $MyHash -AddiIP $AddiIP -RefactorIP $RefactorIP
+      UpdateYamlFile -MyHash $MyHashPassword -AddiIP $AddiIP -RefactorIP $RefactorIP
       # export zookeeper.crt to refactor host
       ExportFileToRemoteHost -CertificatePath $CertificatePath -AddiIP $AddiIP -RefactorIP $RefactorIP
       Write-Host "TLS configuration completed successfully."
