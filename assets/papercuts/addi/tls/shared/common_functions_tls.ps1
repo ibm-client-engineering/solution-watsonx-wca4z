@@ -226,7 +226,7 @@ function GenerateSHA256Password {
     $hashedBytes = $sha256.ComputeHash($passwordBytes)
 
     # convert hashed bytes to hex string
-    $hashedPassword = [System.BitConverted]::ToString($hashedBytes) -replace '-', ''
+    $hashedPassword = [System.BitConverter]::ToString($hashedBytes) -replace '-', ''
 
     return $hashedPassword
 }
