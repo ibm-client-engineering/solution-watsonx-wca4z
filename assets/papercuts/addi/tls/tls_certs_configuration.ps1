@@ -43,12 +43,12 @@ function Main {
       Add-RootCertificateToTrustedRoot -CertificatePath $certificateFilePath
       Add-RootCertificateToTrustedRoot -CertificatePath "C:\certificates\combined.crt"
 
+      $MyHash = "12345678"
+      UpdateYamlFile -MyHash $MyHash -AddiIP $AddiIP -RefactorIP $RefactorIP
       # export zookeeper.crt to refactor host
       ExportFileToRemoteHost -CertificatePath $CertificatePath -AddiIP $AddiIP -RefactorIP $RefactorIP
       Write-Host "TLS configuration completed successfully."
 
-      $MyHash = "12345678"
-      UpdateYamlFile -MyHash $MyHash -AddiIP $AddiIP -RefactorIP $RefactorIP
 
 }
 
