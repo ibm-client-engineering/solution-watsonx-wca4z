@@ -22,13 +22,8 @@ function Main {
     } else {
         Write-Host "The current SQL user does not have all required privileges on $env:serverInstance"
         # Step 3
-        $setUpSqlUser = Read-Host "Do you want to set up the SQL user $env:sqlUser? (Y/N)"
-        if($setUpSqlUser -eq "y") {
-            SetUpSQLUserAccount
-            Write-Host "SQL user set up successfully"
-        } else {
-            Write-Host "SQL user setup skipped."
-        }
+        SetUpSQLUserAccount
+        Write-Host "SQL user set up successfully"
     }
 
 
