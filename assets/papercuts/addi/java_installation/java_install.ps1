@@ -4,7 +4,7 @@ $url = 'https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.
 
 # Path to where you want to save the downloaded zip file
 $downloadPath = 'C:\Program Files\OpenJDK11U-jre_x64_windows_hotspot_11.0.22_7.zip'
-$installerDir = "C:\Program Files\Java\jdk-11.0.22+7-jre\bin"
+$installerDir = "C:\Program Files\Java\jdk-11.0.22+7-jre\"
 # Path to where you want to extract the contents
 $extractPath = 'C:\Program Files\Java'
 
@@ -21,7 +21,7 @@ Expand-Archive -Path $downloadPath -DestinationPath $extractPath
 Remove-Item -Path $downloadPath
 
 $existingPath = [Environment]::GetEnvironmentVariable('PATH', [System.EnvironmentVariableTarget]::Machine)
-$newPathValue = "$existingPath;$installerDir"
+$newPathValue = "$existingPath;$installerDir\bin"
 [Environment]::SetEnvironmentVariable('JAVA_HOME', $installerDir, [System.EnvironmentVariableTarget]::Machine)
 [Environment]::SetEnvironmentVariable('PATH', $newPathValue, [System.EnvironmentVariableTarget]::Machine)
-Write-Host "JAVA_HOME env variable set to $installerDir"
+Write-Host "JAVA_HOME env variable set to $newPathValue"
