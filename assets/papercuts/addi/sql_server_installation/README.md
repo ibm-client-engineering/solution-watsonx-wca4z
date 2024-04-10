@@ -47,7 +47,7 @@ PS C:\Users\Administrator>
 ```
 
 ## Update .env file
-Update `sqlUser`, `serverInstance`, `sqlPassword`, `sqlDatabase`, `sqlCredential`
+Update `sqlUser`, `serverInstance`, `sqlPassword`, `sqlDatabase`
 
 
 ## Troubleshoot Reset SQL Password
