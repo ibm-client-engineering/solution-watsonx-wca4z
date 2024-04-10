@@ -1,7 +1,7 @@
 ---
 id: ADDI-Install
 sidebar_position: 2
-title: 'ADDI Install'
+title: 'ADDI Install (1hr)'
 custom_edit_url: null
 ---
 
@@ -13,7 +13,6 @@ This section will walkthrough the automation scripts for the ADDI install. This 
 - Eclipse
 - SQL server and its user permissions
 - ADDI
-- Set User Permissions
 
 This section will also walkthorugh the configurations for:
 - TLS Connections
@@ -22,14 +21,14 @@ This section will also walkthorugh the configurations for:
 ## Script Walkthrough
 <div style={{ borderBottom: '1px solid #000', marginTop: '20px', marginBottom: '20px' }}></div>
 
-### Adoptium Java Runtime Environment
+### Adoptium Java Runtime Environment (5 mins)
 Navigate to the appropriate directory:
 ```powershell
 cd assets/papercuts/addi/java_installation
 ```
 Run the automation script
 ```powershell
-./java_install.ps1
+.\java_install.ps1
 ```
 Restart the shell and verify that Java is installed by running
 
@@ -49,7 +48,7 @@ Allow the ability to run scripts
 `Set-ExecutionPolicy RemoteSigned`
 :::
 
-### Eclipse Install
+### Eclipse Install (2 mins)
 :::warning
 Run Java Runtime install first
 :::
@@ -63,7 +62,7 @@ Run the automation script
 .\install_eclipse.ps1
 ```
 
-### SQL Server Install and User Permissions
+### SQL Server Install and User Permissions (20 mins)
 
 #### **SQL Server Install**
 This script will install Microsoft SQL server
@@ -115,7 +114,7 @@ Microsoft SQL Server 2019 (RTM) - 15.0.2000.5 (X64)
 PS C:\Users\Administrator>
 ```
 
-#### **SQL Server User Permissions**
+#### **SQL Server User Permissions** (2 mins)
 This script will create an addi user on the SQL server and give them the appropriate permissions. Be sure to fill out the .env file with the appropriate values before runing these scripts.
 Navigate to the appropriate directory:
 ```powershell
@@ -140,7 +139,7 @@ sqlcmd
 Try again and you should now be able to login
 
 
-### ADDI Install
+### ADDI Install (20 mins)
 
 :::note
 ADDI installer executable is sitting in a personal COS bucket (User will have to store executable somewhere)
@@ -176,13 +175,7 @@ Be sure to complete the install by configuring ADDI through a web browser. If th
 
 Once ADDI has been installed, the next step is to install refactor on the refactor host, using the environmnent ID and host port from this ADDI host.
 
-### Set User Permissions
-Navigate to the appropriate directory:
-```powershell
-cd assets/papercuts/addi/access_management/
-```
-
-### Configuring the certs on the ADDI host
+### Configuring the certs on the ADDI host (8 mins)
 
 Use the helper function to install OpenSSL
 ```powershell
