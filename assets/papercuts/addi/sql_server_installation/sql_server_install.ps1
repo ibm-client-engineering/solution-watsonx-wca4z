@@ -61,7 +61,8 @@ function Main {
 
     $envFilePath = ".\.env"
     Set-EnvVariables -FilePath $envFilePath
-    InstallODBCDriver
+    # SQL server install automatically installs ODBC driver
+    #InstallODBCDriver
 
     $ErrorActionPreference = 'STOP'
     $scriptName = (Split-Path -Leaf $PSCommandPath).Replace('.ps1', '')
