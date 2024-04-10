@@ -11,6 +11,7 @@ function Main {
 
       $fqdn = [System.Net.Dns]::GetHostEntry($hostName).HostName
       $KeyPass = $env:KeyPass
+      $MyHashPassword = $env:MyHashPassword
       $KeyStorePath = $env:KeyStorePath
       $CertificatePath = $env:CertificatePath
       $RefactorIP = $env:RefactorIP
@@ -30,6 +31,8 @@ function Main {
       # Generate key pair, export and import cert to keystore
       GenerateKeyPair -KeyPass $KeyPass -KeyStorePath $KeyStorePath -Fqdn $fqdn -AddiIP $AddiIP
       Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ServerCertificateFileName
+      # creates zookeeper.crt file
+      Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ZookeeperFileName
       Import-CertificateToKeystoreWithAlias -KeyStorePath $KeyStorePath -CertificatePath $ServerCertificateFileName -Alias "self-signed-root" -StorePass $KeyPass
 
       ConfigureCerts -RefactorIP $RefactorIP -CertificatePath $CertificatePath -KeyPass $KeyPass -Fqdn $fqdn
@@ -41,7 +44,13 @@ function Main {
       Add-RootCertificateToTrustedRoot -CertificatePath $certificateFilePath
       Add-RootCertificateToTrustedRoot -CertificatePath "C:\certificates\combined.crt"
 
+
+      UpdateYamlFile -MyHash $MyHashPassword -AddiIP $AddiIP -RefactorIP $RefactorIP
+      # export zookeeper.crt to refactor host
+      ExportFileToRemoteHost -CertificatePath $CertificatePath -AddiIP $AddiIP -RefactorIP $RefactorIP
       Write-Host "TLS configuration completed successfully."
+
+
 }
 
 Main

@@ -155,3 +155,56 @@ function Add-RootCertificateToTrustedRoot {
         Write-Host "Error adding root certificate to Trusted Root Certification Authorities store. $_"
     }
 }
+
+function ExportFileToRemoteHost {
+    param (
+        [string]$CertificatePath,
+        [string]$AddiIP,
+        [string]$RefactorIP
+    )
+    Write-Host "Exporting file to remote host zookeeper.yaml && zookeper.crt"
+    $zooKeeperFileName = "zookeeper.crt"
+    $fullZooKeeperFilePath = Join-Path $CertificatePath $zooKeeperFileName
+    cat $fullZooKeeperFilePath
+
+    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$fullZooKeeperFilePath" ("root@" + $RefactorIP + ":/etc/pki/ca-trust/source/anchors/zookeeper.crt")
+
+    if ($LastExitCode -eq 0) {
+        Write-Host "File copied successfully to refactor host"
+
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "sudo update-ca-trust extract"
+        if ($LastExitCode -eq 0) {
+            Write-Host "CA trust store updated successfully on refactor host."
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/ad.crt"
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/dex.crt"
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/zookeeper.crt"
+        } else {
+            Write-Host "Failed to update CA trust store on Refactor host." -ForegroundColor Red
+        }
+    } else {
+        Write-Host "Failed to copy file to refactor host" -ForegroundColor Red
+    }
+}
+
+function UpdateYamlFile {
+   param (
+        [string]$MyHash,
+        [string]$AddiIP,
+        [string]$RefactorIP
+    )
+    Write-Host "Update Zookeeper Yaml File given .env values"
+    $yamlFilePath = ".\dex.yaml"
+    $yamlContent = Get-Content -Path $yamlFilePath -Raw
+
+    # replace vars in the yaml certificateContent
+    $yamlContent = $yamlContent -Replace '\$\{AddiIP}', $AddiIP
+    $yamlContent = $yamlContent -Replace '\$\{RefactorIP}', $RefactorIP
+    $yamlContent = $yamlContent -Replace '\$\{MyHash}', $MyHash
+
+    $updatedYamlFilePath = "C:\Program Files\IBM Application Discovery and Delivery Intelligence\Authentication Server (DEX)\conf\dex.yaml"
+    # write updated content back to the yaml file
+    $yamlContent | Set-Content -Path $updatedYamlFilePath
+
+    Write-Host "Yaml file updated and saved to: $updatedYamlFilePath"
+
+}
