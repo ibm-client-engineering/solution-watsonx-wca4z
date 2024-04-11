@@ -108,7 +108,7 @@ tar zxf refactoring-assistant-*.tgz
 mkdir -p /opt/refactoring-assistant
 mv refactoring-assistant /opt/refactoring-assistant
 
-cd /opt/refactoring_assistant
+cd /opt/refactoring-assistant
 echo "pwd"
 echo "ls -la"
 # ./setup.sh
