@@ -59,19 +59,27 @@ echo "Installation completed."
 echo "Downloading Refactor Assistant"
 REFACTOR_INSTALL_PATH=$(grep 'REFACTOR_INSTALL_PATH' .env | cut -d '=' -f 2)
 
+echo "$REFACTOR_INSTALL_PATH"
+
 echo $(java --version)
 echo $(openssl version)
 echo $(podman version)
 
-#Install
 #unzip the file and setup
 unzip "$REFACTOR_INSTALL_PATH/wCAZ_RA_z_OS_1.0.1_Linux_ML.zip" -d "$REFACTOR_INSTALL_PATH"
 
 cd "$REFACTOR_INSTALL_PATH/IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual"/
-unzip refactoring-assistant-1.1.0.zip 
+echo "Unzipping refactoring-assistant zip file"
+unzip refactoring-assistant-1.1.0.zip
+
 tar zxf refactoring-assistant-1.1.0.tgz
+
+echo "Moving refactoring-assistant to ../refactoring_assistant"
 mv refactoring-assistant ../refactoring_assistant
+
 cd ../refactoring-assistant
+echo "pwd"
+echo "ls -la"
 # ./setup.sh
 
 
