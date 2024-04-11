@@ -102,12 +102,13 @@ fi
 unzip "$REFACTOR_ZIP"
 ls
 
-# tar zxf refactoring-assistant-1.1.0.tgz
+tar zxf refactoring-assistant-*.tgz
 
 #echo "Moving refactoring-assistant to ../refactoring_assistant"
-#mv refactoring-assistant ../refactoring_assistant
+mkdir -p /opt/refactoring-assistant
+mv refactoring-assistant /opt/refactoring-assistant
 
-# cd ../refactoring_assistant
+cd /opt/refactoring_assistant
 echo "pwd"
 echo "ls -la"
 # ./setup.sh
