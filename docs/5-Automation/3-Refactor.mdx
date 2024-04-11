@@ -12,6 +12,10 @@ This section will walkthrough the automation scripts for the Refactor install. T
 - Podman
 - Refactor Containers
 
+## Download the Refactor Binary
+On your linux box
+Go to IBM's internal download [site](https://w3south-limited-use.cpc.ibm.com/software/xl/download/ticket.wss) and download `IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.1 Linux Multilingual`
+
 ## Script Walkthrough
 <div style={{ borderBottom: '1px solid #000', marginTop: '20px', marginBottom: '20px' }}></div>
 
@@ -21,6 +25,8 @@ cd assets/papercuts/refactor
 ```
 
 ### Install Refactor Assistant
+Update the variable `REFACTOR_INSTALL_PATH` where the zip file is saved on the `refactor/.env` file
+
 Run the automation script
 ```sh
 ./install_refactor.sh
