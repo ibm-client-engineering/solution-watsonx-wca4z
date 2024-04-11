@@ -1,3 +1,4 @@
+source .env
 #Install
 
 # Check OS version
@@ -57,20 +58,58 @@ dnf install openssl
 echo "Installation completed."
 
 echo "Downloading Refactor Assistant"
-wget https://ak-dsw-mul.dhe.ibm.com/sdfdl/v2/fulfill/M0H0FML/Xa.2/Xb.htcOMovxHCAgZGRqiJYFDYk9OTYxy-c7/Xc.M0H0FML/wCAZ_RA_z_OS_1.0.1_Linux_ML.zip/Xd./Xf.lPr.A6VR/Xg.12733994/Xi./XY.knac/XZ.1efcOXzSId6WTOO0hjQ6e7nxqkkooqVN/wCAZ_RA_z_OS_1.0.1_Linux_ML.zip -O wCAZ_RA_z_OS_1.0.1_Linux_ML.zip
+REFACTOR_INSTALL_PATH=$(grep 'REFACTOR_INSTALL_PATH' .env | cut -d '=' -f 2)
+
+echo "REFACTOR_INSTALL_PATH: $REFACTOR_INSTALL_PATH"
 
 echo $(java --version)
 echo $(openssl version)
 echo $(podman version)
 
-#Install
 #unzip the file and setup
-unzip wCAZ_RA_z_OS_1.0.1_Linux_ML.zip
-cd 'IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual'/
-unzip refactoring-assistant-1.1.0.zip 
-tar zxf refactoring-assistant-1.1.0.tgz
-mv refactoring-assistant ../refactoring_assistant
-cd ../refactoring_assistant
+ZIP_FILE_PATH="$REFACTOR_INSTALL_PATH/$REFACTOR_NAME_OF_ZIP_FILE"
+
+if [ ! -f "$ZIP_FILE_PATH" ]; then
+  echo "ZIP file not found: $ZIP_FILE_PATH"
+  exit 1
+fi
+
+unzip "$ZIP_FILE_PATH" -d "$REFACTOR_INSTALL_PATH"
+
+if [ $? -ne 0 ]; then
+    echo "Unzipping refactoring assistant zip file failed."
+    exit 1
+fi
+
+REFACT_DIR=$(find "$REFACTOR_INSTALL_PATH" -type d -name 'IBM watsonx*' -print -quit)
+
+if [ ! -d "$REFACT_DIR" ]; then
+    echo "REefactoring directory not found."
+    exit 1
+fi
+
+cd "$REFACT_DIR" || exit 1
+
+echo "Contents of the directory"
+ls -la
+# find the zip within the directory
+REFACTOR_ZIP=$(find . -type f -name 'refactoring-assistant-*.zip' -print -quit)
+
+if [ -z "$REFACTOR_ZIP" ]; then
+    echo "Refactoring zip file not found..."
+    exit 1
+fi
+unzip "$REFACTOR_ZIP"
+ls
+
+tar zxf refactoring-assistant-*.tgz
+
+mkdir -p /opt/refactoring-assistant
+mv refactoring-assistant /opt/refactoring-assistant
+
+cd /opt/refactoring-assistant/refactoring-assistant
+pwd
+ls -la
 ./setup.sh
 
 
