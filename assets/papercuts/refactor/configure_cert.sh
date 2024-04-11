@@ -9,7 +9,7 @@ chmod 766 refactoring_assistant/config/config.properties
 
 sed -i "s@CERTS_LOCATION=.*@CERTS_LOCATION=$CERTS_LOCATION@" refactoring_assistant/config/config.properties
 sed -i "s@HOST_PORT=.*@HOST_PORT=$HOST_PORT@" refactoring_assistant/config/config.properties
-sed -i "s@ENVIRONMENT_ID=.*@ENVIRONMENT_ID==$ENVIRONMENT_ID@" refactoring_assistant/config/config.properties
+sed -i "s@ENVIRONMENT_ID=.*@ENVIRONMENT_ID=$ENVIRONMENT_ID@" refactoring_assistant/config/config.properties
 
 chmod 766 refactoring_assistant/scripts/nls.sh
 
