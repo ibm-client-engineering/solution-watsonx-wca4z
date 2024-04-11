@@ -88,6 +88,10 @@ if [ ! -d "$REFACT_DIR" ]; then
     exit 1
 fi
 
+cd "$REFACT_DIR" || exit 1
+
+echo "Contents of the directory"
+ls -la
 # find the zip within the directory
 REFACTOR_ZIP=$(find . -type f -name 'refactoring-assistant-*.zip' -print -quit)
 
