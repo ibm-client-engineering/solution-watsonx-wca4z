@@ -66,7 +66,7 @@ echo $(openssl version)
 echo $(podman version)
 
 #unzip the file and setup
-unzip "$REFACTOR_INSTALL_PATH" -d "$REFACTOR_INSTALL_PATH"
+unzip $REFACTOR_INSTALL_PATH -d $REFACTOR_INSTALL_PATH
 
 cd "$REFACTOR_INSTALL_PATH/IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual"/
 echo "Unzipping refactoring-assistant zip file"
@@ -77,7 +77,7 @@ tar zxf refactoring-assistant-1.1.0.tgz
 echo "Moving refactoring-assistant to ../refactoring_assistant"
 mv refactoring-assistant ../refactoring_assistant
 
-cd ../refactoring-assistant
+cd ../refactoring_assistant
 echo "pwd"
 echo "ls -la"
 # ./setup.sh
