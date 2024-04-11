@@ -104,13 +104,12 @@ ls
 
 tar zxf refactoring-assistant-*.tgz
 
-#echo "Moving refactoring-assistant to ../refactoring_assistant"
 mkdir -p /opt/refactoring-assistant
 mv refactoring-assistant /opt/refactoring-assistant
 
 cd /opt/refactoring-assistant/refactoring-assistant
 pwd
 ls -la
-# ./setup.sh
+./setup.sh
 
 
