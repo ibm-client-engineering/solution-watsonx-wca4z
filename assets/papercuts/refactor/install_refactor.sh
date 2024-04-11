@@ -67,7 +67,19 @@ echo $(openssl version)
 echo $(podman version)
 
 #unzip the file and setup
-unzip "$REFACTOR_INSTALL_PATH/$REFACTOR_NAME_OF_ZIP_FILE" -d "$REFACTOR_INSTALL_PATH"
+ZIP_FILE_PATH="$REFACTOR_INSTALL_PATH/$REFACTOR_NAME_OF_ZIP_FILE"
+
+if [ ! -f "$ZIP_FILE_PATH" ]; then
+  echo "ZIP file not found: $ZIP_FILE_PATH"
+  exit 1
+fi
+
+unzip "$ZIP_FILE_PATH" -d "$REFACTOR_INSTALL_PATH"
+
+if [ $? -ne 0 ]; then
+    echo "Unzipping refactoring assistant zip file failed."
+    exit 1
+fi
 
 cd "$REFACTOR_INSTALL_PATH/IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual"/
 echo "Unzipping refactoring-assistant zip file"
