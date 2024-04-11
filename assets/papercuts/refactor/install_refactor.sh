@@ -81,12 +81,22 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# cd "$REFACTOR_INSTALL_PATH/IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual"/
-cd "$(find "$REFACTOR_INSTALL_PATH" -type d -name 'IBM watsonx*' -print -quit)"
+REFACT_DIR=$(find "$REFACTOR_INSTALL_PATH" -type d -name 'IBM watsonx*' -print -quit)
+
+if [ ! -d "$REFACT_DIR" ]; then
+    echo "REefactoring directory not found."
+    exit 1
+fi
+
+# find the zip within the directory
+REFACTOR_ZIP=$(find . -type f -name 'refactoring-assistant-*.zip' -print -quit)
+
+if [ -z "$REFACTOR_ZIP" ]; then
+    echo "Refactoring zip file not found..."
+    exit 1
+fi
+unzip "$REFACTOR_ZIP"
 ls
-REFACTOR_ZIP=$(find "$REFACTOR_INSTALL_PATH" -type f -name '*.zip' -print -quit)
-echo "Unzipping refactoring-assistant zip file $REFACTOR_ZIP"
-unzip REFACTOR_ZIP -d .
 
 # tar zxf refactoring-assistant-1.1.0.tgz
 
