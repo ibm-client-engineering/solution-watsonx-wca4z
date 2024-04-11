@@ -1,5 +1,5 @@
 ---
-id: Refactor-Install
+id: Refactor-Install (10 mins)
 sidebar_position: 3
 title: 'Refactor Install'
 custom_edit_url: null
@@ -12,6 +12,83 @@ This section will walkthrough the automation scripts for the Refactor install. T
 - Podman
 - Refactor Containers
 
+## Download the Refactor Binary
+On your linux box
+Go to IBM's internal download [site](https://w3south-limited-use.cpc.ibm.com/software/xl/download/ticket.wss) and download `IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.1 Linux Multilingual`
+Right click on your browser and inspect -> network. Then click download and copy the `Requested URL` from the network tab.
+
+On your linux machine run the following to install wget
+```
+[root@adp-linux home]# yum install wget
+Updating Subscription Management repositories.
+Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)                                                                                                                                                                                                                                                                                       817  B/s | 4.1 kB     00:05
+Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)                                                                                                                                                                                                                                                                                115 kB/s | 3.8 kB     00:00
+Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)                                                                                                                                                                                                                                                                                    159 kB/s | 4.5 kB     00:00
+Dependencies resolved.
+============================================================================================================================================================================================================================================================================================================================================================================
+ Package                                                                            Architecture                                                                  Version                                                                                 Repository                                                                                                   Size
+============================================================================================================================================================================================================================================================================================================================================================================
+Installing:
+ wget                                                                               x86_64                                                                        1.19.5-11.el8                                                                           rhel-8-for-x86_64-appstream-eus-rpms                                                                        734 k
+Installing dependencies:
+ libmetalink                                                                        x86_64                                                                        0.1.3-7.el8                                                                             rhel-8-for-x86_64-baseos-rpms                                                                                32 k
+
+Transaction Summary
+============================================================================================================================================================================================================================================================================================================================================================================
+Install  2 Packages
+
+Total download size: 766 k
+Installed size: 2.8 M
+Is this ok [y/N]: y
+Downloading Packages:
+(1/2): libmetalink-0.1.3-7.el8.x86_64.rpm                                                                                                                                                                                                                                                                                                   6.3 kB/s |  32 kB     00:05
+(2/2): wget-1.19.5-11.el8.x86_64.rpm                                                                                                                                                                                                                                                                                                        142 kB/s | 734 kB     00:05
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Total                                                                                                                                                                                                                                                                                                                                       149 kB/s | 766 kB     00:05
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                                                                                                                                                                                                                                                                                                                    1/1
+  Installing       : libmetalink-0.1.3-7.el8.x86_64                                                                                                                                                                                                                                                                                                                     1/2
+  Installing       : wget-1.19.5-11.el8.x86_64                                                                                                                                                                                                                                                                                                                          2/2
+  Running scriptlet: wget-1.19.5-11.el8.x86_64                                                                                                                                                                                                                                                                                                                          2/2
+  Verifying        : wget-1.19.5-11.el8.x86_64                                                                                                                                                                                                                                                                                                                          1/2
+  Verifying        : libmetalink-0.1.3-7.el8.x86_64                                                                                                                                                                                                                                                                                                                     2/2
+Installed products updated.
+
+Installed:
+  libmetalink-0.1.3-7.el8.x86_64                                                wget-1.19.5-11.el8.x86_64
+
+Complete!
+[root@adp-linux home]#
+```
+
+Then download the binary by running
+
+```
+[root@adp-linux home]# wget https://ak-dsw-mul.dhe.ibm.com/sdfdl/v2/fulfill/M0HV4ML/Xa.2/Xb.htcOMovxHCAgZGSx9HN2d9ToNzH5Bw37/Xc.M0HV4ML/IwCAfZRA_1.1.2_L_ML.zip/Xd./Xf.lPr.A6VR/Xg.12776632/Xi./XY.knac/XZ.iwzQoMk3hbdbv7KOxMrMlBgY0ZRud6M0/IwCAfZRA_1.1.2_L_ML.zip
+--2024-04-11 17:34:33--  https://ak-dsw-mul.dhe.ibm.com/sdfdl/v2/fulfill/M0HV4ML/Xa.2/Xb.htcOMovxHCAgZGSx9HN2d9ToNzH5Bw37/Xc.M0HV4ML/IwCAfZRA_1.1.2_L_ML.zip/Xd./Xf.lPr.A6VR/Xg.12776632/Xi./XY.knac/XZ.iwzQoMk3hbdbv7KOxMrMlBgY0ZRud6M0/IwCAfZRA_1.1.2_L_ML.zip
+Resolving ak-dsw-mul.dhe.ibm.com (ak-dsw-mul.dhe.ibm.com)... 170.225.126.30
+Connecting to ak-dsw-mul.dhe.ibm.com (ak-dsw-mul.dhe.ibm.com)|170.225.126.30|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 964597948 (920M) [application/zip]
+Saving to: ‘IwCAfZRA_1.1.2_L_ML.zip’
+
+IwCAfZRA_1.1.2_L_ML.zip               100%[=========================================================================>] 919.91M  51.8MB/s    in 18s
+
+2024-04-11 17:34:57 (50.1 MB/s) - ‘IwCAfZRA_1.1.2_L_ML.zip’ saved [964597948/964597948]
+```
+
+Verify you downloaded the zip file
+
+```
+[root@adp-linux home]# ls
+IwCAfZRA_1.1.2_L_ML.zip  vpcuser
+[root@adp-linux home]#
+```
+
 ## Script Walkthrough
 <div style={{ borderBottom: '1px solid #000', marginTop: '20px', marginBottom: '20px' }}></div>
 
@@ -20,13 +97,23 @@ Navigate to the appropriate directory:
 cd assets/papercuts/refactor
 ```
 
-### Install Refactor Assistant
+### Install Refactor Assistant (5 mins)
+Update the variable `REFACTOR_INSTALL_PATH` && `REFACTOR_NAME_OF_ZIP_FILE` where the zip file is saved on the `refactor/.env` file
+For example your `.env` file might look like
+
+```bash
+.
+.
+REFACTOR_INSTALL_PATH=/home
+REFACTOR_NAME_OF_ZIP_FILE=IwCAfZRA_1.1.2_L_ML.zip
+````
+
 Run the automation script
 ```sh
 ./install_refactor.sh
 ```
 
-### Configure Certifcates
+### Configure Certifcates (1 min)
 
 :::note
     - ensure ADDI is installed
