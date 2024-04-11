@@ -42,17 +42,17 @@ fi
 
 
 #Prereqs
-dnf update
+#dnf update
 
 # Install Podman version 4 
 echo "Installing Podman version 4..."
-dnf -y install podman unzip wget java-11-openjdk.x86_64
-systemctl start podman
-systemctl enable podman
+#dnf -y install podman unzip wget java-11-openjdk.x86_64
+#systemctl start podman
+#systemctl enable podman
  
 # Install OpenSSL 
 echo "Installing OpenSSL..."
-dnf install openssl
+#dnf install openssl
 
 # Add commands to install OpenSSL based on your package manager (e.g., apt-get, brew) 
 echo "Installation completed."
@@ -84,7 +84,7 @@ fi
 # cd "$REFACTOR_INSTALL_PATH/IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual"/
 cd "$(find "$REFACTOR_INSTALL_PATH" -type d -name 'IBM watsonx*' -print -quit)"
 ls
-REFACTOR_ZIP=$(find . -type f -name '*.zip' -print -quit)
+REFACTOR_ZIP=$(find "$REFACTOR_INSTALL_PATH" -type f -name '*.zip' -print -quit)
 echo "Unzipping refactoring-assistant zip file $REFACTOR_ZIP"
 unzip REFACTOR_ZIP -d .
 
