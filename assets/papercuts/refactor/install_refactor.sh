@@ -42,17 +42,17 @@ fi
 
 
 #Prereqs
-#dnf update
+dnf update
 
 # Install Podman version 4 
 echo "Installing Podman version 4..."
-#dnf -y install podman unzip wget java-11-openjdk.x86_64
-#systemctl start podman
-#systemctl enable podman
+dnf -y install podman unzip wget java-11-openjdk.x86_64
+systemctl start podman
+systemctl enable podman
  
 # Install OpenSSL 
 echo "Installing OpenSSL..."
-#dnf install openssl
+dnf install openssl
 
 # Add commands to install OpenSSL based on your package manager (e.g., apt-get, brew) 
 echo "Installation completed."
