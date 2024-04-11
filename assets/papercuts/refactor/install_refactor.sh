@@ -57,7 +57,7 @@ dnf install openssl
 echo "Installation completed."
 
 echo "Downloading Refactor Assistant"
-wget https://ak-dsw-mul.dhe.ibm.com/sdfdl/v2/fulfill/M0H0FML/Xa.2/Xb.htcOMovxHCAgZGRqiJYFDYk9OTYxy-c7/Xc.M0H0FML/wCAZ_RA_z_OS_1.0.1_Linux_ML.zip/Xd./Xf.lPr.A6VR/Xg.12733994/Xi./XY.knac/XZ.1efcOXzSId6WTOO0hjQ6e7nxqkkooqVN/wCAZ_RA_z_OS_1.0.1_Linux_ML.zip -O wCAZ_RA_z_OS_1.0.1_Linux_ML.zip
+REFACTOR_INSTALL_PATH=$(grep 'REFACTOR_INSTALL_PATH' .env | cut -d '=' -f 2)
 
 echo $(java --version)
 echo $(openssl version)
@@ -65,12 +65,13 @@ echo $(podman version)
 
 #Install
 #unzip the file and setup
-unzip wCAZ_RA_z_OS_1.0.1_Linux_ML.zip
-cd 'IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual'/
+unzip "$REFACTOR_INSTALL_PATH/wCAZ_RA_z_OS_1.0.1_Linux_ML.zip" -d "$REFACTOR_INSTALL_PATH"
+
+cd "$REFACTOR_INSTALL_PATH/IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual"/
 unzip refactoring-assistant-1.1.0.zip 
 tar zxf refactoring-assistant-1.1.0.tgz
 mv refactoring-assistant ../refactoring_assistant
 cd ../refactoring-assistant
-./setup.sh
+# ./setup.sh
 
 
