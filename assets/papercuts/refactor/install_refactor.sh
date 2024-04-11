@@ -83,14 +83,14 @@ fi
 
 # cd "$REFACTOR_INSTALL_PATH/IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual"/
 cd "$(find "$REFACTOR_INSTALL_PATH" -type d -name 'IBM watsonx*' -print -quit)"
-
+ls
 REFACTOR_ZIP=$(find . -type f -name '*.zip' -print -quit)
-echo "Unzipping refactoring-assistant zip file"
+echo "Unzipping refactoring-assistant zip file $REFACTOR_ZIP"
 unzip REFACTOR_ZIP -d .
 
 # tar zxf refactoring-assistant-1.1.0.tgz
 
-echo "Moving refactoring-assistant to ../refactoring_assistant"
+#echo "Moving refactoring-assistant to ../refactoring_assistant"
 #mv refactoring-assistant ../refactoring_assistant
 
 # cd ../refactoring_assistant
