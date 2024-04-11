@@ -1,3 +1,4 @@
+source .env
 #Install
 
 # Check OS version
@@ -59,7 +60,7 @@ echo "Installation completed."
 echo "Downloading Refactor Assistant"
 REFACTOR_INSTALL_PATH=$(grep 'REFACTOR_INSTALL_PATH' .env | cut -d '=' -f 2)
 
-echo "$REFACTOR_INSTALL_PATH"
+echo "REFACTOR_INSTALL_PATH: $REFACTOR_INSTALL_PATH"
 
 echo $(java --version)
 echo $(openssl version)
