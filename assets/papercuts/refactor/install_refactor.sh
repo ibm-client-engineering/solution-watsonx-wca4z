@@ -81,7 +81,9 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-cd "$REFACTOR_INSTALL_PATH/IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual"/
+# cd "$REFACTOR_INSTALL_PATH/IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multilingual"/
+cd "$(find "$REFACTOR_INSTALL_PATH" -type d -name 'IBM watsonx*' -print -quit)"
+
 echo "Unzipping refactoring-assistant zip file"
 unzip refactoring-assistant-1.1.0.zip
 
