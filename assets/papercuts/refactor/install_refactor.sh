@@ -70,7 +70,7 @@ cd 'IBM watsonx Code Assistant for Z Refactoring Assistant 1.1.0 Linux Multiling
 unzip refactoring-assistant-1.1.0.zip 
 tar zxf refactoring-assistant-1.1.0.tgz
 mv refactoring-assistant ../refactoring_assistant
-cd ../refactoring-assistant
+cd ../refactoring_assistant
 ./setup.sh
 
 
