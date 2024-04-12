@@ -156,6 +156,46 @@ function Add-RootCertificateToTrustedRoot {
     }
 }
 
+function TestConnection {
+    param (
+        [string]$AddiIP,
+        [string]$RefactorIP,
+        [string]$PrivateKeyPath
+    )
+    try {
+        $dummyFilePath = "C:\dummy.txt"
+        if (-not (Test-Path $dummyFilePath -PathType Leaf)) {
+            New-Item -Path $dummyFilePath -ItemType File -Value "This is a dummy file"
+        }
+        $sshCommand = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+        if ($PrivateKeyPath -and (Test-Path $PrivateKeyPath)) {
+            $sshCommand += " -i $PrivateKeyPath"
+        }
+        $sshCommand += " root@$RefactorIP 'exit'"
+        Invoke-Expression $sshCommand | Out-Null
+        Write-Host "SSH connection to $RefactorIP successful."
+    } catch {
+        Write-Host "Failed to establish ssh connection to $RefactorIP with private key. Exiting script." -ForegroundColor Red
+        exit 1
+    }
+    # test scp connection
+    try {
+
+        $destination = "root@$RefactorIP:/root/"
+
+        $scpCommand = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+        if ($PrivateKeyPath -and (Test-Path $PrivateKeyPath)) {
+            $scpCommand += " -i $PrivateKeyPath"
+        }
+        # add source and des paths to the scp scpCommand
+        $scpCommand += " `"$dummyFilePath`" $destination"
+        Invoke-Expression $scpCommand
+        Write-Host "Scp connection to $RefactorIP was successful."
+    } catch {
+        Write-Host "Failed to establish SCP connection to $RefactorIP. Exiting script." -ForegroundColor Red
+        exit 1
+    }
+}
 function ExportFileToRemoteHost {
     param (
         [string]$CertificatePath,
@@ -163,6 +203,9 @@ function ExportFileToRemoteHost {
         [string]$RefactorIP,
         [string]$PrivateKeyPath
     )
+
+    Test-NetConnection -ComputerName $RefactorIP -Port 22
+
     Write-Host "Exporting file to remote host zookeeper.yaml && zookeper.crt"
     $zooKeeperFileName = "zookeeper.crt"
     $fullZooKeeperFilePath = Join-Path $CertificatePath $zooKeeperFileName
