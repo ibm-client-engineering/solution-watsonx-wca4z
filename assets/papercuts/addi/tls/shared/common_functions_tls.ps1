@@ -217,13 +217,13 @@ function ExportFileToRemoteHost {
         $scpCommand += " -i $PrivateKeyPath"
     }
     # copy file to remote host
-    $scpCommand += " `"$fullZooKeeperFilePath`" root@$RefactorIP:/etc/pki/ca-trust/source/anchors/zookeeper.crt"
+    $scpCommand += " `"${fullZooKeeperFilePath}`" root@${RefactorIP}:/etc/pki/ca-trust/source/anchors/zookeeper.crt"
     #scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$fullZooKeeperFilePath" ("root@" + $RefactorIP + ":/etc/pki/ca-trust/source/anchors/zookeeper.crt")
     Invoke-Expression $scpCommand
 
     if ($LastExitCode -eq 0) {
         Write-Host "File copied successfully to refactor host"
-        $sshCommand = "ssh -o StrictHostKeyChecking -o UserKnownHostsFile=/dev/null root@$RefactorIP"
+        $sshCommand = "ssh -o StrictHostKeyChecking -o UserKnownHostsFile=/dev/null root@${RefactorIP}"
         Invoke-Expression "$sshCommand `"`sudo update-ca-trust extract`""
 
         #ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "sudo update-ca-trust extract"
