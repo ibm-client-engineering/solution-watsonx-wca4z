@@ -196,6 +196,7 @@ function TestConnection {
         exit 1
     }
 }
+
 function ExportFileToRemoteHost {
     param (
         [string]$CertificatePath,
