@@ -181,7 +181,7 @@ function TestConnection {
     # test scp connection
     try {
 
-        $destination = "root@$RefactorIP:/root/"
+        $destination = "root@${RefactorIP}:/root/"
 
         $scpCommand = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
         if ($PrivateKeyPath -and (Test-Path $PrivateKeyPath)) {
