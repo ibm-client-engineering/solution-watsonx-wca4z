@@ -74,7 +74,8 @@ function ConfigureCerts {
         [string]$RefactorIP,
         [string]$CertificatePath,
         [string]$KeyPass,
-        [string]$Fqdn
+        [string]$Fqdn,
+        [string]$PrivateKeyPath
     )
 
     Write-Host "ConfigureCerts RefactorIP: $RefactorIP , CertificatePath: $CertificatePath"
@@ -95,9 +96,20 @@ function ConfigureCerts {
 
     $fullFilePath = Join-Path $CertificatePath $serverKeyFileName
 
-    openssl pkcs12 -in $fullKeyStoreFilePath -nocerts -nodes -out $fullServerKeyFilePath
+    openssl pkcs12 -password pass:$KeyPass -in $fullKeyStoreFilePath -nocerts -nodes -out $fullServerKeyFilePath
 
-    scp root@${RefactorIP}:/root/certs/root.crt $fullRootCertFilePath
+
+    scpCommand = "scp"
+    if($PrivateKeyPath -and (Test-Path $PrivateKeyPath)) {
+        $scpCommand += " -i $PrivateKeyPath"
+    }
+    # copy file to remote host
+    $scpCommand += "  root@${RefactorIP}:/root/certs/root.crt ${fullRootCertFilePath}"
+
+    Invoke-Expression $scpCommand
+
+
+    # scp root@${RefactorIP}:/root/certs/root.crt $fullRootCertFilePath
 
     # creates combined.cer and combined.crt
     (Get-Content $fullCertificateFilePath -Raw) + (Get-Content $fullRootCertFilePath -Raw) | Set-Content -Encoding ASCII -NoNewline $fullCombinedFilePath
@@ -218,7 +230,7 @@ function ExportFileToRemoteHost {
     }
     # copy file to remote host
     $scpCommand += " `"${fullZooKeeperFilePath}`" root@${RefactorIP}:/etc/pki/ca-trust/source/anchors/zookeeper.crt"
-    #scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$fullZooKeeperFilePath" ("root@" + $RefactorIP + ":/etc/pki/ca-trust/source/anchors/zookeeper.crt")
+
     Invoke-Expression $scpCommand
 
     if ($LastExitCode -eq 0) {
@@ -226,15 +238,11 @@ function ExportFileToRemoteHost {
         $sshCommand = "ssh -o StrictHostKeyChecking -o UserKnownHostsFile=/dev/null root@${RefactorIP}"
         Invoke-Expression "$sshCommand `"`sudo update-ca-trust extract`""
 
-        #ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "sudo update-ca-trust extract"
         if ($LastExitCode -eq 0) {
             Write-Host "CA trust store updated successfully on refactor host."
             Invoke-Expression "$sshCommand `"`ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/ad.crt`""
             Invoke-Expression "$sshCommand `"`ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/dex.crt`""
             Invoke-Expression "$sshCommand `"`ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/zookeeper.crt`""
-            #ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/ad.crt"
-            #ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/dex.crt"
-            #ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/zookeeper.crt"
         } else {
             Write-Host "Failed to update CA trust store on Refactor host." -ForegroundColor Red
         }
