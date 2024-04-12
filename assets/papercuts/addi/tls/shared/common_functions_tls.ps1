@@ -160,24 +160,37 @@ function ExportFileToRemoteHost {
     param (
         [string]$CertificatePath,
         [string]$AddiIP,
-        [string]$RefactorIP
+        [string]$RefactorIP,
+        [string]$PrivateKeyPath
     )
     Write-Host "Exporting file to remote host zookeeper.yaml && zookeper.crt"
     $zooKeeperFileName = "zookeeper.crt"
     $fullZooKeeperFilePath = Join-Path $CertificatePath $zooKeeperFileName
     cat $fullZooKeeperFilePath
 
-    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$fullZooKeeperFilePath" ("root@" + $RefactorIP + ":/etc/pki/ca-trust/source/anchors/zookeeper.crt")
+    scpCommand = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+    if($PrivateKeyPath -and (Test-Path $PrivateKeyPath)) {
+        $scpCommand += " -i $PrivateKeyPath"
+    }
+    # copy file to remote host
+    $scpCommand += " `"$fullZooKeeperFilePath`" root@$RefactorIP:/etc/pki/ca-trust/source/anchors/zookeeper.crt"
+    #scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$fullZooKeeperFilePath" ("root@" + $RefactorIP + ":/etc/pki/ca-trust/source/anchors/zookeeper.crt")
+    Invoke-Expression $scpCommand
 
     if ($LastExitCode -eq 0) {
         Write-Host "File copied successfully to refactor host"
+        $sshCommand = "ssh -o StrictHostKeyChecking -o UserKnownHostsFile=/dev/null root@$RefactorIP"
+        Invoke-Expression "$sshCommand `"`sudo update-ca-trust extract`""
 
-        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "sudo update-ca-trust extract"
+        #ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "sudo update-ca-trust extract"
         if ($LastExitCode -eq 0) {
             Write-Host "CA trust store updated successfully on refactor host."
-            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/ad.crt"
-            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/dex.crt"
-            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/zookeeper.crt"
+            Invoke-Expression "$sshCommand `"`ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/ad.crt`""
+            Invoke-Expression "$sshCommand `"`ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/dex.crt`""
+            Invoke-Expression "$sshCommand `"`ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/zookeeper.crt`""
+            #ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/ad.crt"
+            #ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/dex.crt"
+            #ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/zookeeper.crt"
         } else {
             Write-Host "Failed to update CA trust store on Refactor host." -ForegroundColor Red
         }
