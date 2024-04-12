@@ -99,7 +99,7 @@ function ConfigureCerts {
     openssl pkcs12 -password pass:$KeyPass -in $fullKeyStoreFilePath -nocerts -nodes -out $fullServerKeyFilePath
 
 
-    scpCommand = "scp"
+    $scpCommand = "scp"
     if($PrivateKeyPath -and (Test-Path $PrivateKeyPath)) {
         $scpCommand += " -i $PrivateKeyPath"
     }
@@ -107,7 +107,6 @@ function ConfigureCerts {
     $scpCommand += "  root@${RefactorIP}:/root/certs/root.crt ${fullRootCertFilePath}"
 
     Invoke-Expression $scpCommand
-
 
     # scp root@${RefactorIP}:/root/certs/root.crt $fullRootCertFilePath
 
@@ -224,7 +223,7 @@ function ExportFileToRemoteHost {
     $fullZooKeeperFilePath = Join-Path $CertificatePath $zooKeeperFileName
     cat $fullZooKeeperFilePath
 
-    scpCommand = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+    $scpCommand = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
     if($PrivateKeyPath -and (Test-Path $PrivateKeyPath)) {
         $scpCommand += " -i $PrivateKeyPath"
     }
