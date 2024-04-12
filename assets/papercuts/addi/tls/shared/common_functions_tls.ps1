@@ -171,7 +171,7 @@ function TestConnection {
         if ($PrivateKeyPath -and (Test-Path $PrivateKeyPath)) {
             $sshCommand += " -i $PrivateKeyPath"
         }
-        $sshCommand += " root@$RefactorIP 'exit'"
+        $sshCommand += " root@${RefactorIP} 'exit'"
         Invoke-Expression $sshCommand | Out-Null
         Write-Host "SSH connection to $RefactorIP successful."
     } catch {
