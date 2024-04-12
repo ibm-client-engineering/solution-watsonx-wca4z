@@ -19,6 +19,8 @@ function Main {
       $JreCaCertsPath = $env:JreCaCertsPath
       $PrivateKeyPath = $env:PrivateKeyPath
 
+      TestConnection -AddiIP $AddiIP -RefactorIP $RefactorIP -PrivateKeyPath $PrivateKeyPath
+
       if (-not (Test-Path $CertificatePath -PathType Container)) {
           Write-Host "Directory $CertificatePath does not exist... creating one now"
           New-Item -ItemType Directory -Path $CertificatePath
@@ -47,6 +49,7 @@ function Main {
 
 
       UpdateYamlFile -MyHash $MyHashPassword -AddiIP $AddiIP -RefactorIP $RefactorIP
+
       # export zookeeper.crt to refactor host
       ExportFileToRemoteHost -CertificatePath $CertificatePath -AddiIP $AddiIP -RefactorIP $RefactorIP -PrivateKeyPath $PrivateKeyPath
       Write-Host "TLS configuration completed successfully."
