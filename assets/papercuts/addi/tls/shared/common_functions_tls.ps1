@@ -6,7 +6,8 @@ function GenerateKeyPair {
         [string]$AddiIP
     )
     Write-Host "GenerateKeyPair KeyStorePath: $KeyStorePath , KeyPass: $KeyPass , FQDN: $Fqdn"
-    keytool -genkeypair -alias "$Fqdn" -keyalg RSA -keysize 2048 -dname "cn=$AddiIP" -ext BasicConstraints:critical=ca:true -keypass "$KeyPass" -keystore "$KeyStorePath" -storepass "$KeyPass" -storetype PKCS12
+#    keytool -genkeypair -alias "wca4z2-winaddi.fyre.ibm.com" -keyalg RSA -keysize 2048 -dname "cn=wca4z2-winaddi.fyre.ibm.com" -keypass "p@ssw0rd" -keystore "D:\certificates\server_keystore.p12" -storepass "p@ssw0rd" -storetype PKCS12 -ext BasicConstraints:critical=ca:true -ext san=dns:wca4z2-winaddi.fyre.ibm.com
+    keytool -genkeypair -alias "$Fqdn" -keyalg RSA -keysize 2048 -dname "cn=$AddiIP" -ext BasicConstraints:critical=ca:true -ext san=dns:$AddiIP -keypass "$KeyPass" -keystore "$KeyStorePath" -storepass "$KeyPass" -storetype PKCS12
 }
 
 function Export-CertificateToPfx {
