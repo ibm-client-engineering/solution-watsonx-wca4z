@@ -17,6 +17,10 @@ function Main {
       $RefactorIP = $env:RefactorIP
       $AddiIP = $env:AddiIP
       $JreCaCertsPath = $env:JreCaCertsPath
+      $PrivateKeyPath = $env:PrivateKeyPath
+
+      TestConnection -AddiIP $AddiIP -RefactorIP $RefactorIP -PrivateKeyPath $PrivateKeyPath
+
 
       if (-not (Test-Path $CertificatePath -PathType Container)) {
           Write-Host "Directory $CertificatePath does not exist... creating one now"
@@ -29,13 +33,13 @@ function Main {
       $ZookeeperFileName = "zookeeper.crt"
 
       # Generate key pair, export and import cert to keystore
-      GenerateKeyPair -KeyPass $KeyPass -KeyStorePath $KeyStorePath -Fqdn $fqdn -AddiIP $AddiIP
+      GenerateKeyPair -KeyPass $KeyPass -KeyStorePath $KeyStorePath -Fqdn $fqdn -AddiIP $AddiIP -RefactorIP $RefactorIP
       Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ServerCertificateFileName
       # creates zookeeper.crt file
       Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ZookeeperFileName
-      Import-CertificateToKeystoreWithAlias -KeyStorePath $KeyStorePath -CertificatePath $ServerCertificateFileName -Alias "self-signed-root" -StorePass $KeyPass
+      Import-CertificateToKeystoreWithAlias -KeyStorePath $KeyStorePath -CertificatePath $ServerCertificateFileName -Alias "self-signed-root" -StorePass $KeyPass -Fqdn $Fqdn -AddiIP $AddiIP
 
-      ConfigureCerts -RefactorIP $RefactorIP -CertificatePath $CertificatePath -KeyPass $KeyPass -Fqdn $fqdn
+      ConfigureCerts -RefactorIP $RefactorIP -CertificatePath $CertificatePath -KeyPass $KeyPass -Fqdn $fqdn -PrivateKeyPath $PrivateKeyPath -AddiIP $AddiIP
 
       ImportCertToJavaKeyStore -KeyStorePath $KeyStorePath -KeyPass $KeyPass -JreCaCertsPath $JreCaCertsPath
 
@@ -46,8 +50,9 @@ function Main {
 
 
       UpdateYamlFile -MyHash $MyHashPassword -AddiIP $AddiIP -RefactorIP $RefactorIP
+
       # export zookeeper.crt to refactor host
-      ExportFileToRemoteHost -CertificatePath $CertificatePath -AddiIP $AddiIP -RefactorIP $RefactorIP
+      ExportFileToRemoteHost -CertificatePath $CertificatePath -AddiIP $AddiIP -RefactorIP $RefactorIP -PrivateKeyPath $PrivateKeyPath
       Write-Host "TLS configuration completed successfully."
 
 
