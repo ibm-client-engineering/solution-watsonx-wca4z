@@ -3,11 +3,11 @@ function GenerateKeyPair {
         [string]$KeyPass,
         [string]$KeyStorePath,
         [string]$Fqdn,
-        [string]$AddiIP
+        [string]$AddiIP,
+        [string]$RefactorIP
     )
     Write-Host "GenerateKeyPair KeyStorePath: $KeyStorePath , KeyPass: $KeyPass , FQDN: $Fqdn"
-#    keytool -genkeypair -alias "wca4z2-winaddi.fyre.ibm.com" -keyalg RSA -keysize 2048 -dname "cn=wca4z2-winaddi.fyre.ibm.com" -keypass "p@ssw0rd" -keystore "D:\certificates\server_keystore.p12" -storepass "p@ssw0rd" -storetype PKCS12 -ext BasicConstraints:critical=ca:true -ext san=dns:wca4z2-winaddi.fyre.ibm.com
-    keytool -genkeypair -alias "$Fqdn" -keyalg RSA -keysize 2048 -dname "cn=$AddiIP" -ext BasicConstraints:critical=ca:true -ext san=dns:$AddiIP -keypass "$KeyPass" -keystore "$KeyStorePath" -storepass "$KeyPass" -storetype PKCS12
+    keytool -genkeypair -alias "$Fqdn" -keyalg RSA -keysize 2048 -dname "cn=$Fqdn" -ext BasicConstraints:critical=ca:true -ext "san=dns:$Fqdn,ip:$AddiIP,ip:$RefactorIP" -keypass "$KeyPass" -keystore "$KeyStorePath" -storepass "$KeyPass" -storetype PKCS12
 }
 
 function Export-CertificateToPfx {
@@ -21,7 +21,7 @@ function Export-CertificateToPfx {
 
     $fullFilePath = Join-Path $CertificatePath $Filename
     Write-Host "Export-CertificateToPfx KeyStorePath: $KeyStorePath , CertificatePath: $CertificatePath, KeyPass: $KeyPass , Filename: $Filename , fullFilePath: $fullFilePath"
-    keytool -exportcert -alias "$Fqdn" -keystore "$KeyStorePath" -file $fullFilePath -storepass "$KeyPass" -rfc
+    keytool -exportcert -alias "$Fqdn" -keystore "$KeyStorePath" -file $fullFilePath -storepass "$KeyPass" -rfc -ext BasicConstraints:critical=ca:true -ext "san=dns:$Fqdn,ip:$AddiIP"
     # Set-Content -Path $fullFilePath -Encoding utf8 -Value ""
 }
 
@@ -57,7 +57,9 @@ function Import-CertificateToKeystoreWithAlias {
         [string]$KeyStorePath,
         [string]$CertificatePath,
         [string]$Alias,
-        [string]$StorePass
+        [string]$StorePass,
+        [string]$Fqdn,
+        [string]$AddiIP
     )
 
     Write-Host "Importing certificate to keystore with alias: $Alias"
@@ -67,7 +69,7 @@ function Import-CertificateToKeystoreWithAlias {
         return
     }
 
-    keytool -importcert -keystore "$KeyStorePath" -file "$CertificatePath" -alias "$Alias" -storepass "$StorePass" -noprompt
+    keytool -importcert -keystore "$KeyStorePath" -file "$CertificatePath" -alias "$Alias" -storepass "$StorePass" -noprompt -ext BasicConstraints:critical=ca:true -ext "san=dns:$Fqdn,ip:$AddiIP"
 }
 
 function ConfigureCerts {
@@ -75,7 +77,9 @@ function ConfigureCerts {
         [string]$RefactorIP,
         [string]$CertificatePath,
         [string]$KeyPass,
-        [string]$Fqdn
+        [string]$Fqdn,
+        [string]$PrivateKeyPath,
+        [string]$AddiIP
     )
 
     Write-Host "ConfigureCerts RefactorIP: $RefactorIP , CertificatePath: $CertificatePath"
@@ -96,19 +100,29 @@ function ConfigureCerts {
 
     $fullFilePath = Join-Path $CertificatePath $serverKeyFileName
 
-    openssl pkcs12 -in $fullKeyStoreFilePath -nocerts -nodes -out $fullServerKeyFilePath
+    openssl pkcs12 -password pass:$KeyPass -in $fullKeyStoreFilePath -nocerts -nodes -out $fullServerKeyFilePath
 
-    scp root@${RefactorIP}:/root/certs/root.crt $fullRootCertFilePath
+
+    $scpCommand = "scp"
+    if($PrivateKeyPath -and (Test-Path $PrivateKeyPath)) {
+        $scpCommand += " -i $PrivateKeyPath"
+    }
+    # copy file to remote host
+    $scpCommand += "  root@${RefactorIP}:/root/certs/root.crt ${fullRootCertFilePath}"
+
+    Invoke-Expression $scpCommand
+
+    # scp root@${RefactorIP}:/root/certs/root.crt $fullRootCertFilePath
 
     # creates combined.cer and combined.crt
     (Get-Content $fullCertificateFilePath -Raw) + (Get-Content $fullRootCertFilePath -Raw) | Set-Content -Encoding ASCII -NoNewline $fullCombinedFilePath
     (Get-Content $fullCertificateFilePath -Raw) + (Get-Content $fullRootCertFilePath -Raw) | Set-Content -Encoding ASCII -NoNewline $fullCombinedCertFileName
 
     # add the root certificate to the keystore
-    keytool -importcert -keystore $fullKeyStoreFilePath -file $fullRootCertFilePath -alias "root" -storepass "$KeyPass" -noprompt
+    keytool -importcert -keystore $fullKeyStoreFilePath -file $fullRootCertFilePath -alias "root" -storepass "$KeyPass" -noprompt -ext BasicConstraints:critical=ca:true -ext "san=dns:$Fqdn,ip:$AddiIP"
 
     # import the combined .cert file into the keystore
-    keytool -importcert -keystore $fullKeyStoreFilePath -file $fullCombinedFilePath -alias "combined" -storepass "$KeyPass" -noprompt
+    keytool -importcert -keystore $fullKeyStoreFilePath -file $fullCombinedFilePath -alias "combined" -storepass "$KeyPass" -noprompt -ext BasicConstraints:critical=ca:true -ext "san=dns:$Fqdn,ip:$AddiIP"
 
 
     Write-Host "Certificates configured successfully"
@@ -157,28 +171,81 @@ function Add-RootCertificateToTrustedRoot {
     }
 }
 
+function TestConnection {
+    param (
+        [string]$AddiIP,
+        [string]$RefactorIP,
+        [string]$PrivateKeyPath
+    )
+    try {
+        $dummyFilePath = "C:\dummy.txt"
+        if (-not (Test-Path $dummyFilePath -PathType Leaf)) {
+            New-Item -Path $dummyFilePath -ItemType File -Value "This is a dummy file"
+        }
+        $sshCommand = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+        if ($PrivateKeyPath -and (Test-Path $PrivateKeyPath)) {
+            $sshCommand += " -i $PrivateKeyPath"
+        }
+        $sshCommand += " root@${RefactorIP} 'exit'"
+        Invoke-Expression $sshCommand | Out-Null
+        Write-Host "SSH connection to $RefactorIP successful."
+    } catch {
+        Write-Host "Failed to establish ssh connection to $RefactorIP with private key. Exiting script." -ForegroundColor Red
+        exit 1
+    }
+    # test scp connection
+    try {
+
+        $destination = "root@${RefactorIP}:/root/"
+
+        $scpCommand = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+        if ($PrivateKeyPath -and (Test-Path $PrivateKeyPath)) {
+            $scpCommand += " -i $PrivateKeyPath"
+        }
+        # add source and des paths to the scp scpCommand
+        $scpCommand += " `"$dummyFilePath`" $destination"
+        Invoke-Expression $scpCommand
+        Write-Host "Scp connection to $RefactorIP was successful."
+    } catch {
+        Write-Host "Failed to establish SCP connection to $RefactorIP. Exiting script." -ForegroundColor Red
+        exit 1
+    }
+}
+
 function ExportFileToRemoteHost {
     param (
         [string]$CertificatePath,
         [string]$AddiIP,
-        [string]$RefactorIP
+        [string]$RefactorIP,
+        [string]$PrivateKeyPath
     )
+
+    Test-NetConnection -ComputerName $RefactorIP -Port 22
+
     Write-Host "Exporting file to remote host zookeeper.yaml && zookeper.crt"
     $zooKeeperFileName = "zookeeper.crt"
     $fullZooKeeperFilePath = Join-Path $CertificatePath $zooKeeperFileName
     cat $fullZooKeeperFilePath
 
-    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$fullZooKeeperFilePath" ("root@" + $RefactorIP + ":/etc/pki/ca-trust/source/anchors/zookeeper.crt")
+    $scpCommand = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+    if($PrivateKeyPath -and (Test-Path $PrivateKeyPath)) {
+        $scpCommand += " -i $PrivateKeyPath"
+    }
+    # copy file to remote host
+    $scpCommand += " `"${fullZooKeeperFilePath}`" root@${RefactorIP}:/etc/pki/ca-trust/source/anchors/zookeeper.crt"
+
+    Invoke-Expression $scpCommand
 
     if ($LastExitCode -eq 0) {
         Write-Host "File copied successfully to refactor host"
+        $sshCommand = "ssh -o StrictHostKeyChecking -o UserKnownHostsFile=/dev/null root@${RefactorIP}"
+        Invoke-Expression "$sshCommand `"`sudo update-ca-trust extract`""
 
-        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "sudo update-ca-trust extract"
         if ($LastExitCode -eq 0) {
             Write-Host "CA trust store updated successfully on refactor host."
-            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/ad.crt"
-            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/dex.crt"
-            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RefactorIP "ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/zookeeper.crt"
+            Invoke-Expression "$sshCommand `"`ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/ad.crt`""
+            Invoke-Expression "$sshCommand `"`ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/dex.crt`""
+            Invoke-Expression "$sshCommand `"`ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/zookeeper.crt`""
         } else {
             Write-Host "Failed to update CA trust store on Refactor host." -ForegroundColor Red
         }
