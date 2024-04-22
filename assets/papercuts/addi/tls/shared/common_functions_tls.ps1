@@ -2,9 +2,7 @@ function GenerateKeyPair {
     param(
         [string]$KeyPass,
         [string]$KeyStorePath,
-        [string]$Fqdn,
-        [string]$AddiIP,
-        [string]$RefactorIP
+        [string]$Fqdn
     )
     Write-Host "GenerateKeyPair KeyStorePath: $KeyStorePath , KeyPass: $KeyPass , FQDN: $Fqdn"
     keytool -genkeypair -alias "$Fqdn" -keyalg RSA -keysize 2048 -dname "cn=$Fqdn" -ext BasicConstraints:critical=ca:true -keypass "$KeyPass" -keystore "$KeyStorePath" -storepass "$KeyPass" -storetype PKCS12
@@ -54,9 +52,7 @@ function Import-CertificateToKeystoreWithAlias {
         [string]$KeyStorePath,
         [string]$CertificatePath,
         [string]$Alias,
-        [string]$StorePass,
-        [string]$Fqdn,
-        [string]$AddiIP
+        [string]$StorePass
     )
     Write-Host "Importing certificate to keystore with alias: $Alias"
 
@@ -72,9 +68,7 @@ function ConfigureCerts {
         [string]$RefactorIP,
         [string]$CertificatePath,
         [string]$KeyPass,
-        [string]$Fqdn,
-        [string]$PrivateKeyPath,
-        [string]$AddiIP
+        [string]$PrivateKeyPath
     )
     Write-Host "ConfigureCerts RefactorIP: $RefactorIP , CertificatePath: $CertificatePath"
 
@@ -106,7 +100,7 @@ function ConfigureCerts {
 
     Invoke-Expression $scpCommand
 
-    # scp root@${RefactorIP}:/root/certs/root.crt $fullRootCertFilePath
+    scp root@${RefactorIP}:/root/certs/root.crt $fullRootCertFilePath
 
     # creates combined.cer and combined.crt
     (Get-Content $fullCertificateFilePath -Raw) + (Get-Content $fullRootCertFilePath -Raw) | Set-Content -Encoding ASCII -NoNewline $fullCombinedFilePath
