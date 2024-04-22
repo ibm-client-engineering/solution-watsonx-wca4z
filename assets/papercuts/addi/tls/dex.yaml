@@ -1,4 +1,4 @@
-issuer: https://${AddiIP}:7600/dex
+issuer: https://${AddiFQDN}:7600/dex
 storage:
   type: sqlite3
   config:
@@ -15,6 +15,7 @@ enablePasswordDB: true
 staticClients:
   - id: refactoring-assistant
     redirectURIs:
+      - https://${RefactorFQDN}:9443
       - https://${RefactorIP}:9443
     name: Refactoring Assistant
     secret: pkce
