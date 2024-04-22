@@ -6,8 +6,9 @@ function GenerateKeyPair {
         [string]$AddiIP,
         [string]$RefactorIP
     )
+    $fqdn = "addi.cpdkh23yy.ibmworkshops.com"
     Write-Host "GenerateKeyPair KeyStorePath: $KeyStorePath , KeyPass: $KeyPass , FQDN: $Fqdn"
-    keytool -genkeypair -alias "$Fqdn" -keyalg RSA -keysize 2048 -dname "cn=$Fqdn" -ext BasicConstraints:critical=ca:true -ext "san=dns:$Fqdn,ip:$AddiIP,ip:$RefactorIP" -keypass "$KeyPass" -keystore "$KeyStorePath" -storepass "$KeyPass" -storetype PKCS12
+    keytool -genkeypair -alias "$Fqdn" -keyalg RSA -keysize 2048 -dname "cn=$Fqdn" -ext BasicConstraints:critical=ca:true -keypass "$KeyPass" -keystore "$KeyStorePath" -storepass "$KeyPass" -storetype PKCS12
 }
 
 function Export-CertificateToPfx {
@@ -18,10 +19,10 @@ function Export-CertificateToPfx {
         [string]$CertificatePath,
         [string]$Filename
     )
-
+    $fqdn = "addi.cpdkh23yy.ibmworkshops.com"
     $fullFilePath = Join-Path $CertificatePath $Filename
     Write-Host "Export-CertificateToPfx KeyStorePath: $KeyStorePath , CertificatePath: $CertificatePath, KeyPass: $KeyPass , Filename: $Filename , fullFilePath: $fullFilePath"
-    keytool -exportcert -alias "$Fqdn" -keystore "$KeyStorePath" -file $fullFilePath -storepass "$KeyPass" -rfc -ext BasicConstraints:critical=ca:true -ext "san=dns:$Fqdn,ip:$AddiIP"
+    keytool -exportcert -alias "$Fqdn" -keystore "$KeyStorePath" -file $fullFilePath -storepass "$KeyPass" -rfc -ext BasicConstraints:critical=ca:true
     # Set-Content -Path $fullFilePath -Encoding utf8 -Value ""
 }
 
@@ -33,6 +34,7 @@ function Import-CertificateToKeystore {
         [string]$Filename,
         [string]$Fqdn
     )
+    $fqdn = "addi.cpdkh23yy.ibmworkshops.com"
 
     $fullFilePath = Join-Path $CertificatePath $Filename
     Write-Host "Import-CertificateToKeystore  KeyStorePath: $KeyStorePath , CertificatePath: $CertificatePath, KeyPass: $KeyPass , Filename: $Filename , fullFilePath: $fullFilePath"
@@ -61,6 +63,7 @@ function Import-CertificateToKeystoreWithAlias {
         [string]$Fqdn,
         [string]$AddiIP
     )
+    $fqdn = "addi.cpdkh23yy.ibmworkshops.com"
 
     Write-Host "Importing certificate to keystore with alias: $Alias"
 
@@ -68,8 +71,7 @@ function Import-CertificateToKeystoreWithAlias {
         Write-Host "Certificate file not found: $CertificatePath"
         return
     }
-
-    keytool -importcert -keystore "$KeyStorePath" -file "$CertificatePath" -alias "$Alias" -storepass "$StorePass" -noprompt -ext BasicConstraints:critical=ca:true -ext "san=dns:$Fqdn,ip:$AddiIP"
+    keytool -importcert -keystore "$KeyStorePath" -file "$CertificatePath" -alias "$Alias" -storepass "$StorePass" -noprompt -ext BasicConstraints:critical=ca:true
 }
 
 function ConfigureCerts {
@@ -81,6 +83,7 @@ function ConfigureCerts {
         [string]$PrivateKeyPath,
         [string]$AddiIP
     )
+    $fqdn = "addi.cpdkh23yy.ibmworkshops.com"
 
     Write-Host "ConfigureCerts RefactorIP: $RefactorIP , CertificatePath: $CertificatePath"
 
@@ -119,10 +122,10 @@ function ConfigureCerts {
     (Get-Content $fullCertificateFilePath -Raw) + (Get-Content $fullRootCertFilePath -Raw) | Set-Content -Encoding ASCII -NoNewline $fullCombinedCertFileName
 
     # add the root certificate to the keystore
-    keytool -importcert -keystore $fullKeyStoreFilePath -file $fullRootCertFilePath -alias "root" -storepass "$KeyPass" -noprompt -ext BasicConstraints:critical=ca:true -ext "san=dns:$Fqdn,ip:$AddiIP"
+    keytool -importcert -keystore $fullKeyStoreFilePath -file $fullRootCertFilePath -alias "root" -storepass "$KeyPass" -noprompt -ext BasicConstraints:critical=ca:true
 
     # import the combined .cert file into the keystore
-    keytool -importcert -keystore $fullKeyStoreFilePath -file $fullCombinedFilePath -alias "combined" -storepass "$KeyPass" -noprompt -ext BasicConstraints:critical=ca:true -ext "san=dns:$Fqdn,ip:$AddiIP"
+    keytool -importcert -keystore $fullKeyStoreFilePath -file $fullCombinedFilePath -alias "combined" -storepass "$KeyPass" -noprompt -ext BasicConstraints:critical=ca:true
 
 
     Write-Host "Certificates configured successfully"
