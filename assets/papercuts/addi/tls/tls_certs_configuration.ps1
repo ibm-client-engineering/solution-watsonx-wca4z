@@ -16,6 +16,8 @@ function Main {
       $CertificatePath = $env:CertificatePath
       $RefactorIP = $env:RefactorIP
       $AddiIP = $env:AddiIP
+      $AddiFQDN = $env:AddiFQDN
+
       $JreCaCertsPath = $env:JreCaCertsPath
       $PrivateKeyPath = $env:PrivateKeyPath
 
@@ -33,6 +35,7 @@ function Main {
       $ZookeeperFileName = "zookeeper.crt"
 
       # Generate key pair, export and import cert to keystore
+      $fqdn = $AddiFQDN # overwrite fqdn with whatever the user puts on the .env for now TO-DO fix this in the future
       GenerateKeyPair -KeyPass $KeyPass -KeyStorePath $KeyStorePath -Fqdn $fqdn -AddiIP $AddiIP -RefactorIP $RefactorIP
       Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ServerCertificateFileName
       # creates zookeeper.crt file
