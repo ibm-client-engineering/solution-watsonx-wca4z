@@ -16,11 +16,9 @@ function Main {
       $CertificatePath = $env:CertificatePath
       $RefactorIP = $env:RefactorIP
       $AddiIP = $env:AddiIP
-      $AddiFQDN = $env:AddiFQDN
-
       $JreCaCertsPath = $env:JreCaCertsPath
       $PrivateKeyPath = $env:PrivateKeyPath
-
+      $DB2CertPath = $env:DB2CertPath
       TestConnection -AddiIP $AddiIP -RefactorIP $RefactorIP -PrivateKeyPath $PrivateKeyPath
 
 
@@ -35,14 +33,13 @@ function Main {
       $ZookeeperFileName = "zookeeper.crt"
 
       # Generate key pair, export and import cert to keystore
-      $fqdn = $AddiFQDN # overwrite fqdn with whatever the user puts on the .env for now TO-DO fix this in the future
-      GenerateKeyPair -KeyPass $KeyPass -KeyStorePath $KeyStorePath -Fqdn $fqdn
+      GenerateKeyPair -KeyPass $KeyPass -KeyStorePath $KeyStorePath -Fqdn $fqdn -AddiIP $AddiIP -RefactorIP $RefactorIP
       Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ServerCertificateFileName
       # creates zookeeper.crt file
       Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ZookeeperFileName
-      Import-CertificateToKeystoreWithAlias -KeyStorePath $KeyStorePath -CertificatePath $ServerCertificateFileName -Alias "self-signed-root" -StorePass $KeyPass
-
-      ConfigureCerts -RefactorIP $RefactorIP -CertificatePath $CertificatePath -KeyPass $KeyPass -PrivateKeyPath $PrivateKeyPath
+      Import-CertificateToKeystoreWithAlias -KeyStorePath $KeyStorePath -CertificatePath $ServerCertificateFileName -Alias "self-signed-root" -StorePass $KeyPass -Fqdn $Fqdn -AddiIP $AddiIP -RefactorIP $RefactorIP
+      ImportDB2CertIntoKeyStore -KeyStorePath $KeyStorePath -KeyPass $KeyPass -DB2CertPath $DB2CertPath
+      ConfigureCerts -RefactorIP $RefactorIP -CertificatePath $CertificatePath -KeyPass $KeyPass -Fqdn $fqdn -PrivateKeyPath $PrivateKeyPath -AddiIP $AddiIP
 
       ImportCertToJavaKeyStore -KeyStorePath $KeyStorePath -KeyPass $KeyPass -JreCaCertsPath $JreCaCertsPath
 

@@ -2,8 +2,13 @@ function GenerateKeyPair {
     param(
         [string]$KeyPass,
         [string]$KeyStorePath,
-        [string]$Fqdn
+        [string]$Fqdn,
+        [string]$AddiIP,
+        [string]$RefactorIP
     )
+    $fqdn = "addi.cpdkh23yy.ibmworkshops.com"
+    $san = "dns:$Fqdn,ip:$AddiIP,ip:$RefactorIP"
+    echo $san
     Write-Host "GenerateKeyPair KeyStorePath: $KeyStorePath , KeyPass: $KeyPass , FQDN: $Fqdn"
     keytool -genkeypair -alias "$Fqdn" -keyalg RSA -keysize 2048 -dname "cn=$Fqdn" -ext BasicConstraints:critical=ca:true -keypass "$KeyPass" -keystore "$KeyStorePath" -storepass "$KeyPass" -storetype PKCS12
 }
@@ -16,9 +21,14 @@ function Export-CertificateToPfx {
         [string]$CertificatePath,
         [string]$Filename
     )
+    $fqdn = "addi.cpdkh23yy.ibmworkshops.com"
+
+    $san = "dns:$Fqdn,ip:$AddiIP,ip:$RefactorIP"
+    echo $san
     $fullFilePath = Join-Path $CertificatePath $Filename
     Write-Host "Export-CertificateToPfx KeyStorePath: $KeyStorePath , CertificatePath: $CertificatePath, KeyPass: $KeyPass , Filename: $Filename , fullFilePath: $fullFilePath"
     keytool -exportcert -alias "$Fqdn" -keystore "$KeyStorePath" -file $fullFilePath -storepass "$KeyPass" -rfc -ext BasicConstraints:critical=ca:true
+    # Set-Content -Path $fullFilePath -Encoding utf8 -Value ""
 }
 
 function Import-CertificateToKeystore {
@@ -29,6 +39,8 @@ function Import-CertificateToKeystore {
         [string]$Filename,
         [string]$Fqdn
     )
+    $fqdn = "addi.cpdkh23yy.ibmworkshops.com"
+
     $fullFilePath = Join-Path $CertificatePath $Filename
     Write-Host "Import-CertificateToKeystore  KeyStorePath: $KeyStorePath , CertificatePath: $CertificatePath, KeyPass: $KeyPass , Filename: $Filename , fullFilePath: $fullFilePath"
 
@@ -52,14 +64,21 @@ function Import-CertificateToKeystoreWithAlias {
         [string]$KeyStorePath,
         [string]$CertificatePath,
         [string]$Alias,
-        [string]$StorePass
+        [string]$StorePass,
+        [string]$Fqdn,
+        [string]$AddiIP,
+        [string]$RefactorIP
     )
+    $fqdn = "addi.cpdkh23yy.ibmworkshops.com"
+
     Write-Host "Importing certificate to keystore with alias: $Alias"
 
     if (-not (Test-Path $CertificatePath -PathType Leaf)) {
         Write-Host "Certificate file not found: $CertificatePath"
         return
     }
+    $san = "dns:$Fqdn,ip:$AddiIP,ip:$RefactorIP"
+    echo $san
     keytool -importcert -keystore "$KeyStorePath" -file "$CertificatePath" -alias "$Alias" -storepass "$StorePass" -noprompt -ext BasicConstraints:critical=ca:true
 }
 
@@ -68,8 +87,12 @@ function ConfigureCerts {
         [string]$RefactorIP,
         [string]$CertificatePath,
         [string]$KeyPass,
-        [string]$PrivateKeyPath
+        [string]$Fqdn,
+        [string]$PrivateKeyPath,
+        [string]$AddiIP
     )
+    $fqdn = "addi.cpdkh23yy.ibmworkshops.com"
+
     Write-Host "ConfigureCerts RefactorIP: $RefactorIP , CertificatePath: $CertificatePath"
 
     $serverKeyFileName = "server.key"
@@ -100,12 +123,14 @@ function ConfigureCerts {
 
     Invoke-Expression $scpCommand
 
-    scp root@${RefactorIP}:/root/certs/root.crt $fullRootCertFilePath
+    # scp root@${RefactorIP}:/root/certs/root.crt $fullRootCertFilePath
 
     # creates combined.cer and combined.crt
     (Get-Content $fullCertificateFilePath -Raw) + (Get-Content $fullRootCertFilePath -Raw) | Set-Content -Encoding ASCII -NoNewline $fullCombinedFilePath
     (Get-Content $fullCertificateFilePath -Raw) + (Get-Content $fullRootCertFilePath -Raw) | Set-Content -Encoding ASCII -NoNewline $fullCombinedCertFileName
 
+    $san = "dns:$Fqdn,ip:$AddiIP,ip:$RefactorIP"
+    echo $san
     # add the root certificate to the keystore
     keytool -importcert -keystore $fullKeyStoreFilePath -file $fullRootCertFilePath -alias "root" -storepass "$KeyPass" -noprompt -ext BasicConstraints:critical=ca:true
 
@@ -199,7 +224,6 @@ function TestConnection {
         exit 1
     }
 }
-
 function ExportFileToRemoteHost {
     param (
         [string]$CertificatePath,
@@ -225,23 +249,34 @@ function ExportFileToRemoteHost {
     Invoke-Expression $scpCommand
 
     if ($LastExitCode -eq 0) {
-        Write-Host "File copied successfully to refactor host"
-        $sshCommand = "ssh -o StrictHostKeyChecking -o UserKnownHostsFile=/dev/null root@${RefactorIP}"
-        Invoke-Expression "$sshCommand `"`sudo update-ca-trust extract`""
+        Write-Host "File copied successfully to Refactor host"
+        $sshCommand = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@${RefactorIP}"
+        $sudoCommand = "sudo update-ca-trust extract"
+        Invoke-Expression "$sshCommand `"$sudoCommand`""
 
         if ($LastExitCode -eq 0) {
-            Write-Host "CA trust store updated successfully on refactor host."
+            Write-Host "CA trust store updated successfully on Refactor host."
             Invoke-Expression "$sshCommand `"`ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/ad.crt`""
             Invoke-Expression "$sshCommand `"`ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/dex.crt`""
             Invoke-Expression "$sshCommand `"`ln -s /etc/pki/ca-trust/source/anchors/zookeeper.crt /root/certs/zookeeper.crt`""
         } else {
-            Write-Host "Failed to update CA trust store on Refactor host." -ForegroundColor Red
+            Write-Host "Failed to create symbolic links on Refactor host." -ForegroundColor Red
         }
     } else {
-        Write-Host "Failed to copy file to refactor host" -ForegroundColor Red
+        Write-Host "Failed to copy file to Refactor host" -ForegroundColor Red
     }
 }
 
+function ImportDB2CertIntoKeyStore {
+        param(
+        [string]$KeyStorePath,
+        [string]$KeyPass,
+        [string]$DB2CertPath
+    )
+    Write-Host "ImportDB2CertIntoKeyStore KeyStorePath: $KeyStorePath , KeyPass: $KeyPass , DB2CertPath: $DB2CertPath"
+    keytool -import -trustcacerts -alias "DB2-ssl-cert" -file $DB2CertPath -keystore "$KeyStorePath" -storepass $KeyPass
+
+}
 function UpdateYamlFile {
    param (
         [string]$MyHash,
