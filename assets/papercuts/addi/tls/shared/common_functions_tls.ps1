@@ -129,6 +129,12 @@ function ConfigureCerts {
     (Get-Content $fullCertificateFilePath -Raw) + (Get-Content $fullRootCertFilePath -Raw) | Set-Content -Encoding ASCII -NoNewline $fullCombinedFilePath
     (Get-Content $fullCertificateFilePath -Raw) + (Get-Content $fullRootCertFilePath -Raw) | Set-Content -Encoding ASCII -NoNewline $fullCombinedCertFileName
 
+    # Conctantes contents of the db2_cert.pem into combined.crt
+    $combinedCrtContent = Get-Content $fullCombinedCertFileName -Raw
+    $db2CertContent = Get-Content "C:\certificates\db2_cert.pem" -Raw
+    $combinedCrtContent += $db2CertContent
+    Set-Content -Path $fullCombinedCertFileName -Value $combinedCrtContent -Encoding ASCII
+
     $san = "dns:$Fqdn,ip:$AddiIP,ip:$RefactorIP"
     echo $san
     # add the root certificate to the keystore
@@ -276,6 +282,13 @@ function ImportDB2CertIntoKeyStore {
     Write-Host "ImportDB2CertIntoKeyStore KeyStorePath: $KeyStorePath , KeyPass: $KeyPass , DB2CertPath: $DB2CertPath"
     keytool -import -trustcacerts -alias "DB2-ssl-cert" -file $DB2CertPath -keystore "$KeyStorePath" -storepass $KeyPass
 
+}
+function GenerateDB2CertPem {
+    param(
+    [string]$DB2CertPath
+    )
+   Write-Host "GenerateDB2CertPem DB2CertPath: $DB2CertPath"
+   openssl x509 -inform DER -in "$DB2CertPath" -out "C:\certificates\db2_cert.pem"
 }
 function UpdateYamlFile {
    param (

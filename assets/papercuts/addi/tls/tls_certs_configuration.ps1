@@ -39,8 +39,8 @@ function Main {
       Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ZookeeperFileName
       Import-CertificateToKeystoreWithAlias -KeyStorePath $KeyStorePath -CertificatePath $ServerCertificateFileName -Alias "self-signed-root" -StorePass $KeyPass -Fqdn $Fqdn -AddiIP $AddiIP -RefactorIP $RefactorIP
       ImportDB2CertIntoKeyStore -KeyStorePath $KeyStorePath -KeyPass $KeyPass -DB2CertPath $DB2CertPath
+      GenerateDB2CertPem -DB2CertPath $DB2CertPath
       ConfigureCerts -RefactorIP $RefactorIP -CertificatePath $CertificatePath -KeyPass $KeyPass -Fqdn $fqdn -PrivateKeyPath $PrivateKeyPath -AddiIP $AddiIP
-
       ImportCertToJavaKeyStore -KeyStorePath $KeyStorePath -KeyPass $KeyPass -JreCaCertsPath $JreCaCertsPath
 
       # Import the root certificate to the trusted root certification authorities store
