@@ -78,7 +78,7 @@ Create the name as `db2_sa` with the `Manager` role and click `Add`
 
 ![CleanShot 2024-04-24 at 13 55 00](https://media.github.ibm.com/user/20330/files/415d1212-eea0-4e84-b79b-6b400481ccf7)
 
-The API key will be generated as well as a password. Take note of these values from the JSON.
+The service UserID will be generated as well as a password. Take note of these values from the JSON.
 
 ```json
 {
@@ -164,7 +164,6 @@ From the above output we can extract the following values for this service accou
 
 - Service Account Username: `856d915d`
 - Service Account Password: `7bpRpEYGALwWt4fr`
-- Service Account API Key: `VHKChdvb_AzpSEQPjK7foePL41UJgr13ACQzRRHU03te`
 - FQDN + Port: `dbd5d8b8-61c3-49dc-9213-79a4104c27f6.c8l9ggsd0kmvoig3l8kg.databases.appdomain.cloud:31106`
 
 ## Installing/Configuring DB2 Client 
@@ -214,6 +213,64 @@ In the webui for DB2, let's also create a user to admin this database. This is s
 In our case, we created a user called `wca4z_db2` and gave him the password `yhJ_sBvn7qx-B6YXJjBA`
 
 ![CleanShot 2024-03-03 at 12 33 48](https://media.github.ibm.com/user/20330/files/5854e74c-5b89-4645-99af-aeff51c6cb61)
+
+## Configure WCA4Z instance for DB2
+
+In the IBM Cloud Dashboard under resources select the WCA4Z instance
+
+![CleanShot 2024-04-24 at 14 25 30](https://media.github.ibm.com/user/20330/files/1aa13aa7-a7fc-4404-98a8-813add84260d)
+
+Launce the watsonx Code Assistant ui
+
+![CleanShot 2024-04-24 at 14 27 41](https://media.github.ibm.com/user/20330/files/8628ba85-e93d-46da-813e-0dc70e4625d6)
+
+We are going to perform the tasks highlighted by the red arrows.
+
+![CleanShot 2024-04-24 at 14 30 11](https://media.github.ibm.com/user/20330/files/8830bb26-f001-4e01-a879-9e8812b9e461)
+
+### Create service Id
+
+We'll call it `wca4z_service_id`
+![CleanShot 2024-04-24 at 14 34 08](https://media.github.ibm.com/user/20330/files/3f8c285b-fc46-4983-965c-c20b7cd29765)
+
+### Create API Key
+
+Once the service ID is created, select API Keys from left hand side. Click Create and call the API key `wca-api-key`
+
+![CleanShot 2024-04-24 at 14 39 30](https://media.github.ibm.com/user/20330/files/759f1c90-654a-44d1-a039-1d8d333443d0)
+
+Copy or download the API key somewhere safe. This is needed for next step.
+
+![CleanShot 2024-04-24 at 14 42 32](https://media.github.ibm.com/user/20330/files/d0d4bc09-a923-49c2-bff3-698fd839d7bd)
+
+### Create the Deployment Space
+
+We are going with `wca-deployment` for our deployment space name.
+
+![CleanShot 2024-04-24 at 15 36 05](https://media.github.ibm.com/user/20330/files/cb165f94-8f54-4172-95d4-0bc2e411e7fc)
+
+### Add Service ID to Deployment Space
+
+Select under the `Add collaborators` button add service ids
+
+![CleanShot 2024-04-24 at 15 39 29](https://media.github.ibm.com/user/20330/files/824564ea-64bf-4742-9aae-861bfaeec3a8)
+
+Check off the service ID we created earlier and set the role to `Admin`
+
+### Add DB2 Connection to workspace
+
+Under Import asserts, select Data access and then Connection
+
+![CleanShot 2024-04-24 at 15 45 23](https://media.github.ibm.com/user/20330/files/2d566f5c-c8aa-4a7e-8a1b-9cdcac063992)
+
+Select IBM under the provider and DB2 on Cloud
+
+![CleanShot 2024-04-24 at 15 46 49](https://media.github.ibm.com/user/20330/files/b721059f-9b08-4fce-b498-4c99104ece4a)
+
+Populate the values with the service account user/pass/fqdn/port we extracted from our returned JSON
+
+![CleanShot 2024-04-24 at 15 56 30](https://media.github.ibm.com/user/20330/files/4c8b35b2-23b0-4ebe-b2e9-a0e0d150b058)
+
 
 ## Configure ADDI for DB2
 
