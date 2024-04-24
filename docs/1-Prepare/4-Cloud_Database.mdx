@@ -64,6 +64,109 @@ needs to be configured as follows.
 After configuring the `hosts` file (Found under `C:\Windows\System32\drivers\etc`), you will then
 proceed to configure the connection to DB2 using `plugproxy-xyz.customer.lab` as the hostname.
 
+## Creating the service credentials
+
+In the IBM Cloud dashboard, select databases from the resource list and open it up
+
+![CleanShot 2024-04-24 at 13 51 06](https://media.github.ibm.com/user/20330/files/f0a5d1dd-8401-4ef8-aed2-189b9546214f)
+
+Select the Service Credentials
+
+![CleanShot 2024-04-24 at 13 45 08](https://media.github.ibm.com/user/20330/files/f973cfca-c547-4af9-873a-d66a8b968ee7)
+
+Create the name as `db2_sa` with the `Manager` role and click `Add`
+
+![CleanShot 2024-04-24 at 13 55 00](https://media.github.ibm.com/user/20330/files/415d1212-eea0-4e84-b79b-6b400481ccf7)
+
+The API key will be generated as well as a password. Take note of these values from the JSON.
+
+```json
+{
+  "apikey": "VHKChdvb_AzpSEQPjK7foePL41UJgr13ACQzRRHU03te",
+  "connection": {
+    "cli": {
+      "arguments": [
+        [
+          "-u",
+          "856d915d",
+          "-p",
+          "7bpRpEYGALwWt4fr",
+          "--ssl",
+          "--sslCAFile",
+          "f64c7886-a9cf-45d4-8c62-2a5d468cb8d2",
+          "--authenticationDatabase",
+          "admin",
+          "--host",
+          "dbd5d8b8-61c3-49dc-9213-79a4104c27f6.c8l9ggsd0kmvoig3l8kg.databases.appdomain.cloud:31106"
+        ]
+      ],
+      "bin": "db2",
+      "certificate": {
+        "certificate_base64": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURFakNDQWZxZ0F3SUJBZ0lKQVA1S0R3ZTNCTkxiTUEwR0NTcUdTSWIzRFFFQkN3VUFNQjR4SERBYUJnTlYKQkFNTUUwbENUU0JEYkc5MVpDQkVZWFJoWW1GelpYTXdIaGNOTWpBd01qSTVNRFF5TVRBeVdoY05NekF3TWpJMgpNRFF5TVRBeVdqQWVNUnd3R2dZRFZRUUREQk5KUWswZ1EyeHZkV1FnUkdGMFlXSmhjMlZ6TUlJQklqQU5CZ2txCmhraUc5dzBCQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBdXUvbitpWW9xdkdGNU8xSGpEalpsK25iYjE4UkR4ZGwKTzRUL3FoUGMxMTREY1FUK0plRXdhdG13aGljTGxaQnF2QWFMb1hrbmhqSVFOMG01L0x5YzdBY291VXNmSGR0QwpDVGcrSUsxbjBrdDMrTHM3d1dTakxqVE96N3M3MlZUSU5yYmx3cnRIRUlvM1JWTkV6SkNHYW5LSXdZMWZVSUtrCldNMlR0SDl5cnFsSGN0Z2pIUlFmRkVTRmlYaHJiODhSQmd0amIva0xtVGpCaTFBeEVadWNobWZ2QVRmNENOY3EKY21QcHNqdDBPTnI0YnhJMVRyUWxEemNiN1hMSFBrWW91SUprdnVzMUZvaTEySmRNM1MrK3labFZPMUZmZkU3bwpKMjhUdGJoZ3JGOGtIU0NMSkJvTTFSZ3FPZG9OVm5QOC9EOWZhamNNN0lWd2V4a0lSOTNKR1FJREFRQUJvMU13ClVUQWRCZ05WSFE0RUZnUVVlQ3JZanFJQzc1VUpxVmZEMDh1ZWdqeDZiUmN3SHdZRFZSMGpCQmd3Rm9BVWVDclkKanFJQzc1VUpxVmZEMDh1ZWdqeDZiUmN3RHdZRFZSMFRBUUgvQkFVd0F3RUIvekFOQmdrcWhraUc5dzBCQVFzRgpBQU9DQVFFQUkyRTBUOUt3MlN3RjJ2MXBqaHV4M0lkWWV2SGFVSkRMb0tPd0hSRnFSOHgxZ2dRcGVEcFBnMk5SCkx3R08yek85SWZUMmhLaWd1d2orWnJ5SGxxcHlxQ0pLOHJEU28xZUVPekIyWmE2S1YrQTVscEttMWdjV3VHYzMKK1UrVTFzTDdlUjd3ZFFuVjU0TVU4aERvNi9sVHRMRVB2Mnc3VlNPSlFDK013ejgrTFJMdjVHSW5BNlJySWNhKwozM0wxNnB4ZEttd1pLYThWcnBnMXJ3QzRnY3dlYUhYMUNEWE42K0JIbzhvWG5YWkh6UG91cldYS1BoaGdXZ2J5CkNDcUdIK0NWNnQ1eFg3b05NS3VNSUNqRVZndnNLWnRqeTQ5VW5iNVZZbHQ0b1J3dTFlbGdzRDNjekltbjlLREQKNHB1REFvYTZyMktZZE4xVkxuN3F3VG1TbDlTU05RPT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=",
+        "name": "f64c7886-a9cf-45d4-8c62-2a5d468cb8d2"
+      },
+      "composed": [
+        "db2 -u 856d915d -p 7bpRpEYGALwWt4fr --ssl --sslCAFile f64c7886-a9cf-45d4-8c62-2a5d468cb8d2 --authenticationDatabase admin --host dbd5d8b8-61c3-49dc-9213-79a4104c27f6.c8l9ggsd0kmvoig3l8kg.databases.appdomain.cloud:31106"
+      ],
+      "environment": {},
+      "type": "cli"
+    },
+    "db2": {
+      "authentication": {
+        "method": "direct",
+        "password": "7bpRpEYGALwWt4fr",
+        "username": "856d915d"
+      },
+      "certificate": {
+        "certificate_base64": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURFakNDQWZxZ0F3SUJBZ0lKQVA1S0R3ZTNCTkxiTUEwR0NTcUdTSWIzRFFFQkN3VUFNQjR4SERBYUJnTlYKQkFNTUUwbENUU0JEYkc5MVpDQkVZWFJoWW1GelpYTXdIaGNOTWpBd01qSTVNRFF5TVRBeVdoY05NekF3TWpJMgpNRFF5TVRBeVdqQWVNUnd3R2dZRFZRUUREQk5KUWswZ1EyeHZkV1FnUkdGMFlXSmhjMlZ6TUlJQklqQU5CZ2txCmhraUc5dzBCQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBdXUvbitpWW9xdkdGNU8xSGpEalpsK25iYjE4UkR4ZGwKTzRUL3FoUGMxMTREY1FUK0plRXdhdG13aGljTGxaQnF2QWFMb1hrbmhqSVFOMG01L0x5YzdBY291VXNmSGR0QwpDVGcrSUsxbjBrdDMrTHM3d1dTakxqVE96N3M3MlZUSU5yYmx3cnRIRUlvM1JWTkV6SkNHYW5LSXdZMWZVSUtrCldNMlR0SDl5cnFsSGN0Z2pIUlFmRkVTRmlYaHJiODhSQmd0amIva0xtVGpCaTFBeEVadWNobWZ2QVRmNENOY3EKY21QcHNqdDBPTnI0YnhJMVRyUWxEemNiN1hMSFBrWW91SUprdnVzMUZvaTEySmRNM1MrK3labFZPMUZmZkU3bwpKMjhUdGJoZ3JGOGtIU0NMSkJvTTFSZ3FPZG9OVm5QOC9EOWZhamNNN0lWd2V4a0lSOTNKR1FJREFRQUJvMU13ClVUQWRCZ05WSFE0RUZnUVVlQ3JZanFJQzc1VUpxVmZEMDh1ZWdqeDZiUmN3SHdZRFZSMGpCQmd3Rm9BVWVDclkKanFJQzc1VUpxVmZEMDh1ZWdqeDZiUmN3RHdZRFZSMFRBUUgvQkFVd0F3RUIvekFOQmdrcWhraUc5dzBCQVFzRgpBQU9DQVFFQUkyRTBUOUt3MlN3RjJ2MXBqaHV4M0lkWWV2SGFVSkRMb0tPd0hSRnFSOHgxZ2dRcGVEcFBnMk5SCkx3R08yek85SWZUMmhLaWd1d2orWnJ5SGxxcHlxQ0pLOHJEU28xZUVPekIyWmE2S1YrQTVscEttMWdjV3VHYzMKK1UrVTFzTDdlUjd3ZFFuVjU0TVU4aERvNi9sVHRMRVB2Mnc3VlNPSlFDK013ejgrTFJMdjVHSW5BNlJySWNhKwozM0wxNnB4ZEttd1pLYThWcnBnMXJ3QzRnY3dlYUhYMUNEWE42K0JIbzhvWG5YWkh6UG91cldYS1BoaGdXZ2J5CkNDcUdIK0NWNnQ1eFg3b05NS3VNSUNqRVZndnNLWnRqeTQ5VW5iNVZZbHQ0b1J3dTFlbGdzRDNjekltbjlLREQKNHB1REFvYTZyMktZZE4xVkxuN3F3VG1TbDlTU05RPT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=",
+        "name": "f64c7886-a9cf-45d4-8c62-2a5d468cb8d2"
+      },
+      "composed": [
+        "db2://856d915d:7bpRpEYGALwWt4fr@dbd5d8b8-61c3-49dc-9213-79a4104c27f6.c8l9ggsd0kmvoig3l8kg.databases.appdomain.cloud:31106/bludb?authSource=admin&replicaSet=replset"
+      ],
+      "database": "bludb",
+      "host_ros": [
+        "dbd5d8b8-61c3-49dc-9213-79a4104c27f6.c8l9ggsd0kmvoig3l8kg.databases.appdomain.cloud:31858"
+      ],
+      "hosts": [
+        {
+          "hostname": "dbd5d8b8-61c3-49dc-9213-79a4104c27f6.c8l9ggsd0kmvoig3l8kg.databases.appdomain.cloud",
+          "port": 31106
+        }
+      ],
+      "jdbc_url": [
+        "jdbc:db2://dbd5d8b8-61c3-49dc-9213-79a4104c27f6.c8l9ggsd0kmvoig3l8kg.databases.appdomain.cloud:31106/bludb:user=<userid>;password=<your_password>;sslConnection=true;"
+      ],
+      "path": "/bludb",
+      "query_options": {
+        "authSource": "admin",
+        "replicaSet": "replset"
+      },
+      "replica_set": "replset",
+      "scheme": "db2",
+      "type": "uri"
+    }
+  },
+  "iam_apikey_description": "Auto-generated for key crn:v1:bluemix:public:dashdb-for-transactions:us-south:a/fb7864c969b640e29a59ee1365731e3b:dbd5d8b8-61c3-49dc-9213-79a4104c27f6:resource-key:856d915d-d65a-4381-afe1-c92d03288fce",
+  "iam_apikey_id": "ApiKey-f9751182-792f-451b-b963-34de564f6059",
+  "iam_apikey_name": "db2_sa",
+  "iam_role_crn": "crn:v1:bluemix:public:iam::::serviceRole:Manager",
+  "iam_serviceid_crn": "crn:v1:bluemix:public:iam-identity::a/fb7864c969b640e29a59ee1365731e3b::serviceid:ServiceId-719a6cfa-ec45-4ff1-8970-e2208ad69d0d",
+  "instance_administration_api": {
+    "deployment_id": "crn:v1:bluemix:public:dashdb-for-transactions:us-south:a/fb7864c969b640e29a59ee1365731e3b:dbd5d8b8-61c3-49dc-9213-79a4104c27f6::",
+    "instance_id": "crn:v1:bluemix:public:dashdb-for-transactions:us-south:a/fb7864c969b640e29a59ee1365731e3b:dbd5d8b8-61c3-49dc-9213-79a4104c27f6::",
+    "root": "https://api.db2.cloud.ibm.com/v5/ibm"
+  }
+}
+```
+
+From the above output we can extract the following values for this service account:
+
+- Service Account Username: `856d915d`
+- Service Account Password: `7bpRpEYGALwWt4fr`
+- Service Account API Key: `VHKChdvb_AzpSEQPjK7foePL41UJgr13ACQzRRHU03te`
+- FQDN + Port: `dbd5d8b8-61c3-49dc-9213-79a4104c27f6.c8l9ggsd0kmvoig3l8kg.databases.appdomain.cloud:31106`
+
 ## Installing/Configuring DB2 Client 
 
 You will need the following:
@@ -81,8 +184,7 @@ Open the webui and follow the below images
 
 ![CleanShot 2024-03-03 at 12 15 41](https://media.github.ibm.com/user/20330/files/ce46c70f-7edc-4317-823a-9f8a6892fdf4)
 
-![CleanShot 2024-03-03 at 12 16 47](https://media.github.ibm.com/user/20330/files/8c4595c2-7a43-4b21-800d-1d50aad991a8)
-
+![CleanShot 2024-04-24 at 14 09 48](https://media.github.ibm.com/user/20330/files/1965dc98-6e91-4d39-930b-70e0e8494a49)
 
 1. Download Windows driver package
 Download Windows driver package from driver [list](https://www.ibm.com/support/fixcentral/swg/quickorder?parent=ibm%2FInformation%20Management&product=ibm/Information+Management/IBM+Data+Server+Client+Packages&release=11.5.8.0&platform=Windows+64-bit,+x86&function=fixId&fixids=DSClients-ntx64-dsdriver-11.5.9000.352-FP000&includeRequisites=1&includeSupersedes=0&downloadMethod=http&source=fc)
@@ -95,17 +197,17 @@ For ODBC apps, add new entries to the db2dsdriver.cfg driver configuration file 
 	
 Determine the FQDN of your DB2 on Cloud instance:
 
-From the above image our example FQDN for DB2 is `3b84375f-36fb-42b0-8241-ac0e7840e5dc.bpe60pbd01oinge4psd0.databases.appdomain.cloud` and our port is `31838`.
+From the above image our example FQDN for DB2 is `dbd5d8b8-61c3-49dc-9213-79a4104c27f6.c8l9ggsd0kmvoig3l8kg.databases.appdomain.cloud` and our port is `31106`.
 
 Once you have the instance up and you have the FQDN, run the following db2 local config commands in Powershell on the ADDI Host as illustrated from the db2 webui:
 
 ```powershell
-db2cli writecfg add -database bludb -host 3b84375f-36fb-42b0-8241-ac0e7840e5dc.bpe60pbd01oinge4psd0.databases.appdomain.cloud-port 31838
-db2cli writecfg add -dsn dashdb -database bludb -host3b84375f-36fb-42b0-8241-ac0e7840e5dc.bpe60pbd01oinge4psd0.databases.appdomain.cloud -port 31838
-db2cli writecfg add -database bludb -host 3b84375f-36fb-42b0-8241-ac0e7840e5dc.bpe60pbd01oinge4psd0.databases.appdomain.cloud-port 31838 -parameter "SecurityTransportMode=SSL"
+db2cli writecfg add -database bludb -host dbd5d8b8-61c3-49dc-9213-79a4104c27f6.c8l9ggsd0kmvoig3l8kg.databases.appdomain.cloud -port 31106
+db2cli writecfg add -dsn dashdb -database bludb -host dbd5d8b8-61c3-49dc-9213-79a4104c27f6.c8l9ggsd0kmvoig3l8kg.databases.appdomain.cloud -port 31106
+db2cli writecfg add -database bludb -host dbd5d8b8-61c3-49dc-9213-79a4104c27f6.c8l9ggsd0kmvoig3l8kg.databases.appdomain.cloud -port 31106 -parameter "SecurityTransportMode=SSL"
 ```
 
-In the webui for DB2, let's also create a user to admin this database:
+In the webui for DB2, let's also create a user to admin this database. This is separate from the service account we created above:
 
 ![CleanShot 2024-03-03 at 12 30 49](https://media.github.ibm.com/user/20330/files/606791f4-a38b-4975-bdb0-54bc76ec766e)
 
