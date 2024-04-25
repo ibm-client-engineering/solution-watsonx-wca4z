@@ -34,20 +34,32 @@ function Main {
 
       # Generate key pair, export and import cert to keystore
       GenerateKeyPair -KeyPass $KeyPass -KeyStorePath $KeyStorePath -Fqdn $fqdn -AddiIP $AddiIP -RefactorIP $RefactorIP
+
+      # Export Cert to Pfx
       Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ServerCertificateFileName
+
       # creates zookeeper.crt file
       Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ZookeeperFileName
+
+      # Import Cert to Keystore self-signed-root
       Import-CertificateToKeystoreWithAlias -KeyStorePath $KeyStorePath -CertificatePath $ServerCertificateFileName -Alias "self-signed-root" -StorePass $KeyPass -Fqdn $Fqdn -AddiIP $AddiIP -RefactorIP $RefactorIP
+
+      # Import DB2 Cert to KeyStore
       ImportDB2CertIntoKeyStore -KeyStorePath $KeyStorePath -KeyPass $KeyPass -DB2CertPath $DB2CertPath
+
+      # Generate DB2 Cert PEM file
       GenerateDB2CertPem -DB2CertPath $DB2CertPath
+
+      #Configure Certs
       ConfigureCerts -RefactorIP $RefactorIP -CertificatePath $CertificatePath -KeyPass $KeyPass -Fqdn $fqdn -PrivateKeyPath $PrivateKeyPath -AddiIP $AddiIP
+
+      #Import Cert To Java KeyStore
       ImportCertToJavaKeyStore -KeyStorePath $KeyStorePath -KeyPass $KeyPass -JreCaCertsPath $JreCaCertsPath
 
       # Import the root certificate to the trusted root certification authorities store
       $certificateFilePath = $env:certificatePathRoot
       Add-RootCertificateToTrustedRoot -CertificatePath $certificateFilePath
       Add-RootCertificateToTrustedRoot -CertificatePath "C:\certificates\combined.crt"
-
 
       UpdateYamlFile -MyHash $MyHashPassword -AddiIP $AddiIP -RefactorIP $RefactorIP
 
