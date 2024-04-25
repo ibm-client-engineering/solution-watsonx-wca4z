@@ -2,9 +2,7 @@ function GenerateKeyPair {
     param(
         [string]$KeyPass,
         [string]$KeyStorePath,
-        [string]$Fqdn,
-        [string]$AddiIP,
-        [string]$RefactorIP
+        [string]$Fqdn
     )
     Write-Host "GenerateKeyPair KeyStorePath: $KeyStorePath , KeyPass: $KeyPass , FQDN: $Fqdn"
     keytool -genkeypair -alias "$Fqdn" -keyalg RSA -keysize 2048 -dname "cn=$Fqdn" -ext BasicConstraints:critical=ca:true -keypass "$KeyPass" -keystore "$KeyStorePath" -storepass "$KeyPass" -storetype PKCS12
@@ -55,9 +53,7 @@ function Import-CertificateToKeystoreWithAlias {
         [string]$CertificatePath,
         [string]$Alias,
         [string]$StorePass,
-        [string]$Fqdn,
-        [string]$AddiIP,
-        [string]$RefactorIP
+        [string]$Fqdn
     )
     Write-Host "Importing certificate to keystore with alias: $Alias"
 
@@ -74,8 +70,7 @@ function ConfigureCerts {
         [string]$CertificatePath,
         [string]$KeyPass,
         [string]$Fqdn,
-        [string]$PrivateKeyPath,
-        [string]$AddiIP
+        [string]$PrivateKeyPath
     )
     Write-Host "ConfigureCerts RefactorIP: $RefactorIP , CertificatePath: $CertificatePath"
 
@@ -126,15 +121,6 @@ function ConfigureCerts {
 
     Write-Host "Certificates configured successfully"
 }
-
-function DeleteServerCertificate {
-    param(
-        [string]$CertificatePath
-    )
-
-    #Remove-Item -Recurse -Force -Path $CertificatePath
-}
-
 function ImportCertToJavaKeyStore {
     param(
         [string]$KeyStorePath,

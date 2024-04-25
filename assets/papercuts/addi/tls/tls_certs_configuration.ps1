@@ -34,7 +34,7 @@ function Main {
       $ZookeeperFileName = "zookeeper.crt"
 
       # Generate key pair, export and import cert to keystore
-      GenerateKeyPair -KeyPass $KeyPass -KeyStorePath $KeyStorePath -Fqdn $fqdn -AddiIP $AddiIP -RefactorIP $RefactorIP
+      GenerateKeyPair -KeyPass $KeyPass -KeyStorePath $KeyStorePath -Fqdn $fqdn
 
       # Export Cert to Pfx
       Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ServerCertificateFileName
@@ -43,7 +43,7 @@ function Main {
       Export-CertificateToPfx -Fqdn $fqdn -KeyPass $KeyPass -KeyStorePath $KeyStorePath -CertificatePath $CertificatePath -Filename $ZookeeperFileName
 
       # Import Cert to Keystore self-signed-root
-      Import-CertificateToKeystoreWithAlias -KeyStorePath $KeyStorePath -CertificatePath $ServerCertificateFileName -Alias "self-signed-root" -StorePass $KeyPass -Fqdn $Fqdn -AddiIP $AddiIP -RefactorIP $RefactorIP
+      Import-CertificateToKeystoreWithAlias -KeyStorePath $KeyStorePath -CertificatePath $ServerCertificateFileName -Alias "self-signed-root" -StorePass $KeyPass -Fqdn $Fqdn
 
       # Import DB2 Cert to KeyStore
       ImportDB2CertIntoKeyStore -KeyStorePath $KeyStorePath -KeyPass $KeyPass -DB2CertPath $DB2CertPath
@@ -52,7 +52,7 @@ function Main {
       GenerateDB2CertPem -DB2CertPath $DB2CertPath
 
       #Configure Certs
-      ConfigureCerts -RefactorIP $RefactorIP -CertificatePath $CertificatePath -KeyPass $KeyPass -Fqdn $fqdn -PrivateKeyPath $PrivateKeyPath -AddiIP $AddiIP
+      ConfigureCerts -RefactorIP $RefactorIP -CertificatePath $CertificatePath -KeyPass $KeyPass -Fqdn $fqdn -PrivateKeyPath $PrivateKeyPath
 
       #Import Cert To Java KeyStore
       ImportCertToJavaKeyStore -KeyStorePath $KeyStorePath -KeyPass $KeyPass -JreCaCertsPath $JreCaCertsPath
