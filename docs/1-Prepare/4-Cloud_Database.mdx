@@ -206,14 +206,6 @@ db2cli writecfg add -dsn dashdb -database bludb -host dbd5d8b8-61c3-49dc-9213-79
 db2cli writecfg add -database bludb -host dbd5d8b8-61c3-49dc-9213-79a4104c27f6.c8l9ggsd0kmvoig3l8kg.databases.appdomain.cloud -port 31106 -parameter "SecurityTransportMode=SSL"
 ```
 
-In the webui for DB2, let's also create a user to admin this database. This is separate from the service account we created above:
-
-![CleanShot 2024-03-03 at 12 30 49](https://media.github.ibm.com/user/20330/files/606791f4-a38b-4975-bdb0-54bc76ec766e)
-
-In our case, we created a user called `wca4z_db2` and gave him the password `yhJ_sBvn7qx-B6YXJjBA`
-
-![CleanShot 2024-03-03 at 12 33 48](https://media.github.ibm.com/user/20330/files/5854e74c-5b89-4645-99af-aeff51c6cb61)
-
 ## Configure WCA4Z instance for DB2
 
 In the IBM Cloud Dashboard under resources select the WCA4Z instance
@@ -267,19 +259,26 @@ Select IBM under the provider and DB2 on Cloud
 
 ![CleanShot 2024-04-24 at 15 46 49](https://media.github.ibm.com/user/20330/files/b721059f-9b08-4fce-b498-4c99104ece4a)
 
-Populate the values with the service account user/pass/fqdn/port we extracted from our returned JSON
+Populate the values with the service account user/pass/fqdn/port we extracted from our returned JSON. For the connection name we're going with `db2-wca4z-connection`.
 
 ![CleanShot 2024-04-24 at 15 56 30](https://media.github.ibm.com/user/20330/files/4c8b35b2-23b0-4ebe-b2e9-a0e0d150b058)
 
+Finally test the connection and then click `Create`
 
 ## Configure ADDI for DB2
 
 [`db2configuration.bat`](/deployment_files/db2configuration.bat)
 
-Download the above script and run it with your DB2 FQDN. At this point you should have the FQDN, port, User, and password.
+Download the above script and run it with your DB2 FQDN. You will need the following:
+
+- FQDN (retrieved above)
+- Service Account Username (retrieved above): `856d915d`
+- Service Account Password (retrieved above): `7bpRpEYGALwWt4fr`
+- Port: `31106`
+
 
 ```powershell
-PS D:\> .\db2configuration.bat dbName=BLUDB db2Host=3b84375f-36fb-42b0-8241-ac0e7840e5dc.bpe60pbd01oinge4psd0.databases.appdomain.cloud db2Port=31838 db2User=wca4z_db2 db2Password=yhJ_sBvn7qx-B6YXJjBA useTLS=true
+PS D:\> .\db2configuration.bat dbName=BLUDB db2Host=3b84375f-36fb-42b0-8241-ac0e7840e5dc.bpe60pbd01oinge4psd0.databases.appdomain.cloud db2Port=31838 db2User=856d915d db2Password=7bpRpEYGALwWt4fr useTLS=true
 Adding new DB2 database instance into ADDI
 Success.
 ```
