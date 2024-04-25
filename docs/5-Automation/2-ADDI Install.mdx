@@ -45,7 +45,7 @@ OpenJDK 64-Bit Server VM Temurin-11.0.22+7 (build 11.0.22+7, mixed mode)
 
 :::note
 Allow the ability to run scripts
-`Set-ExecutionPolicy RemoteSigned`
+`Set-ExecutionPolicy Unrestricted`
 :::
 
 ### Eclipse Install (2 mins)
@@ -70,7 +70,7 @@ Navigate to the appropriate directory:
 
 
 ```powershell
-cd assets/papercuts/addi/sql_server_install
+cd assets/papercuts/addi/sql_server_installation
 ```
 
 Install MSSQL Server
@@ -125,8 +125,44 @@ cd assets/papercuts/addi/sql_server_install
 .\sql_user_setup.ps1
 ```
 
+
+
+### ADDI Install (20 mins)
+
+First we are going to download the executable for ADDI
+
+Nagivate to this [link](https://w3south-limited-use.cpc.ibm.com/software/xl/download/ticket.wss)
+1. Select "Part Number" below the "Search Options" label
+2. Search "M0H2CML"
+3. Select "HTTPs" as the download method
+4. Press "Search" and download the file
+
+Next, update the ```.env``` files.
+
+Navigate to the addi_installation folder:
+```powershell
+cd assets\papercuts\addi\
+```
+
+Update the .env by adding the ADDI host's external IP address (or FQDN if possible) as the value for the ccsIP parameter and the ccsPort value if the default (2181) is already used.
+
+Update the auto-install.xml files by adding the ADDI host's external IP address (or FQDN if possible) as the value for the CCS_IP and the CCS_PORT value if the default (2181) is already used.
+
+Search for ```$addi_endpoint_install_binary```. Change the value to location of the downloaded zipped file. (For example: $addi_endpoint_install_binary="")
+
+```powershell
+$addi_endpoint_install_binary="[executable file path]"
+```
+
+Run:
+```powershell
+cd assets\papercuts\addi\
+.\install_addi.ps1
+```
+Be sure to complete the install by configuring ADDI through a web browser. If the page does not open automatically while the install script is running, navigate to this URL: https://localhost:9443/ad/admin/setup.
+
 :::note
-If you are having issues with ADDI Server not connecting to the SQL Server you can do the following:
+If you are having issues with ADDI Server not connecting to the SQL Server due to an incorrect login you can do the following:
 :::
 
 Open powershell as an admin
@@ -137,40 +173,6 @@ sqlcmd
 ```
 
 Try again and you should now be able to login
-
-
-### ADDI Install (20 mins)
-
-:::note
-ADDI installer executable is sitting in a personal COS bucket (User will have to store executable somewhere)
-:::
-
-First we are going to download the executable for ADDI
-
-Nagivate to this [link](https://w3east-limited-use.cpc.ibm.com/isc/esd/dswdown/home?ticket=Xa.2%2FXb.ddeX-Pn5_UKDYD1s3YpYVy-E9HPU6DcxxO4Gkg%2FXc.%2FXd.%2FXf.%2FXg.12728081%2FXi.%2FXY.knac%2FXZ.egtpZ_CjXOeNUEnHr5jNVMB0ZKkGNna0)
-1. Select "Part Number" below the "Search Options" label
-2. Search "M0H2CML"
-3. Select "HTTPs" as the download method
-4. Press "Search" and download the file
-
-Next, update the ```.env``` files by adding the ADDI host's external IP address (or FQDN if possible) as the value to the CCS_IP. Update the CCS_PORT value if the default is already used.
-
-Navigate to the appropriate file:
-```powershell
-cd assets/papercuts/addi/install_addi.ps1
-```
-
-On line 48 change the ```$addi_endpoint_install_binary``` value to the directory with the downloaded executable from above
-
-```powershell
-$addi_endpoint_install_binary="[executable file path]"
-```
-
-Run:
-```powershell
-cd assets/papercuts/addi/install_addi.ps1
-```
-Be sure to complete the install by configuring ADDI through a web browser. If the page does not open automatically while the install script is running, navigate to this URL: https://localhost:9443/ad/admin/setup.
 
 
 Once ADDI has been installed, the next step is to install refactor on the refactor host, using the environmnent ID and host port from this ADDI host.
