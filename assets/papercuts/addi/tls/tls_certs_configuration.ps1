@@ -7,9 +7,7 @@ function Main {
       $envFilePath = ".\.env"
       Set-EnvVariables -FilePath $envFilePath
       Confirm-EnvVariables
-      $hostName = [System.Net.Dns]::GetHostName()
 
-      $fqdn = [System.Net.Dns]::GetHostEntry($hostName).HostName
       $KeyPass = $env:KeyPass
       $MyHashPassword = $env:MyHashPassword
       $KeyStorePath = $env:KeyStorePath
@@ -19,8 +17,11 @@ function Main {
       $JreCaCertsPath = $env:JreCaCertsPath
       $PrivateKeyPath = $env:PrivateKeyPath
       $DB2CertPath = $env:DB2CertPath
-      TestConnection -AddiIP $AddiIP -RefactorIP $RefactorIP -PrivateKeyPath $PrivateKeyPath
+      $AddiFQDN = $env:AddiFQDN
+      $fqdn = $AddiFQDN
 
+      # Test SCP connection against remote host, refactor
+      TestConnection -AddiIP $AddiIP -RefactorIP $RefactorIP -PrivateKeyPath $PrivateKeyPath
 
       if (-not (Test-Path $CertificatePath -PathType Container)) {
           Write-Host "Directory $CertificatePath does not exist... creating one now"
