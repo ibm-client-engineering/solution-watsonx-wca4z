@@ -6,9 +6,6 @@ function GenerateKeyPair {
         [string]$AddiIP,
         [string]$RefactorIP
     )
-    $fqdn = "addi.cpdkh23yy.ibmworkshops.com"
-    $san = "dns:$Fqdn,ip:$AddiIP,ip:$RefactorIP"
-    echo $san
     Write-Host "GenerateKeyPair KeyStorePath: $KeyStorePath , KeyPass: $KeyPass , FQDN: $Fqdn"
     keytool -genkeypair -alias "$Fqdn" -keyalg RSA -keysize 2048 -dname "cn=$Fqdn" -ext BasicConstraints:critical=ca:true -keypass "$KeyPass" -keystore "$KeyStorePath" -storepass "$KeyPass" -storetype PKCS12
 }
@@ -21,10 +18,6 @@ function Export-CertificateToPfx {
         [string]$CertificatePath,
         [string]$Filename
     )
-    $fqdn = "addi.cpdkh23yy.ibmworkshops.com"
-
-    $san = "dns:$Fqdn,ip:$AddiIP,ip:$RefactorIP"
-    echo $san
     $fullFilePath = Join-Path $CertificatePath $Filename
     Write-Host "Export-CertificateToPfx KeyStorePath: $KeyStorePath , CertificatePath: $CertificatePath, KeyPass: $KeyPass , Filename: $Filename , fullFilePath: $fullFilePath"
     keytool -exportcert -alias "$Fqdn" -keystore "$KeyStorePath" -file $fullFilePath -storepass "$KeyPass" -rfc -ext BasicConstraints:critical=ca:true
@@ -39,8 +32,6 @@ function Import-CertificateToKeystore {
         [string]$Filename,
         [string]$Fqdn
     )
-    $fqdn = "addi.cpdkh23yy.ibmworkshops.com"
-
     $fullFilePath = Join-Path $CertificatePath $Filename
     Write-Host "Import-CertificateToKeystore  KeyStorePath: $KeyStorePath , CertificatePath: $CertificatePath, KeyPass: $KeyPass , Filename: $Filename , fullFilePath: $fullFilePath"
 
@@ -69,16 +60,12 @@ function Import-CertificateToKeystoreWithAlias {
         [string]$AddiIP,
         [string]$RefactorIP
     )
-    $fqdn = "addi.cpdkh23yy.ibmworkshops.com"
-
     Write-Host "Importing certificate to keystore with alias: $Alias"
 
     if (-not (Test-Path $CertificatePath -PathType Leaf)) {
         Write-Host "Certificate file not found: $CertificatePath"
         return
     }
-    $san = "dns:$Fqdn,ip:$AddiIP,ip:$RefactorIP"
-    echo $san
     keytool -importcert -keystore "$KeyStorePath" -file "$CertificatePath" -alias "$Alias" -storepass "$StorePass" -noprompt -ext BasicConstraints:critical=ca:true
 }
 
@@ -91,8 +78,6 @@ function ConfigureCerts {
         [string]$PrivateKeyPath,
         [string]$AddiIP
     )
-    $fqdn = "addi.cpdkh23yy.ibmworkshops.com"
-
     Write-Host "ConfigureCerts RefactorIP: $RefactorIP , CertificatePath: $CertificatePath"
 
     $serverKeyFileName = "server.key"
@@ -133,8 +118,6 @@ function ConfigureCerts {
     $combinedCrtContent += $db2CertContent
     Set-Content -Path $fullCombinedCertFileName -Value $combinedCrtContent -Encoding ASCII
 
-    $san = "dns:$Fqdn,ip:$AddiIP,ip:$RefactorIP"
-    echo $san
     # add the root certificate to the keystore
     keytool -importcert -keystore $fullKeyStoreFilePath -file $fullRootCertFilePath -alias "root" -storepass "$KeyPass" -noprompt -ext BasicConstraints:critical=ca:true
 
