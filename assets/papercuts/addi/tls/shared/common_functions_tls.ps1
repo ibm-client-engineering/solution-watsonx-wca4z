@@ -21,7 +21,6 @@ function Export-CertificateToPfx {
     $fullFilePath = Join-Path $CertificatePath $Filename
     Write-Host "Export-CertificateToPfx KeyStorePath: $KeyStorePath , CertificatePath: $CertificatePath, KeyPass: $KeyPass , Filename: $Filename , fullFilePath: $fullFilePath"
     keytool -exportcert -alias "$Fqdn" -keystore "$KeyStorePath" -file $fullFilePath -storepass "$KeyPass" -rfc -ext BasicConstraints:critical=ca:true
-    # Set-Content -Path $fullFilePath -Encoding utf8 -Value ""
 }
 
 function Import-CertificateToKeystore {
