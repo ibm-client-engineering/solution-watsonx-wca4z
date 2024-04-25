@@ -123,8 +123,6 @@ function ConfigureCerts {
 
     Invoke-Expression $scpCommand
 
-    # scp root@${RefactorIP}:/root/certs/root.crt $fullRootCertFilePath
-
     # creates combined.cer and combined.crt
     (Get-Content $fullCertificateFilePath -Raw) + (Get-Content $fullRootCertFilePath -Raw) | Set-Content -Encoding ASCII -NoNewline $fullCombinedFilePath
     (Get-Content $fullCertificateFilePath -Raw) + (Get-Content $fullRootCertFilePath -Raw) | Set-Content -Encoding ASCII -NoNewline $fullCombinedCertFileName
