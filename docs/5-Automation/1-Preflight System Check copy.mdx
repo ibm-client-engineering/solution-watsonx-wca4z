@@ -29,14 +29,16 @@ Refactor Host
 Make sure you are in the ADDI host
 :::
 
-Open Powershell and run to allow the ability to run scripts
+Open Powershell as administrator and run to allow the ability to run scripts
 ```tsx
 Set-ExecutionPolicy Unrestricted
 ```
+If you do not run as administrator the scope for the execution policy will be limited to that powershell session, and you will need to run this command every time you open a new powershell window. 
+
 
 Run system check script:
 ```tsx
-cd assets\papercuts\
+cd assets\papercuts\addi
 ```
 ```tsx
 .\system_check.ps1
