@@ -52,8 +52,7 @@ function Import-CertificateToKeystoreWithAlias {
         [string]$KeyStorePath,
         [string]$CertificatePath,
         [string]$Alias,
-        [string]$StorePass,
-        [string]$Fqdn
+        [string]$StorePass
     )
     Write-Host "Importing certificate to keystore with alias: $Alias"
 
