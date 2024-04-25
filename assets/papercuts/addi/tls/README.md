@@ -11,7 +11,7 @@ htpasswd -nbBC 10 addi_user p@ssw0rd
 addi_user:$2y$10$vAk2SLjHIU2x2dNuzwDxDuq6TwdnLK1XeO8OCzxNqXK3yv3ObYfIy
 ````
 
-Next, update the `tls/.env` file. Update each variable that has `<>` for the following `Username`, `AddiIP`, `RefactorIP`, and `MyHashPassword`
+Next, update the `tls/.env` file. Update each variable that has `<>` for the following `Username`, `AddiIP`, `RefactorIP`, `AddiFQDN`, `RefactorFQDN`, `DB2CertPath`, `MyHashPassword`
 ```bash
 KeyPass="password"
 KeyStorePath="C:\certificates\server_keystore.p12"
@@ -42,8 +42,8 @@ RefactorIP=223.456.789
 MyHashPassword="$2y$10$vAk2SLjHIU2x2dNuzwDxDuq6TwdnLK1XeO8OCzxNqXK3yv3ObYfIy"
 JreCaCertsPath="C:\Program Files\Eclipse Adoptium\jre-11.0.22.7-hotspot\lib\security\cacerts"
 DB2CertPath="C:\certificates\DigiCertGlobalRootCA.crt"
-AddiFQDN=<Your ADDI FQDN>
-RefactorFQDN=<Your Refactor FQDN>
+AddiFQDN="addi.cpdkh23yy.ibmworkshops.com"
+RefactorFQDN="refactor.cpdkh23yy.ibmworkshops.com"
 ```
 
 Then you can run the helper script `.\tls_certs_configuration.ps1` to generate the following files.
