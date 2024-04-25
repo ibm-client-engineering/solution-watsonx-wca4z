@@ -45,6 +45,11 @@ Expand-Archive -LiteralPath 'C:\Users\Administrator\Downloads\cics-genapp-main.z
 
 Let's create an INI project file in D:\
 
+Values should be as follows in our example.
+
+- DBServerName - this should be `BLUDB`. It is the db2 cloud database entry we created [here](/Prepare/cloud_databases#installingconfiguring-db2-client)
+- FQDN + port - should be retrieved from the returned JSON from [here](/Prepare/cloud_databases#creating-the-service-credentials). Our example cloud db2 url is `dbd5d8b8-61c3-49dc-9213-79a4104c27f6.c8l9ggsd0kmvoig3l8kg.databases.appdomain.cloud:31106`
+
 `project.ini`
 ```tsx
 [ADNewProj]
@@ -54,10 +59,11 @@ Environment = "zOS"
 ProjectLanguages = "DT Cobol,Assembler,Cobol,Natural,PL1,Ads"
 DBTypes = "Datacom,IDMS,Adabas,Relational,IMS/DB"
 MapTypes = "Natural (LNM),CICS (BMS), IMS TM (MFS),ADS Map"
-ProjectDBType = "SQL"
+ProjectDBType = "DB2_LUW"
 CCSEnvironment = "Default"
-DBServerName = "ADDI SQL [127.0.0.1:1433]"
-AttachToDB = "N"
+DBServerName = "BLUDB [dbd5d8b8-61c3-49dc-9213-79a4104c27f6.c8l9ggsd0kmvoig3l8kg.databases.appdomain.cloud:31106]"
+DBName = "BLUDB"
+AttachToDB = "Y"
 EnableCross = "N"
 ```
 
@@ -73,3 +79,4 @@ cd "C:\Program Files\IBM Application Discovery and Delivery Intelligence\IBM App
 .\IBMApplicationDiscoveryBuildClient.exe /np "D:\project.ini"
 
 ```
+
