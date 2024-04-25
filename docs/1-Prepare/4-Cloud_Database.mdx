@@ -284,3 +284,48 @@ Success.
 ```
 
 This will add the appropriate entries into ADDI.
+
+## IP Restrictions for DB2 on Cloud
+
+For security, it might be required to restrict IP addresses that can access the
+sensitive meta-data contained there. This can be done directly in DB2 on Cloud 
+through the adminstration console by updating the "Allowlist IPs".
+
+**Prerequisite**: The list of IP addresses or subnets for the environment where ADDI deployed are required.
+If ADDI is deployed to an on-prem environment you will need to work with the network team to get those
+values.
+
+1.	Logon to https://cloud.ibm.com/
+2.	Navigate to Resource List → Databases 
+3.	Select the DB2 on Cloud instance you want to modify
+4.	Click on Go To UI under Manage 
+5.	Click on Adminstration 
+6.	Click on Access restriction 
+7.	Scroll down to Allowlist IPs
+8.	Click on "Add IP +" button
+9.	The list below includes the production IP subnets for the WCA4Z service. Add
+each of the following as an Allowlisted IP address. This allows the WCA4Z service
+to access the DB2 instance.
+
+    :::note
+    (April 2024) These IP subnets are not currently published and are accurate as of the time of this documentation.
+    :::
+
+    ```
+    169.60.39.176/28 
+    169.60.36.32/27 
+    169.61.221.64/26 
+    169.61.134.0/27 
+    169.61.138.0/26 
+    169.61.14.48/28 
+    169.62.147.0/27 
+    52.117.255.0/26 
+    10.38.218.0/25 
+    10.93.43.64/26 
+    10.74.40.0/26 
+    10.241.100.128/25 
+    10.73.71.0/26
+    ```
+10.	You will also need to add IP addresses or subnets that include the ADDI server
+environment so that ADDI can access the DB2 instance to write the meta-data. Add
+those IP addresses or subnet in the same manner as you did above.
