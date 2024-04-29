@@ -1,0 +1,312 @@
+---
+id: guacamole
+sidebar_position: 9
+title: Guacamole
+custom_edit_url: null
+---
+
+### Create the main pod and setup the database
+
+#### Create the pod that all other containers will connect with:
+
+```
+podman pod create --name guac -p 8080:8080
+
+```
+#### Create the directories that will be used by guacamole containters:
+
+```
+# the directory the database container will scan for initialization scripts
+mkdir -p "guacamole-db/docker-entrypoint-initdb.d"
+mkdir -p "guacamole-db/data"
+
+```
+#### SELinux and Permissions
+
+Update SELeniux and Folder ownership:
+
+```
+chcon -t container_file_t -R $(pwd)/guacamole-db
+chown 27:27 -R $(pwd)/guacamole-db\
+```
+
+#### Database setup
+
+Create the SQL scripts that will be run by mariadb:
+
+```
+echo "CREATE USER 'tortilla'@'127.0.0.1' IDENTIFIED BY 'p@ssw0rd';" > guacamole-db/docker-entrypoint-initdb.d/01_initdb.sql
+echo "CREATE DATABASE bowl;" >> guacamole-db/docker-entrypoint-initdb.d/01_initdb.sql
+echo "GRANT ALL PRIVILEGES ON bowl.* TO 'tortilla'@'127.0.0.1';" >> guacamole-db/docker-entrypoint-initdb.d/01_initdb.sql
+echo "FLUSH privileges;" >> guacamole-db/docker-entrypoint-initdb.d/01_initdb.sql
+echo "USE bowl;" > guacamole-db/docker-entrypoint-initdb.d/02_initdb.sql
+podman run --rm docker.io/guacamole/guacamole /opt/guacamole/bin/initdb.sh --mysql >> guacamole-db/docker-entrypoint-initdb.d/02_initdb.sql
+```
+
+Change the permissions of scripts used by MariaDB:
+
+```
+chmod a+rx -R /root/guacamole-db/docker-entrypoint-initdb.d
+```
+#### Start the database
+
+Create the mariadb container:
+
+```
+podman run -d \
+--name=bowldatabase \
+--pod=guac \
+-e MARIADB_ROOT_PASSWORD=p@ssw0rd \
+-v $(pwd)/guacamole-db/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d \
+-v $(pwd)/guacamole-db/data:/var/lib/mysql \
+--restart unless-stopped docker.io/mariadb:latest
+```
+
+#### Start the guacamole service
+
+Create the guacd container:
+
+```
+podman run -d \
+--name=guacd \
+--pod=guac \
+--restart unless-stopped \
+-e GUACD_LOG_LEVEL=debug \
+docker.io/guacamole/guacd
+```
+
+#### Start the guacamole web service
+
+Create the guac-web container:
+
+```
+podman run -d \
+--name=guac-web \
+--pod=guac \
+-e MYSQL_HOSTNAME=127.0.0.1 \
+-e MYSQL_PORT=3306 \
+-e MYSQL_DATABASE=bowl \
+-e MYSQL_USER=tortilla \
+-e MYSQL_PASSWORD=p@ssw0rd \
+-e GUACD_HOSTNAME=127.0.0.1 \
+-e GUACD_PORT=4822 \
+-e WEBAPP_CONTEXT=ROOT \
+-e MYSQL_SSL_MODE=disabled \
+--restart unless-stopped \
+docker.io/guacamole/guacamole
+```
+
+### Create a reverse proxy with SSL
+
+#### Download nginx
+
+```
+yum install nginx -y
+```
+
+#### Generate the SSL files:
+
+```
+sudo mkdir /etc/ssl/private
+sudo chmod 700 /etc/ssl/private
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt
+```
+You will see a series of prompts that will ask the following:
+
+```
+Output
+Country Name (2 letter code) [XX]:US
+State or Province Name (full name) []:Example
+Locality Name (eg, city) [Default City]:Example 
+Organization Name (eg, company) [Default Company Ltd]:Example Inc
+Organizational Unit Name (eg, section) []:Example Dept
+Common Name (eg, your name or your server's hostname) []:your_domain_or_ip
+Email Address []:webmaster@example.com
+```
+
+Enter the information you prefer, for our testing we used the server's IP address for the Common Name.
+
+Now run the following, which will take up to 2 minutes to complete:
+
+```
+sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
+```
+
+### Configure NGINX
+#### Create SSL.conf
+
+Create ssl.conf that will be used by nginx:
+
+```
+vi /etc/nginx/conf.d/ssl.conf
+```
+
+And past the following, make sure to update the "HOSTNAME" and "LOCAL_ADDRESS" before saving:
+
+```
+
+server {
+    listen 8442;
+    listen [::]:8442;
+    server_name your_server_ip;
+    return 301 https://$host$request_uri;
+}
+server {
+    listen 8443 http2 ssl;
+    listen [::]:8443 http2 ssl;
+
+    server_name HOSTNAME; # May use a hostname or IP
+
+    ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+    ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+    ssl_dhparam /etc/ssl/certs/dhparam.pem;
+
+  location / {
+    proxy_pass http://LOCAL_ADDRESS:8080; # May use an internal IP or 127.0.0.1
+    proxy_buffering off;
+    proxy_http_version 1.1;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $http_connection;
+    access_log off;
+  }
+
+}
+```
+#### Update nginx.conf
+After saving SSL.conf, Comment out the following in /etc/nginx/nginx.conf
+
+```
+    server {
+        listen       80 default_server;
+        listen       [::]:80 default_server;
+        server_name  _;
+        root         /usr/share/nginx/html;
+
+        # Load configuration files for the default server block.
+        include /etc/nginx/default.d/*.conf;
+
+        location / {
+        }
+
+        error_page 404 /404.html;
+            location = /40x.html {
+        }
+
+
+        error_page 500 502 503 504 /50x.html;
+            location = /50x.html {
+        }
+    }
+
+```
+So that it looks like this:
+
+```
+#    server {
+#        listen       80 default_server;
+#        listen       [::]:80 default_server;
+#        server_name  _;
+#        root         /usr/share/nginx/html;
+#
+#        # Load configuration files for the default server block.
+#        include /etc/nginx/default.d/*.conf;
+#
+#        location / {
+#        }
+#
+#        error_page 404 /404.html;
+#            location = /40x.html {
+#        }
+#
+#
+#        error_page 500 502 503 504 /50x.html;
+#            location = /50x.html {
+#        }
+#    }
+#
+```
+
+#### Start and enable nginx
+
+```
+systemctl start nginx
+systemctl enable nginx
+```
+
+
+### Troubleshooting:
+
+#### Tortilla Users Permission (First Run)
+
+If there are any issues in the 'guac-web' logs related to Tortilla user permmissions, then do the following:
+
+Exec into the mariadb containter:
+```
+podman exec -it bowldatabase bash
+```
+Log into mariadb:
+
+```
+mariadb -u root -p
+```
+After entering your password, run the following commands:
+
+```
+source /docker-entrypoint-initdb.d/01_initdb.sql
+FLUSH PRIVILEGES;
+USE bowl;
+source /docker-entrypoint-initdb.d/02_initdb.sql
+show tables;
+quit; 
+exit
+```
+
+#### Tortilla Users Permission (After Guac has been running for awhile)
+
+Exec into the mariadb containter:
+
+```
+podman exec -it bowldatabase bash
+```
+
+Log into mariadb:
+
+```
+mariadb -u root -p
+```
+
+Update the password used by the tortilla user:
+
+```
+ALTER USER 'tortilla'@'127.0.0.1' IDENTIFIED BY 'P@ssw0rd';
+FLUSH PRIVILEGES;
+quit;
+exit
+```
+
+Stop the guac-web container:
+
+```
+podman container stop guac-web
+podman container rm guac-web
+```
+
+Create a new guac-web container with the updated password:
+
+```
+podman run -d \
+--name=guac-web \
+--pod=guac \
+-e MYSQL_HOSTNAME=127.0.0.1 \
+-e MYSQL_PORT=3306 \
+-e MYSQL_DATABASE=bowl \
+-e MYSQL_USER=tortilla \
+-e MYSQL_PASSWORD=P@ssw0rd \
+-e GUACD_HOSTNAME=127.0.0.1 \
+-e GUACD_PORT=4822 \
+-e WEBAPP_CONTEXT=ROOT \
+-e MYSQL_SSL_MODE=disabled \
+--restart unless-stopped \
+docker.io/guacamole/guacamole
+```
