@@ -19,6 +19,8 @@ podman pod create --name guac -p 8080:8080
 # the directory the database container will scan for initialization scripts
 mkdir -p "guacamole-db/docker-entrypoint-initdb.d"
 mkdir -p "guacamole-db/data"
+mkdir -p /root/guacamole-db/guac_share
+chmod 777 /root/guacamole-db/guac_share
 
 ```
 #### SELinux and Permissions
@@ -72,6 +74,7 @@ podman run -d \
 --pod=guac \
 --restart unless-stopped \
 -e GUACD_LOG_LEVEL=debug \
+-v /root/guacamole-db/guac_share:/share \
 docker.io/guacamole/guacd
 ```
 
@@ -83,6 +86,7 @@ Create the guac-web container:
 podman run -d \
 --name=guac-web \
 --pod=guac \
+-v /root/guacamole-db/guac_share:/share \
 -e MYSQL_HOSTNAME=127.0.0.1 \
 -e MYSQL_PORT=3306 \
 -e MYSQL_DATABASE=bowl \
@@ -298,6 +302,7 @@ Create a new guac-web container with the updated password:
 podman run -d \
 --name=guac-web \
 --pod=guac \
+-v /root/guacamole-db/guac_share:/share \
 -e MYSQL_HOSTNAME=127.0.0.1 \
 -e MYSQL_PORT=3306 \
 -e MYSQL_DATABASE=bowl \
