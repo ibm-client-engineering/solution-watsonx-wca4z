@@ -329,3 +329,31 @@ to access the DB2 instance.
 10.	You will also need to add IP addresses or subnets that include the ADDI server
 environment so that ADDI can access the DB2 instance to write the meta-data. Add
 those IP addresses or subnet in the same manner as you did above.
+
+## Clearing out the Database
+
+As of May 2024, the cloud database can only contain one project for transformation. If you want to 
+transform a new project, then the cloud database will need to be cleared out and reset.
+
+1. Log in to the DB2 on Cloud management UI and select Run SQL.
+
+2. Run the following SQL commands in sequence. It is recommended to run one at a time and let each one
+run to completion before running the next. In theory, they can be run as one unit but in practice some
+commands might fail and will need to be run again.
+
+    ```
+    CALL SYSPROC.ADMIN_DROP_SCHEMA('EZSCH', NULL, 'ERRORSCHEMA', 'ERRORTABLE');
+    drop schema ERRORSCHEMA RESTRICT;
+    drop tablespace TS_DATA;
+    drop tablespace TS_IDX;
+    ALTER TABLESPACE TS_TMP SWITCH ONLINE;
+    drop tablespace TS_TMP;
+    drop bufferpool BPTEMP32K;
+    drop bufferpool BPDATA32K;
+    drop bufferpool BPIDX32K;
+    ```
+
+3. Ensure that the EZSCH schema no longer exists.
+
+The next time that a new project is defined using the ADDI build client that targets the DB2 on Cloud server
+, the database schema will be rebuilt. This takes about 15 minutes.
