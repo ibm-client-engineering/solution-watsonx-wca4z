@@ -110,7 +110,7 @@ REFACTOR_NAME_OF_ZIP_FILE=IwCAfZRA_1.1.2_L_ML.zip
 
 Run the automation script
 ```sh
-./install_refactor.sh
+./refactor/install_refactor.sh
 ```
 
 ### Configure Certifcates (1 min)
@@ -130,5 +130,13 @@ Update the .env file with the appropriate values for the HOST_PORT and ENVIRONME
 
 Once Refactor Assistant has been installed successfully, configure the refactor host cert by running this script within the same directory:
 ```sh
-./configure_cert.sh
+./refactor/configure_cert.sh
+```
+
+### Install Gitlab (5 min)
+Update the .env file with the appropriate values.
+
+Then you can run
+```sh
+./gitlab/setup_gitlab.sh
 ```
