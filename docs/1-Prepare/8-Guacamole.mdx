@@ -18,6 +18,8 @@ podman pod create --name guac -p 8080:8080 -p 8443:8443
 # the directory the database container will scan for initialization scripts
 mkdir -p "guacamole-db/docker-entrypoint-initdb.d"
 mkdir -p "guacamole-db/data"
+mkdir -p /root/guacamole-db/guac_share
+chmod 777 /root/guacamole-db/guac_share
 
 ```
 #### SELinux and Permissions
@@ -71,6 +73,7 @@ podman run -d \
 --pod=guac \
 --restart unless-stopped \
 -e GUACD_LOG_LEVEL=debug \
+-v /root/guacamole-db/guac_share:/share \
 docker.io/guacamole/guacd
 ```
 
@@ -82,6 +85,7 @@ Create the guac-web container:
 podman run -d \
 --name=guac-web \
 --pod=guac \
+-v /root/guacamole-db/guac_share:/share \
 -e MYSQL_HOSTNAME=127.0.0.1 \
 -e MYSQL_PORT=3306 \
 -e MYSQL_DATABASE=bowl \
@@ -233,6 +237,53 @@ systemctl start nginx
 systemctl enable nginx
 ```
 
+### Adding Connections to Guacamole
+
+
+#### Add Linux Connection
+
+Go to the top right and click on username then select "Settings".
+Click on "Connections" and then click on "New Connection"
+Add a name
+Select a protocol
+Scroll down to "Authentication" and enter the username & Password
+Enable "SFTP"
+Click 'Save'
+
+#### Add a RDP Connection
+
+Go to the top right and click on username then select "Settings".
+Click on "Connections" and then click on "New Connection"
+Add a name
+Select a protocol
+Scroll down to "Authentication" and enter the username & Password
+Click "Save"
+
+#### Enable SFTP Sharing on a RDP Connection
+Connect to the Windows server using RDP or Guacamole
+Open "Apps & features"
+Click  "Manage optional features"
+Click "Add a feature"
+Scroll down and select "OpenSSH Server", then install it.
+Open "Windows Defender Firewall"
+Click "Advanced firewall settings"
+Click "Inbound Rules"
+Click "New Rule"
+A new window will open, click on "Port", then click "Next"
+Leave it on "Port" and then add "22" to "Specific Local Ports". 
+Click next twice.
+Select which profiles this rules apply to, we used "Domain" and "Private" and then click next.
+Add a name, and click "Finish"
+Go to "Services", scroll down to "OpenSSH Server", double click and select "Automatic" from the drop down, then select "Start". Press OK.
+
+Back on Guacemole:
+
+Go to the top right and click on your username then select "Settings".
+Click "Connection" and select the already existing RDP connection.
+Enable "SFTP"
+Set the port to "22"
+Add the username and password
+Click 'Save'
 
 ### Troubleshooting:
 
