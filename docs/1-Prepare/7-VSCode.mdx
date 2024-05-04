@@ -47,6 +47,76 @@ Install it to this following Path
 - Install language support for Java extension (already done)
 - While enabling WCAz, the `enter API key` didn't prompt as shown in the instructions, use `Ctrl+Shift+p` menu and search for API key and continue
 
+## Installing IBM z/OS Developer
+
+### Install the IBM Developer for z/OS client
+
+:::info
+
+The installation process is covered in more depth [here](https://www.ibm.com/docs/en/developer-for-zos/16.0?topic=zos-installing-client-by-using-p2)
+
+:::
+
+Open the following link in a browser
+
+https://ibm.github.io/mainframe-downloads/downloads.html
+
+Click on the eclipse tools
+
+![CleanShot 2024-05-03 at 18 09 42](https://media.github.ibm.com/user/20330/files/db753e6b-bbfa-4644-9935-e9099d53a9fa)
+
+Choose your products, select the check box beside IBM Developer for z/OS and click Select.
+Continue to follow the instructions in the wizard prompts to choose an Aqua version, the IBM Installation Manager installation client, and a starting point. 
+
+![CleanShot 2024-05-03 at 18 13 41](https://media.github.ibm.com/user/20330/files/4131908d-efad-49cf-8a77-bdaa4604643e)
+
+Select the latest Aqua version
+
+![CleanShot 2024-05-03 at 18 14 58](https://media.github.ibm.com/user/20330/files/17f21800-5abc-4cb9-81df-a593d95f42e8)
+
+Select the Eclipse P2 option
+
+![CleanShot 2024-05-03 at 18 56 39](https://media.github.ibm.com/user/20330/files/d3f21161-dbaf-47b4-a18e-7b13e562f33d)
+
+Assuming a fresh install, select `Starting from fresh`
+
+![CleanShot 2024-05-03 at 18 59 50](https://media.github.ibm.com/user/20330/files/8b7b540c-5ded-499a-a572-1bc49b35a8ba)
+
+Click the `Download 64-bit` button
+
+Make sure to agree to the license agreement.
+
+Extract and install. In our instance we created a directory in `C:\` called `IDZ` and extracted there.
+
+![CleanShot 2024-05-03 at 19 04 54](https://media.github.ibm.com/user/20330/files/fcdafcf9-64f7-45b3-9242-1ca7cff64663)
+
+This may take a little while...
+
+![CleanShot 2024-05-03 at 19 08 48](https://media.github.ibm.com/user/20330/files/0820a98d-c3aa-4328-b86b-36153dd82fa9)
+
+Once extracted, navigate to the extracted folder and double click the exe:
+
+![CleanShot 2024-05-03 at 19 57 00](https://media.github.ibm.com/user/20330/files/5bebfc5b-931d-46be-b700-8fd72040b24d)
+
+This will ask for a workspace directory. This tends to be user specific.
+
+![CleanShot 2024-05-03 at 19 57 55](https://media.github.ibm.com/user/20330/files/d53d83a5-fcfd-4838-9776-1017ffb7f76e)
+
+And we're up and running!
+
+![CleanShot 2024-05-03 at 20 01 10](https://media.github.ibm.com/user/20330/files/685195ca-6230-408d-910b-f1b35e0dd979)
+
+Pin the executable to the task bar.
+
+![CleanShot 2024-05-03 at 20 03 50](https://media.github.ibm.com/user/20330/files/f05e93e6-4eb5-47c6-ad76-a009a57ff974)
+
+Click on the ZIP download for IDX
+![CleanShot 2024-05-03 at 16 46 14](https://media.github.ibm.com/user/20330/files/ebdd88c5-ddf5-4328-a808-2d9b378d3d3f)
+
+![CleanShot 2024-05-03 at 16 53 24](https://media.github.ibm.com/user/20330/files/464d8a2b-47ca-4dcd-93c3-172ab66b3859)
+
+Make sure to agree to the license agreement.
+
 ## Troubleshooting
 
 - Problem: After IBM Z Open Editor extension installed, error shown on startup
@@ -56,3 +126,4 @@ Error: Failed to load Keytar module: libsecret-1.so.0: cannot open shared object
 - Resolution: Install libsecret libraries on Ubuntu and restart VSCode
 	- `sudo apt install libsecret-1-dev`
 	- restart VSCode
+
