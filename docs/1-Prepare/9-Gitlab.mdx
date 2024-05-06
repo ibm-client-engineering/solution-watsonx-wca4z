@@ -1,0 +1,119 @@
+---
+id: gitlab
+sidebar_position: 9
+title: GitLab
+custom_edit_url: null
+---
+
+# Installing GitLab to the Refactor Assistant Host
+
+## Running the script
+
+On the linux RA host, create the following script
+
+`startgitlab.sh`
+
+```bash
+#/bin/bash
+mkdir -p /gitlab/config /gitlab/logs /gitlab/data
+export CONFIG=/gitlab/config
+export LOGS=/gitlab/logs
+export DATA=/gitlab/data
+
+# Retrieve the IP address associated with addis.ibm.com from /etc/hosts
+#ip_addr=$(awk '/addis.ibm.com/{print $1; exit}' /etc/hosts)
+
+# Check if a container named gitlab already exists
+#    --hostname wca4z-pilot-gitlab.ibm.com \
+#    --add-host=wca4z-addi.ibm.com:$ip_addr \
+if ! podman container exists gitlab; then
+  # If the container does not exist, create and start a new one
+  podman container run \
+    --detach \
+    --publish 10880:80 --publish 10022:22 --publish 10443:443 \
+    --name gitlab \
+    --restart always \
+    --volume ${CONFIG}:/etc/gitlab \
+    --volume ${LOGS}:/var/log/gitlab \
+    --volume ${DATA}:/var/opt/gitlab \
+    --shm-size 256m \
+    gitlab/gitlab-ce:latest
+else
+  # If the container exists, stop and remove it before creating a new one
+  podman stop gitlab || true
+  podman rm gitlab || true
+  podman container run \
+    --detach \
+    --publish 10880:80 --publish 10022:22 --publish 10443:443 \
+    --name gitlab \
+    --restart always \
+    --volume ${CONFIG}:/etc/gitlab \
+    --volume ${LOGS}:/var/log/gitlab \
+    --volume ${DATA}:/var/opt/gitlab \
+    --shm-size 256m \
+    gitlab/gitlab-ce:latest
+fi
+```
+
+Mark the script as executable and run it
+
+```tsx
+chmod a+rx startgitlab.sh
+./startgitlab.sh
+```
+
+This will generate all the required directories for gitlab.
+
+## Retrieving the password and logging in
+
+Once the pod is up and online:
+
+```tsx
+podman ps | grep gitlab
+052cffb36b71  docker.io/gitlab/gitlab-ce:latest                /assets/wrapper       2 hours ago  Up 2 hours (healthy)  0.0.0.0:10022->22/tcp, 0.0.0.0:10443->443/tcp, 0.0.0.0:10880->80/tcp  gitlab
+```
+
+Retrieve the ip of the RA host. 
+
+```tsx
+ifconfig eth0
+
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.240.0.5  netmask 255.255.255.0  broadcast 10.240.0.255
+        inet6 fe80::2ff:fe7b:e259  prefixlen 64  scopeid 0x20<link>
+        ether 02:00:02:7b:e2:59  txqueuelen 1000  (Ethernet)
+        RX packets 4739001  bytes 11180085073 (10.4 GiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 5041538  bytes 768444867 (732.8 MiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+```
+
+Our ip for this RA host is `10.240.0.5`. Your mileage may differ.
+
+Navigate to gitlab's config directory
+
+```tsx
+cd /gitlab/config
+```
+
+Copy the `initial_root_password` file to your home directory for safe keeping. This assumes you are running these commands as `root`
+
+```tsx
+cp initial_root_password ~/
+```
+
+That `initial_root_password` file contains the root password to log into the gitlab instance.
+
+### Logging into GitLab
+
+From the windows ADDI host
+
+Open a browser and navigate to the RA host ip at port 10880
+
+![CleanShot 2024-05-03 at 20 15 33](https://media.github.ibm.com/user/20330/files/be30e0cf-f6f2-4de0-bbdb-f68e65a11389)
+
+User is `root` and the password is retrieved from the `initial_root_password` file from earlier.
+
+### Creating required repos
+
+TBD
