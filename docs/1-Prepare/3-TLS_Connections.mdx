@@ -51,8 +51,12 @@ Make sure that `D:\certificates` exists as this is where we will store these key
  
 It's best to use the FQDN of your ADDI host if you have one. Ours in this example is `wca4z2-winaddi.fyre.ibm.com`. However you can also just use the host ip address.
 
+:::note
+We are adding `-validity 3653` to the documented command to extend the certificate expiration to 10 years from the default of 90 days.
+:::
+
 ```powershell
-keytool -genkeypair -alias "wca4z2-winaddi.fyre.ibm.com" -keyalg RSA -keysize 2048 -dname "cn=wca4z2-winaddi.fyre.ibm.com" -keypass "p@ssw0rd" -keystore "D:\certificates\server_keystore.p12" -storepass "p@ssw0rd" -storetype PKCS12 -ext BasicConstraints:critical=ca:true -ext san=dns:wca4z2-winaddi.fyre.ibm.com
+keytool -genkeypair -alias "wca4z2-winaddi.fyre.ibm.com" -keyalg RSA -keysize 2048 -dname "cn=wca4z2-winaddi.fyre.ibm.com" -keypass "p@ssw0rd" -keystore "D:\certificates\server_keystore.p12" -storepass "p@ssw0rd" -validity 3653 -storetype PKCS12 -ext BasicConstraints:critical=ca:true -ext san=dns:wca4z2-winaddi.fyre.ibm.com
 ```
 
 Now we have a keystore sitting at `C:\Users\Administrator.WCA4Z-ADDI\server_keystore.p12`
