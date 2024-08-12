@@ -74,7 +74,7 @@ if [ ! -f "$ZIP_FILE_PATH" ]; then
   exit 1
 fi
 
-unzip "$ZIP_FILE_PATH" -d "$REFACTOR_INSTALL_PATH"
+unzip -o "$ZIP_FILE_PATH" -d "$REFACTOR_INSTALL_PATH"
 
 if [ $? -ne 0 ]; then
     echo "Unzipping refactoring assistant zip file failed."
