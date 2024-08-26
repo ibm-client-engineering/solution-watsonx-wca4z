@@ -30,6 +30,19 @@ jobs:
         local_dir: build
         on:
           branch: main
+    - stage: sync to public
+      if: type != pull_request
+      before_install:
+        - export GITHUB_PUB_URI=$(echo $GITHUB_PUBLIC | sed "s/\/github.com\//\/$PUBLIC_TOKEN\@github.com\//")
+        - export GITHUB_ENTERPRISE=$(echo $GITHUB_PUBLIC | sed "s/\/github.com\//\/$GITHUB_TOKEN\@github.ibm.com\//")
+        - git clone $GITHUB_ENTERPRISE /tmp/repo
+        - cd /tmp/repo
+        - git checkout $TEST_BRANCH
+      script:
+        - git remote set-url origin $GITHUB_PUB_URI
+#        - git push origin main --force
+        - git push origin $TEST_BRANCH --force
 
 stages:
   - build and deploy pages
+  - sync to public
