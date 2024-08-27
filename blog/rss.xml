@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+    <channel>
+        <title>IBM Client Engineering Blog</title>
+        <link>https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog</link>
+        <description>IBM Client Engineering Blog</description>
+        <lastBuildDate>Fri, 08 Mar 2024 00:00:00 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <language>en</language>
+        <item>
+            <title><![CDATA[Log 6  🛫]]></title>
+            <link>https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-6</link>
+            <guid>https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-6</guid>
+            <pubDate>Fri, 08 Mar 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[Flight Log of Co-Creation Activities]]></description>
+            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="objectives">Objectives<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-6#objectives" class="hash-link" aria-label="Direct link to Objectives" title="Direct link to Objectives">​</a></h2>
+<ul>
+<li><a href="https://ibm.monday.com/boards/6034898292/pulses/6034898945" target="_blank" rel="noopener noreferrer">Establish networking connectivity between on-prem infra and IBM Cloud</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="accomplishments">Accomplishments<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-6#accomplishments" class="hash-link" aria-label="Direct link to Accomplishments" title="Direct link to Accomplishments">​</a></h2>
+<ul>
+<li>Team walked through some of ADDI's functionality with the client</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="in-progress">In Progress<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-6#in-progress" class="hash-link" aria-label="Direct link to In Progress" title="Direct link to In Progress">​</a></h2>
+<ul>
+<li>L2 and L3 support are continuing to investigate the build client connecting to Db2.</li>
+<li>The team discussed JCL Diagrams within ADDI.</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="next-steps">Next Steps<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-6#next-steps" class="hash-link" aria-label="Direct link to Next Steps" title="Direct link to Next Steps">​</a></h2>
+<ul>
+<li>Troubleshoot build client connecting to Db2.</li>
+<li>Work to produce Job Callgraph from JCL.</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="tracking-issues">Tracking (Issues)<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-6#tracking-issues" class="hash-link" aria-label="Direct link to Tracking (Issues)" title="Direct link to Tracking (Issues)">​</a></h2>
+<ul>
+<li>Error occurred in build client connecting to Db2 on Cloud. Looking through the logs there was an error <em><code>An unexpected token "SELECT" was found following "SELECT * FROM "."</code></em>. Ticket TS015590124 was opened on this error.</li>
+<li>Programs were missing in the Job Callgraph. Ticket TS015590124 was opened on this.</li>
+</ul>
+<p><strong>Cases open: 3</strong></p>
+<ul>
+<li>Case TS015664878 - Unable to produce Job Callgraph for  JCL</li>
+<li>Case TS015590124 - Db2 error during build client project build</li>
+<li>Case TS015519419 - Refactor Assistant is throwing an intermittent error when attempting to slice</li>
+</ul>
+<p><strong>Cases closed: 3</strong></p>
+<ul>
+<li>Case TS015519060 - Graphs not populating in IBM Developer for Z</li>
+<li>Case TS015447064 - Unable to use the host name instead of IP address in client's Windows VM</li>
+<li>Case TS015362785</li>
+</ul>]]></content:encoded>
+            <category>log</category>
+            <category>sprint</category>
+        </item>
+        <item>
+            <title><![CDATA[Log 5 🛫]]></title>
+            <link>https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-5</link>
+            <guid>https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-5</guid>
+            <pubDate>Thu, 29 Feb 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[Flight Log of Co-Creation Activities]]></description>
+            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="objectives">Objectives<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-5#objectives" class="hash-link" aria-label="Direct link to Objectives" title="Direct link to Objectives">​</a></h2>
+<ul>
+<li><a href="https://ibm.monday.com/boards/6034898292/pulses/6034898945" target="_blank" rel="noopener noreferrer">Establish networking connectivity between on-prem infra and IBM Cloud</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="accomplishments">Accomplishments<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-5#accomplishments" class="hash-link" aria-label="Direct link to Accomplishments" title="Direct link to Accomplishments">​</a></h2>
+<ul>
+<li>Client's environment was able access Db2 on Cloud.</li>
+<li>Team showed Client how to delete a project in GenApp.</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="in-progress">In Progress<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-5#in-progress" class="hash-link" aria-label="Direct link to In Progress" title="Direct link to In Progress">​</a></h2>
+<ul>
+<li>Client is working to get Git setup within their VM to move forward with the GenApp transform.</li>
+<li>During this setup we encountered an error in build client connecting to Db2 on Cloud.</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="next-steps">Next Steps<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-5#next-steps" class="hash-link" aria-label="Direct link to Next Steps" title="Direct link to Next Steps">​</a></h2>
+<ul>
+<li>Continue to work with client to get GenApp prepared and test transforms</li>
+<li>Troubleshoot build client connecting to Db2</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="tracking-issues">Tracking (Issues)<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-5#tracking-issues" class="hash-link" aria-label="Direct link to Tracking (Issues)" title="Direct link to Tracking (Issues)">​</a></h2>
+<ul>
+<li>Error occurred in build client connecting to Db2 on Cloud. Looking through the logs there was an error <em><code>An unexpected token "SELECT" was found following "SELECT * FROM "."</code></em>. Ticket TS015590124 was opened on this error.</li>
+</ul>
+<p><strong>Cases open: 2</strong></p>
+<ul>
+<li>Case TS015590124 - Db2 error during build client project build</li>
+<li>Case TS015519419 - Refactor Assistant is throwing an intermittent error when attempting to slice</li>
+</ul>
+<p><strong>Cases closed: 3</strong></p>
+<ul>
+<li>Case TS015519060 - Graphs not populating in IBM Developer for Z</li>
+<li>Case TS015447064 - Unable to use the host name instead of IP address in client's Windows VM</li>
+<li>Case TS015362785</li>
+</ul>]]></content:encoded>
+            <category>log</category>
+            <category>sprint</category>
+        </item>
+        <item>
+            <title><![CDATA[Log 4 🛫]]></title>
+            <link>https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-4</link>
+            <guid>https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-4</guid>
+            <pubDate>Wed, 28 Feb 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[Flight Log of Co-Creation Activities]]></description>
+            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="objectives">Objectives<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-4#objectives" class="hash-link" aria-label="Direct link to Objectives" title="Direct link to Objectives">​</a></h2>
+<ul>
+<li>Get IDZ up and running in client's environment</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="accomplishments">Accomplishments<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-4#accomplishments" class="hash-link" aria-label="Direct link to Accomplishments" title="Direct link to Accomplishments">​</a></h2>
+<ul>
+<li>Setup java keystore within client's environment</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="work-in-progress">Work in Progress<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-4#work-in-progress" class="hash-link" aria-label="Direct link to Work in Progress" title="Direct link to Work in Progress">​</a></h2>
+<ul>
+<li>The team made contact with the client and they said that they think they have resolved things on their side that should allow outbound connectivity to the DB.</li>
+<li>Another one of the clients local machines was experiencing the same <code>Cannot connect Mainframe Projects service (URL is null)! Please check settings from CCS</code> error that we troubleshooted in a previous session</li>
+<li>After further conversation with the client, they discovered that the machine that was encountering this error had multiple Java versions and JAVA_HOME was not set. After setting the correct Java and clearing the cache they were able to see the list of projects in IDZ.</li>
+<li>The team is continuing to work with support to resolve Case TS015519419. Recent feedback on the ticket suggested collecting logs from Podman ad-core-server, refactoring-assistant, and refactoring-assistant-u if the client encounters this issue again.</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="currently-tracking">Currently Tracking<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-4#currently-tracking" class="hash-link" aria-label="Direct link to Currently Tracking" title="Direct link to Currently Tracking">​</a></h2>
+<ul>
+<li>
+<p>The team will work with the client in tomorrows working session to test and verify the outbound connectivity to the DB.</p>
+</li>
+<li>
+<p>Team will continue to work with support on the Refactor Assistant issue.</p>
+<ul>
+<li>This flight log is being submitted via PR "02/28/2024 Documentation"</li>
+</ul>
+</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="tracking">Tracking<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-4#tracking" class="hash-link" aria-label="Direct link to Tracking" title="Direct link to Tracking">​</a></h2>
+<p><strong>Cases open: 1</strong></p>
+<ul>
+<li>Case TS015519419 - Refactor Assistant is throwing an intermittent error when attempting to slice.</li>
+</ul>
+<p><strong>Cases closed: 3</strong></p>
+<ul>
+<li>Case TS015519060 - Graphs not populating in IBM Developer for Z</li>
+<li>Case TS015447064 - Unable to use the host name instead of IP address in client's Windows VM</li>
+<li>Case TS015362785</li>
+</ul>]]></content:encoded>
+            <category>log</category>
+            <category>sprint</category>
+        </item>
+        <item>
+            <title><![CDATA[Log 3 🛫]]></title>
+            <link>https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-3</link>
+            <guid>https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-3</guid>
+            <pubDate>Fri, 23 Feb 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[Flight Log of Co-Creation Activities]]></description>
+            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="objectives">Objectives<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-3#objectives" class="hash-link" aria-label="Direct link to Objectives" title="Direct link to Objectives">​</a></h2>
+<ul>
+<li>Get IDZ up and running in client's environment</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="accomplishments">Accomplishments<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-3#accomplishments" class="hash-link" aria-label="Direct link to Accomplishments" title="Direct link to Accomplishments">​</a></h2>
+<ul>
+<li>Team was was able to get graphs enabled within IDZ</li>
+<li>Setup client's local machines to work with IDZ</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="work-in-progress">Work in Progress<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-3#work-in-progress" class="hash-link" aria-label="Direct link to Work in Progress" title="Direct link to Work in Progress">​</a></h2>
+<ul>
+<li>The team had a trouble shooting session with the client (2/22/24). The focus of this session was to resolve the issue of graphs not populating in IBM Developer for Z (IDZ) and to resolve connecting from a client's local machine to IDZ.</li>
+<li>After some investigation, the team discovered that the port needed for the OrientDB connection was being used by another java process. Once that other java process was stopped and the graphDB service started, the graphs began to populate in the client's IDZ.</li>
+<li>Next the team moved to resolve connecting the client's local machine to IDZ. After some troubleshooting the team identified the issue was the keystore. IDZ has its own java environment and the issue was resolved by adding the keystore to the java environment being used by IDZ. Once the keystore was added the client was able to use IDZ from their local machine.</li>
+<li>The team had another session (2/23/24). There was an attempt to reproduce the splicing error, however the client was unable to reproduce it during this session. The team then conversed about the outbound connectivity to the firewall for accessing IBM DB Cloud DB2. The client said they expected this to be resolved by next Monday (2/26/24).</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="currently-tracking">Currently Tracking<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-3#currently-tracking" class="hash-link" aria-label="Direct link to Currently Tracking" title="Direct link to Currently Tracking">​</a></h2>
+<ul>
+<li>
+<p>The team will work with the client to setup the outbound connectivity to the firewall for accessing IBM DB Cloud DB2.</p>
+</li>
+<li>
+<p>Team will continue to work with support on the Refactor Assistant issue.</p>
+<ul>
+<li>This flight log is being submitted via PR "02/23/2024 Documentation"</li>
+</ul>
+</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="tracking">Tracking<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-3#tracking" class="hash-link" aria-label="Direct link to Tracking" title="Direct link to Tracking">​</a></h2>
+<p><strong>Cases open: 1</strong></p>
+<ul>
+<li>Case TS015519419 - Refactor Assistant is throwing an intermittent error when attempting to slice.</li>
+</ul>
+<p><strong>Cases closed: 3</strong></p>
+<ul>
+<li>Case TS015519060 - Graphs not populating in IBM Developer for Z</li>
+<li>Case TS015447064 - Unable to use the host name instead of IP address in client's Windows VM</li>
+<li>Case TS015362785</li>
+</ul>]]></content:encoded>
+            <category>log</category>
+            <category>sprint</category>
+        </item>
+        <item>
+            <title><![CDATA[Log 2 🛫]]></title>
+            <link>https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-2</link>
+            <guid>https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-2</guid>
+            <pubDate>Thu, 22 Feb 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[Flight Log of Co-Creation Activities]]></description>
+            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="objectives">Objectives<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-2#objectives" class="hash-link" aria-label="Direct link to Objectives" title="Direct link to Objectives">​</a></h2>
+<ul>
+<li>Get IDZ up and running in client's environment</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="accomplishments">Accomplishments<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-2#accomplishments" class="hash-link" aria-label="Direct link to Accomplishments" title="Direct link to Accomplishments">​</a></h2>
+<ul>
+<li>Team was able to launch IDZ within customer's environment.</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="work-in-progress">Work in Progress<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-2#work-in-progress" class="hash-link" aria-label="Direct link to Work in Progress" title="Direct link to Work in Progress">​</a></h2>
+<ul>
+<li>The team experienced an issue within IBM Developer for Z where some graphs were not appearing. The team had a troubleshooting session on this issue and has opened a ticket TS015519060.</li>
+<li>The customer was also encountering an issue with Refactor Assistant. The error was <code>Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is java.lang.NullPointerException] with root cause java.lang.NullPointerException: null</code>. The team opened ticket TS015519419 on this error.</li>
+<li>The team met with the client and had an app walkthrough session with the client.</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="currently-tracking">Currently Tracking<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-2#currently-tracking" class="hash-link" aria-label="Direct link to Currently Tracking" title="Direct link to Currently Tracking">​</a></h2>
+<ul>
+<li>
+<p>The team will work with the client to setup the outbound connectivity to the firewall for accessing IBM DB Cloud DB2.</p>
+</li>
+<li>
+<p>Team will continue to work with support on the graphs and Refactor Assistant issues.</p>
+<ul>
+<li>This flight log is being submitted via PR "02/22/2024 Documentation"</li>
+</ul>
+</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="tracking">Tracking<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-2#tracking" class="hash-link" aria-label="Direct link to Tracking" title="Direct link to Tracking">​</a></h2>
+<p><strong>Cases open: 2</strong></p>
+<ul>
+<li>Case TS015519060 - Graphs not populating in IBM Developer for Z</li>
+<li>Case TS015519419 - Refactor Assistant is throwing an intermittent error when attempting to slice.</li>
+</ul>
+<p><strong>Cases closed: 2</strong></p>
+<ul>
+<li>Case TS015447064 - Unable to use the host name instead of IP address in client's Windows VM</li>
+<li>Case TS015362785</li>
+</ul>]]></content:encoded>
+            <category>log</category>
+            <category>sprint</category>
+        </item>
+        <item>
+            <title><![CDATA[Log 1 🛫]]></title>
+            <link>https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-1</link>
+            <guid>https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-1</guid>
+            <pubDate>Tue, 20 Feb 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[Flight Log of Co-Creation Activities]]></description>
+            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="objectives">Objectives<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-1#objectives" class="hash-link" aria-label="Direct link to Objectives" title="Direct link to Objectives">​</a></h2>
+<ul>
+<li>Get IDZ up and running in client's environment</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="accomplishments">Accomplishments<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-1#accomplishments" class="hash-link" aria-label="Direct link to Accomplishments" title="Direct link to Accomplishments">​</a></h2>
+<ul>
+<li>Team resolved network errors within the client's environment</li>
+<li>Resolved pod errors within the clients environment</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="work-in-progress">Work in Progress<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-1#work-in-progress" class="hash-link" aria-label="Direct link to Work in Progress" title="Direct link to Work in Progress">​</a></h2>
+<ul>
+<li>The team experienced some difficulty using host names instead of IP addresses due to IT issues on client’s side.</li>
+<li>The problem stemmed from how the client was provisioning system was configured, which did not allow for the use of fully qualified domain names.</li>
+<li>The team opened ticket TS015447064. This issue was resolve by changing priority to IPv4 instead of IPv6.</li>
+<li>The client was having issues related to container management. The team explained using the <code>stop.sh --all</code> command ensures that all containers are stopped. And the client was able to restart pods with out issues.</li>
+<li>Inconsistencies and errors were observed in the client's environment, particularly regarding certificate errors.</li>
+<li>The team suspected that these issues were related to the network provisioning for client's systems.</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="currently-tracking">Currently Tracking<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-1#currently-tracking" class="hash-link" aria-label="Direct link to Currently Tracking" title="Direct link to Currently Tracking">​</a></h2>
+<ul>
+<li>
+<p>The team will work with the client to setup the outbound connectivity to the firewall for accessing IBM DB Cloud DB2.</p>
+<ul>
+<li>This flight log is being submitted via PR "02/20/2024 Documentation"</li>
+</ul>
+</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="tracking">Tracking<a href="https://ibm-client-engineering.github.io/solution-watsonx-wca4z/blog/flight-log-1#tracking" class="hash-link" aria-label="Direct link to Tracking" title="Direct link to Tracking">​</a></h2>
+<p><strong>Cases open: 0</strong></p>
+<p><strong>Cases closed: 2</strong></p>
+<ul>
+<li>
+<p>Case TS015447064 - Unable to use the host name instead of IP address in client's Windows VM</p>
+</li>
+<li>
+<p>Case TS015362785</p>
+</li>
+</ul>]]></content:encoded>
+            <category>log</category>
+            <category>sprint</category>
+        </item>
+    </channel>
+</rss>
