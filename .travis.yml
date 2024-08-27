@@ -37,11 +37,11 @@ jobs:
         - export GITHUB_ENTERPRISE=$(echo $GITHUB_PUBLIC | sed "s/\/github.com\//\/$GITHUB_TOKEN\@github.ibm.com\//")
         - git clone $GITHUB_ENTERPRISE /tmp/repo
         - cd /tmp/repo
-        - git checkout $TEST_BRANCH
+#        - git checkout $TEST_BRANCH
       script:
         - git remote set-url origin $GITHUB_PUB_URI
-#        - git push origin main --force
-        - git push origin $TEST_BRANCH --force
+        - git push origin main --force
+#        - git push origin $TEST_BRANCH --force
 
 stages:
   - build and deploy pages
