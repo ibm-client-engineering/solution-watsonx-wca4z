@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[8718],{4212:s=>{s.exports=JSON.parse('{"label":"log","permalink":"/solution-watsonx-wca4z/blog/tags/log","allTagsPath":"/solution-watsonx-wca4z/blog/tags","count":6,"unlisted":false}')}}]);
