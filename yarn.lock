@@ -5134,8 +5134,8 @@ jsonfile@^6.0.1:
     graceful-fs "^4.1.6"
 
 katex@^0.16.8:
-  version "0.16.9"
-  resolved "https://registry.npmjs.org/katex/-/katex-0.16.9.tgz"
+  version "0.16.11"
+  resolved "https://registry.yarnpkg.com/katex/-/katex-0.16.11.tgz#4bc84d5584f996abece5f01c6ad11304276a33f5"
   dependencies:
     commander "^8.3.0"
 
