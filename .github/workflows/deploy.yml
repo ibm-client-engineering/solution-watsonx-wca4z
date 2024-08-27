@@ -23,7 +23,10 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      - name: Build website
+      - name: Update Docusaurus
+        run: |
+          bash update_docusaurus_pub.sh ${{ vars.PUB_PAGES_URL }} ${{ github.repository }}
+      - name: Build websitle
         run: yarn build
 
       # Popular action to deploy to GitHub Pages:
